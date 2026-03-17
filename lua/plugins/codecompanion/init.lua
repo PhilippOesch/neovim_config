@@ -1,6 +1,3 @@
-local default_free_model = "gpt-5-mini"
-local default_premium_model = "claude-sonnet-4.5"
-
 local model_mapping = {
 	Copilot = {
 		default = "gpt-5-mini",
@@ -24,6 +21,22 @@ return {
 	lazy = true,
 	opts = {
 		log_level = "TRACE", -- TRACE|DEBUG|ERROR|INFO
+		mcp = {
+			servers = {
+				["tavily"] = {
+					cmd = { "npx", "-y", "tavily-mcp@latest" },
+					env = {
+						TAVILY_API_KEY = "TAVILY_API_KEY",
+					},
+				},
+				["context7"] = {
+					cmd = { "npx", "-y", "@upstash/context7-mcp" },
+					env = {
+						DEFAULT_MINIMUM_TOKENS = "10",
+					},
+				},
+			},
+		},
 		rules = {
 			default = {
 				description = "Collection of common files for all projects",
@@ -108,8 +121,8 @@ return {
 						},
 					},
 				},
-				adapter = "opencode",
-				-- adapter = { name = "copilot", model = default_free_model },
+				-- adapter = "opencode",
+				adapter = { name = "copilot", model = model_mapping['Copilot'].default },
 				opts = {
 					completion_provider = "blink",
 				},
