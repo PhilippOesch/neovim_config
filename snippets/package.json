@@ -1,0 +1,14 @@
+{
+  "name": "my-snipps",
+  "contributes": {
+    "snippets": [
+      {
+        "language": [
+          "cs",
+          "csharp"
+        ],
+        "path": "./csharp.json"
+      }
+    ]
+  }
+}

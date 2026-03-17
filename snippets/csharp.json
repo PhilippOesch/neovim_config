@@ -1,0 +1,47 @@
+{
+  "public interface": {
+    "prefix": "pin",
+    "body": ["${1:public} interface ${2:$TM_FILENAME_BASE}", "{", "\t$0", "}"],
+    "description": "snippet for public interface"
+  },
+  "public enum": {
+    "prefix": "pen",
+    "body": ["${1:public} enum ${2:$TM_FILENAME_BASE}", "{", "\t$0", "}"],
+    "description": "snippet for public enum"
+  },
+  "xml comment": {
+    "prefix": "<su",
+    "body": ["/// <summary>", "/// ${0}", "/// </summary>"],
+    "description": "snippet for creating xml comment."
+  },
+  "xml param": {
+    "prefix": "<pa",
+    "body": ["<param name=\"${1}\">${2:$1}</param>"],
+    "description": "snippet xml param"
+  },
+  "xml returns": {
+    "prefix": "<re",
+    "body": ["<returns>${1}</returns>"],
+    "description": "snippet xml returns"
+  },
+  "xml exception": {
+    "prefix": "<ex",
+    "body": ["<exception cref=\"${1:System.Exception}\">${2}</exception>"],
+    "description": "snippet xml exception"
+  },
+  "xml see": {
+    "prefix": "<see",
+    "body": ["<see cref=\"${1}\"/>"],
+    "description": "snippet xml see"
+  },
+  "xml remarks": {
+    "prefix": "<rem",
+    "body": ["<remarks>${1}</remarks>"],
+    "description": "snippet xml remarks"
+  },
+  "xml code": {
+    "prefix": "<co",
+    "body": ["<code>${1}</code>"],
+    "description": "snippet xml code"
+  }
+}
