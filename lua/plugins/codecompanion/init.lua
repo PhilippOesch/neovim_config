@@ -245,9 +245,6 @@ return {
 			i_got_to_have_my_tools = {
 				enabled = true,
 			},
-			prompts = {
-				enabled = true,
-			},
 		},
 	},
 	config = function(_, opts)
