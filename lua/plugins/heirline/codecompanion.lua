@@ -4,12 +4,22 @@ local utils = require("heirline.utils")
 local list_chats_available, list_chats = pcall(require, "codecompanion._extensions.list_chats")
 
 local Title = {
+	init = function(self)
+		self.title = (
+			(
+				codecompanion
+				and codecompanion.last_chat()
+				and codecompanion.last_chat().title
+				and codecompanion.last_chat().title ~= ""
+			) and codecompanion.last_chat().title
+		) or "✨CodeCompanion"
+	end,
 	condition = function()
 		return cc_available and vim.bo.filetype == "codecompanion"
 	end,
 	hl = { fg = "blue", bold = true, force = true },
 	provider = function(self)
-		return string.format("✨CodeCompanion")
+		return self.title
 	end,
 }
 
