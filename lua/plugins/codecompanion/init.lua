@@ -36,6 +36,9 @@ return {
 					},
 				},
 			},
+			opts = {
+				default_servers = { "context7" },
+			},
 		},
 		rules = {
 			default = {
@@ -122,7 +125,7 @@ return {
 					},
 				},
 				-- adapter = "opencode",
-				adapter = { name = "copilot", model = model_mapping['Copilot'].default },
+				adapter = { name = "copilot", model = model_mapping["Copilot"].default },
 				opts = {
 					completion_provider = "blink",
 				},
