@@ -46,7 +46,7 @@ return {
 					".goosehints",
 					".rules",
 					".windsurfrules",
-					"$XDG_CONFIG_HOME/.copilot/copilot-instructions.md",
+					"$XDG_CONFIG_HOME/AGENTS.md",
 					".github/copilot-instructions.md",
 					"AGENT.md",
 					"AGENTS.md",

@@ -174,6 +174,35 @@ local Adapter = {
 	},
 }
 
+local Mode = {
+	init = function(self)
+		local buf = vim.api.nvim_get_current_buf()
+		self.mode = _G.codecompanion_chat_metadata[buf].mode.name
+	end,
+	condition = function()
+		local buf = vim.api.nvim_get_current_buf()
+		return cc_available
+			and vim.bo.filetype == "codecompanion"
+			and codecompanion.last_chat()
+			and buf
+			and _G.codecompanion_chat_metadata
+			and _G.codecompanion_chat_metadata[buf]
+			and _G.codecompanion_chat_metadata[buf].mode
+			and _G.codecompanion_chat_metadata[buf].mode.name
+	end,
+	{
+		provider = "Mode: ",
+	},
+	{
+		provider = function(self)
+			return self.mode
+		end,
+		hl = {
+			fg = "cyan",
+		},
+	},
+}
+
 local Model = {
 	init = function(self)
 		local buf = vim.api.nvim_get_current_buf()
@@ -216,4 +245,5 @@ return {
 	Status = Status,
 	Billing = Billing,
 	Chat = Chat,
+	Mode = Mode,
 }

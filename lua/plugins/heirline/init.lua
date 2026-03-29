@@ -171,6 +171,8 @@ return {
 			Space,
 			codecompanion.Model,
 			Space,
+			codecompanion.Mode,
+			Space,
 			codecompanion.Billing,
 			Align,
 			codecompanion.Chat,
