@@ -238,7 +238,7 @@ return {
 			history = {
 				enabled = true,
 				opts = {
-					title_generation_opts = { adapter = "copilot", model = "gpt-4.1" },
+					title_generation_opts = { adapter = "copilot", model = model_mapping['Copilot'].default },
 				},
 			},
 			add_buffers = {
