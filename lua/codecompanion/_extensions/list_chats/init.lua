@@ -5,6 +5,31 @@ local config = require("codecompanion.config")
 ---@field exports? table Functions exposed via codecompanion.extensions.your_extension
 local Extension = {}
 
+---comment
+---@param title string|nil
+---@param max_length number
+---@return string
+local function truncateText(title, max_length)
+	if title ~= nil then
+		local title_str = tostring(title)
+		-- use vim.fn.strchars/strcharpart to handle multibyte characters if available
+		if vim and vim.fn and vim.fn.strchars then
+			if vim.fn.strchars(title_str) > max_length then
+				return vim.fn.strcharpart(title_str, 0, max_length) .. "…"
+			else
+				return title_str
+			end
+		else
+			if #title_str > max_length then
+				return title_str:sub(1, max_length) .. "…"
+			else
+				return title_str
+			end
+		end
+	end
+	return ""
+end
+
 local function open_chat_picker()
 	local ok, snacks = pcall(require, "snacks")
 
@@ -31,8 +56,12 @@ local function open_chat_picker()
 		:map(function(i, v)
 			local info = _G.codecompanion_chat_metadata[v]
 
+			local generate_title = require("codecompanion").buf_get_chat(v)
+				and require("codecompanion").buf_get_chat(v).title
+
 			return {
 				title = string.format("%d", v),
+				gen_title = truncateText(generate_title, 30),
 				text = string.format("%d %s %s %d", v, (info.adapter).name, (info.adapter).model, info.tokens),
 				buf = v,
 				index = i,
@@ -48,7 +77,7 @@ local function open_chat_picker()
 		format = function(item, _)
 			local formatted = {
 				{ item.index .. ". ", "Constant" },
-				{ "Buf: " .. item.title },
+				{ " " .. item.gen_title },
 				{ " - " },
 				{ item.adapter, "Special" },
 				{ " (" .. item.model .. ")", "Special" },

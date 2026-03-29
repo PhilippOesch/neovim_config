@@ -66,6 +66,27 @@ return {
 			},
 		},
 		interactions = {
+			background = {
+				adapter = {
+					name = "copilot",
+					model = "gpt-4.1",
+				},
+				chat = {
+					callbacks = {
+						["on_ready"] = {
+							actions = {
+								"interactions.background.builtin.chat_make_title",
+							},
+							-- Enable "on_ready" callback which contains the title generation action
+							enabled = true,
+						},
+					},
+					opts = {
+						-- Enable background interactions generally
+						enabled = true,
+					},
+				},
+			},
 			chat = {
 				tools = {
 					opts = {
@@ -196,13 +217,6 @@ return {
 						wrap = true,
 					},
 				},
-				---Customize how tokens are displayed
-				---@param tokens number
-				---@param adapter CodeCompanion.Adapter
-				---@return string
-				token_count = function(tokens, adapter)
-					return ""
-				end,
 			},
 			diff = {
 				enabled = true,
@@ -238,7 +252,7 @@ return {
 			history = {
 				enabled = true,
 				opts = {
-					title_generation_opts = { adapter = "copilot", model = model_mapping['Copilot'].default },
+					title_generation_opts = { adapter = "copilot", model = model_mapping["Copilot"].default },
 				},
 			},
 			add_buffers = {
