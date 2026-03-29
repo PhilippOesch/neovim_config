@@ -9,7 +9,7 @@ return {
 		-- Function to determine if a session should be saved
 		---@type fun(): boolean
 		should_save = function()
-			return true
+			return vim.bo.buftype ~= "terminal"
 		end,
 
 		save_dir = vim.fn.expand(vim.fn.stdpath("data") .. "/sessions/"), -- Directory where session files are saved
@@ -47,13 +47,17 @@ return {
 			pattern = "PersistedSavePre",
 			group = group,
 			callback = function()
-				local ok, codecompanion = pcall(require, "codecompanion")
+				local cc_available, codecompanion = pcall(require, "codecompanion")
 
-				if not ok then
-					return
+				if cc_available then
+					codecompanion.close_last_chat()
 				end
 
-				codecompanion.close_last_chat()
+				local opencode_available, opencode = pcall(require, "opencode")
+
+				if opencode_available then
+					opencode.stop()
+				end
 			end,
 		})
 	end,
