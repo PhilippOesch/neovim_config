@@ -66,7 +66,6 @@ return {
 			},
 		},
 		interactions = {
-			-- Change the default chat adapter
 			chat = {
 				tools = {
 					opts = {
@@ -197,7 +196,6 @@ return {
 						wrap = true,
 					},
 				},
-
 				---Customize how tokens are displayed
 				---@param tokens number
 				---@param adapter CodeCompanion.Adapter
