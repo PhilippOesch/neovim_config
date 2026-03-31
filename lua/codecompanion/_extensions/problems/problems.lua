@@ -2,7 +2,7 @@ local fmt = string.format
 local log = require("codecompanion.utils.log")
 
 ---@param args {min_diagnostic_level?: string, bufnr?: integer}
----@return nil|{ status: "success"|"error", data: string }
+---@return {status: "success"|"error", data: string}
 local function get_lsp_infos(args)
 	local min_diagnostic_level = "warn"
 	if args.min_diagnostic_level ~= nil and type(args.min_diagnostic_level) == "string" then
@@ -44,8 +44,7 @@ end
 local Problems = {
 	name = "problems",
 	cmds = {
-
-		---Execute the search commands
+		---Execute the file commands
 		---@param self CodeCompanion.Tools.Tool
 		---@param args table The arguments from the LLM's tool call
 		---@param input? any The output from the previous function call
@@ -58,7 +57,7 @@ local Problems = {
 		type = "function",
 		["function"] = {
 			name = "problems",
-			description = "Get potential issues detected by the language server",
+			description = "This is a tool for getting language server information about a specific buffer or the whole current project",
 			strict = true,
 			parameters = {
 				type = "object",

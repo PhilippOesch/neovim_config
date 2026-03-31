@@ -1,11 +1,25 @@
+---@alias Models table<string,string>
+
+local function capitalize(s)
+	if type(s) ~= "string" or s == "" then
+		return s
+	end
+	return s:sub(1, 1):upper() .. s:sub(2)
+end
+
+---@class DefaultModels
+---@field Copilot Models
+---@field OpenCode Models
 local model_mapping = {
 	Copilot = {
 		default = "gpt-5-mini",
 		premium = "claude-sonnet-4.5",
+		opus = "claude-opus-4.6",
 	},
 	OpenCode = {
 		default = "github-copilot/gpt-5-mini",
 		premium = "github-copilot/claude-sonnet-4.5",
+		opus = "github-copilot/claude-opus-4.6",
 	},
 }
 
@@ -130,7 +144,7 @@ return {
 						["research"] = {
 							description = "Researcher - for planning tasks",
 							tools = {
-								"context7",
+								"mcp:context7",
 								"fetch_webpage",
 								"tavily",
 								"file_search",
@@ -168,13 +182,27 @@ return {
 					show_presets = false,
 					show_model_choices = true, -- Show model choices when changing adapter
 				},
-				copilot = "copilot",
+				copilot = function()
+					return require("codecompanion.adapters").extend("copilot", {
+						schema = {
+							model = {
+								default = model_mapping["Copilot"].default,
+							},
+						},
+					})
+				end,
 			},
 			acp = {
 				opts = {
 					show_presets = false,
 				},
-				opencode = "opencode",
+				opencode = function()
+					return require("codecompanion.adapters").extend("opencode", {
+						defaults = {
+							model = model_mapping["OpenCode"].default,
+						},
+					})
+				end,
 			},
 		},
 		display = {
@@ -301,15 +329,56 @@ return {
 			desc = "Generate Commit Message",
 		})
 
-		vim.keymap.set({ "n" }, "<leader>im", function()
-			local bufnr = vim.api.nvim_get_current_buf()
-			local adapter_models = model_mapping[_G.codecompanion_chat_metadata[bufnr].adapter.name]
-			local current_model = _G.codecompanion_chat_metadata[bufnr].adapter.model
-			if current_model == adapter_models.premium then
-				codecompanion.last_chat():change_model({ model = adapter_models.default })
-			else
-				codecompanion.last_chat():change_model({ model = adapter_models.premium })
+		vim.keymap.set({ "n" }, "<leader>is", function()
+			local chat = codecompanion.last_chat()
+
+			if not chat then
+				return
 			end
+
+			---@type Models
+			local current_adapter = _G.codecompanion_chat_metadata[chat.bufnr].adapter.name
+
+			local new_adapter = "Opencode"
+			--
+			if current_adapter == "OpenCode" then
+				new_adapter = "Copilot"
+			end
+			--
+			chat:change_adapter(string.lower(new_adapter))
+			vim.notify(string.format('Adapter changed to: %s', new_adapter), vim.log.levels.INFO)
+		end, {
+			noremap = true,
+			desc = "Switch between adapters",
+		})
+
+		vim.keymap.set({ "n" }, "<leader>im", function()
+			local chat = codecompanion.last_chat()
+
+			if not chat then
+				return
+			end
+
+			---@type Models
+			local adapter_models = model_mapping[_G.codecompanion_chat_metadata[chat.bufnr].adapter.name]
+			--
+			local items = vim.iter(pairs(adapter_models))
+				:map(function(k, v)
+					return { type = k, name = v }
+				end)
+				:totable()
+			--
+			vim.ui.select(items, {
+				prompt = "Select Model from favorites",
+				format_item = function(item)
+					return string.format("%s - %s", item.type, item.name)
+				end,
+			}, function(item, _)
+				if not item then
+					return
+				end
+				chat:change_model({ model = item.name })
+			end)
 		end, {
 			noremap = true,
 			desc = "Toggle between free an premium model",
