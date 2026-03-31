@@ -260,7 +260,7 @@ return {
 					excluded_filetypes = { "codecompanion", "oil" },
 				},
 			},
-			background = {
+			background_color = {
 				enabled = true,
 			},
 			fidget_spinner = {
@@ -269,7 +269,7 @@ return {
 			list_chats = {
 				enabled = true,
 			},
-			i_got_to_have_my_tools = {
+			problems = {
 				enabled = true,
 			},
 		},
