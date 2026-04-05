@@ -1,6 +1,2 @@
-  return {
-    "nvim-tree/nvim-web-devicons",
-    config = function(_, opts)
-      require("nvim-web-devicons").setup(opts)
-    end,
-  }
+vim.pack.add({ "https://github.com/nvim-tree/nvim-web-devicons" }, { confirm = false })
+require("nvim-web-devicons").setup({})

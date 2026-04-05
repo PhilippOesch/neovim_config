@@ -72,7 +72,7 @@ vim.opt.cursorline = true
 --
 vim.o.laststatus = 3
 
-vim.cmd.colorscheme("tokyonight")
+-- vim.cmd.colorscheme("tokyonight")
 vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "red" })
 
 vim.g.netrw_sort_options = "i"

@@ -7,26 +7,37 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- [[ Install `lazy.nvim` plugin manager ]]
-vim.pack.add({ "https://github.com/folke/lazy.nvim" })
-
-require("lazy").setup({
-	-- Git related plugins
-	"tpope/vim-fugitive",
-	"tpope/vim-rhubarb",
-	"tpope/vim-sleuth",
-	-- plugins
-	-- { import = "plugins.color_themes" },
-	{ import = "plugins" },
-}, {
-	change_detection = {
-		notify = false,
-	},
+vim.api.nvim_create_autocmd("PackChanged", {
+	callback = function(ev)
+		if name == "blink.cmp" and kind == "install" then
+			if not ev.data.active then
+				vim.cmd.packadd("blink.cmp")
+			end
+			vim.cmd("BlinkCmp build")
+		end
+	end,
 })
 
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
+vim.pack.add({
+	"https://github.com/tpope/vim-fugitive",
+	"https://github.com/tpope/vim-rhubarb",
+	"https://github.com/tpope/vim-sleuth",
+	"https://github.com/nvim-lua/plenary.nvim",
+}, { confirm = false })
 
+require("config.theme")
 require("config.general")
 require("config.keymaps")
+
+-- Plugins
+require("plugins.blink_cmp")
+require("plugins.lsp.init")
+require("plugins.treesitter")
+require("plugins.whichkey")
+require("plugins.oil")
+require("plugins.autopairs")
+require("plugins.snacks")
+require("plugins.webdev_icons")
+require("plugins.todo_comment")
+require("plugins.surround")
+require("plugins.smear_nvim")

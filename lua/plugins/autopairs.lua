@@ -1,8 +1,4 @@
-return {
-	"windwp/nvim-autopairs",
-	-- Optional dependency
-	-- dependencies = { "hrsh7th/nvim-cmp" },
-	opts = {
-		disable_filetype = { "TelescopePrompt", "spectre_panel", "snacks_picker_input", "codecompanion" },
-	},
-}
+vim.pack.add({ "https://github.com/windwp/nvim-autopairs" }, { confirm = false })
+require("nvim-autopairs").setup({
+	disable_filetype = { "TelescopePrompt", "spectre_panel", "snacks_picker_input", "codecompanion" },
+})

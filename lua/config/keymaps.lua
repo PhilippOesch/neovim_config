@@ -1,6 +1,5 @@
 local map = vim.keymap.set
 
-
 map({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
 map({ "t" }, "<Esc>", "<C-\\><C-n> ", { silent = true })
@@ -55,7 +54,8 @@ map("n", "gx", [[:execute '!open ' . shellescape(expand('<cfile>'), 1)<CR>]], op
 map("x", "p", "P", { silent = true })
 map("x", "P", "p", { silent = true })
 
-local oil = require("oil")
+local ok, oil = pcall(require, 'oil')
+
 
 local function getBufFileType()
 	local bufnr = vim.api.nvim_get_current_buf()
