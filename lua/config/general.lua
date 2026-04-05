@@ -77,4 +77,6 @@ vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "red" })
 
 vim.g.netrw_sort_options = "i"
 
+vim.cmd("packadd nvim.undotree")
+
 -- for some reason shellslash is being reset to true

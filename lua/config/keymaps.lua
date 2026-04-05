@@ -104,3 +104,4 @@ map("n", "<leader>cf", insertFullPath, { noremap = true, desc = "Copy full file 
 map("n", "<leader>cs", insertFileName, { noremap = true, desc = "Copy file name" })
 map("n", "<leader>cd", insertPwd, { noremap = true, desc = "Copy current working directory to clipboard." })
 map("n", "<leader>cp", insertCwdPath, { noremap = true, desc = "Copy filepath relative to current working directory" })
+map("n", "<leader>u", require("undotree").open, {noremap = true, desc = 'undootree'})
