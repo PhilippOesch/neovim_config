@@ -7,6 +7,8 @@ vim.pack.add({
 	},
 }, { confirm = false })
 
+require("nvim-treesitter").setup({})
+
 local ensureInstalled = {
 	"c",
 	"cpp",
@@ -42,6 +44,7 @@ else
 	local msg = "`tree-sitter-cli` not found. Skipping auto-install of parsers."
 	vim.notify(msg, vim.log.levels.WARN, { title = "Treesitter" })
 end
+
 require("nvim-treesitter").update()
 
 -- auto-start highlights & indentation
