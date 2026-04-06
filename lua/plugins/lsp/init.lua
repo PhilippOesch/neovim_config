@@ -1,31 +1,30 @@
-return {
-	-- LSP Configuration & Plugins
-	"neovim/nvim-lspconfig",
-	dependencies = {
-		-- Automatically install LSPs to stdpath for neovim
-		{
-			"williamboman/mason.nvim",
-			config = true,
-			dependencies = {
-				"WhoIsSethDaniel/mason-tool-installer.nvim",
-			},
-			"saghen/blink.cmp",
-		},
-		"williamboman/mason-lspconfig.nvim",
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-		{ "j-hui/fidget.nvim", opts = {} },
-		{ import = "plugins.lsp.libs" },
-	},
-	config = function()
-		local lspHelpers = require("plugins.lsp.utils")
-		vim.api.nvim_create_autocmd("LspAttach", {
-			group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
+-- return {
+-- 	-- LSP Configuration & Plugins
+vim.pack.add({
+	"https://github.com/neovim/nvim-lspconfig",
+	"https://github.com/williamboman/mason.nvim",
+	"https://github.com/williamboman/mason-lspconfig.nvim",
+	"https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim",
+}, { confirm = false })
 
-			callback = function(event)
-				lspHelpers.on_attach(event)
-			end,
-		})
+local lspHelpers = require("plugins.lsp.utils")
 
-		require("plugins.lsp.setup.mason")
+-- require("plugins.lsp.libs.typescript-tools")
+
+--other lsps:
+vim.pack.add({
+	"https://github.com/folke/lazydev.nvim",
+	"https://github.com/ionide/Ionide-vim",
+	"https://github.com/seblj/roslyn.nvim",
+	"https://github.com/mfussenegger/nvim-jdtls",
+}, {confirm = false})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
+
+	callback = function(event)
+		lspHelpers.on_attach(event)
 	end,
-}
+})
+
+require("plugins.lsp.setup.mason")

@@ -7,26 +7,89 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- [[ Install `lazy.nvim` plugin manager ]]
-vim.pack.add({ "https://github.com/folke/lazy.nvim" })
-
-require("lazy").setup({
-	-- Git related plugins
-	"tpope/vim-fugitive",
-	"tpope/vim-rhubarb",
-	"tpope/vim-sleuth",
-	-- plugins
-	-- { import = "plugins.color_themes" },
-	{ import = "plugins" },
-}, {
-	change_detection = {
-		notify = false,
+local build_scripts = {
+	["blink.cmp"] = {
+		kind = { "install", "update" },
+		callback = function(ev) end,
 	},
+	["strudel.nvim"] = {
+		kind = { "install", "update" },
+		callback = function(ev)
+			vim.fn.system("cd " .. ev.data.path .. " && npm ci")
+		end,
+	},
+	["nvim-treesitter"] = {
+		kind = { "install", "update" },
+		callback = function(ev)
+			if not ev.data.active then
+				vim.cmd.packadd("nvim-treesitter")
+			end
+			vim.cmd("TSUpdate")
+		end,
+	},
+	["markdown-preview.nvim"] = {
+		kind = { "install", "update" },
+		callback = function(ev)
+			vim.fn.system("cd " .. ev.data.path .. " && cd app && yarn install")
+		end,
+	},
+	["vscode-js-debug"] = {
+		kind = { "install", "update" },
+		callback = function(ev)
+			vim.fn.system("cd " .. ev.data.path .. " && npm i && npm run compile vsDebugServerBundle && mv dist out")
+		end,
+	},
+}
+
+vim.api.nvim_create_autocmd("PackChanged", {
+	callback = function(ev)
+		local script = build_scripts[ev.data.spec.name]
+		vim.print("script", ev, script)
+		if script and vim.tbl_contains(script.kind, ev.data.kind) then
+			script.callback(ev)
+		end
+	end,
 })
 
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
+-- essential
+vim.pack.add({
+	"https://github.com/tpope/vim-fugitive",
+	"https://github.com/tpope/vim-rhubarb",
+	"https://github.com/tpope/vim-sleuth",
+	"https://github.com/nvim-lua/plenary.nvim",
+}, { confirm = false })
 
+require("config.theme")
 require("config.general")
 require("config.keymaps")
+
+-- Plugins
+require("plugins.blink_cmp")
+require("plugins.lsp.init")
+require("plugins.treesitter")
+require("plugins.whichkey")
+require("plugins.oil")
+require("plugins.autopairs")
+require("plugins.snacks")
+require("plugins.webdev_icons")
+require("plugins.todo_comment")
+require("plugins.surround")
+require("plugins.smear_nvim")
+require("plugins.comment")
+require("plugins.obsidian_nvim")
+require("plugins.conform")
+require("plugins.dadbod")
+require("plugins.diff")
+require("plugins.dooing")
+require("plugins.harpoon")
+require("plugins.gitsigns")
+require("plugins.kulala")
+require("plugins.navic")
+require("plugins.markdown_preview")
+require("plugins.markdown_render")
+require("plugins.strudel")
+require("plugins.neotest")
+require("plugins.dap.init")
+require("plugins.codecompanion.init")
+require("plugins.heirline.init")
+require("plugins.persisted_nvim")
