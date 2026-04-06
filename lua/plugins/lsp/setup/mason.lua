@@ -81,6 +81,7 @@ local other_tools = {
 	"vale",
 	"java-test",
 	"golangci-lint",
+	"tree-sitter-cli",
 }
 ensure_tools_installed = vim.list_extend(ensure_tools_installed, other_tools)
 local formatters = {
