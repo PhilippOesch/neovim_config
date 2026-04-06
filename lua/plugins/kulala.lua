@@ -5,4 +5,3 @@ local opts = {
 	kulala_keymaps_prefix = "",
 }
 require("kulala").setup(opts)
-
