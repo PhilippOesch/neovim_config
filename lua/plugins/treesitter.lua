@@ -7,6 +7,8 @@ vim.pack.add({
 	},
 }, { confirm = false })
 
+vim.cmd.packadd("nvim-treesitter")
+
 require("nvim-treesitter").setup({})
 
 local ensureInstalled = {
