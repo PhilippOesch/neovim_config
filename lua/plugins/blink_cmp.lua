@@ -1,5 +1,5 @@
 vim.pack.add({
-	"https://github.com/saghen/blink.cmp",
+	{ src = "https://github.com/saghen/blink.cmp", version = "v1.10.2" },
 	"https://github.com/L3MON4D3/LuaSnip",
 	"https://github.com/rafamadriz/friendly-snippets",
 }, { confirm = false })

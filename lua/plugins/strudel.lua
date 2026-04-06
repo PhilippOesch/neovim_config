@@ -24,32 +24,28 @@ local function setup_strudel_keybinds()
 	map("n", "<leader>sx", strudel.execute, "Strudel set current buffer and update", icon)
 end
 
-return {
-	"gruvw/strudel.nvim",
-	build = "npm ci",
-	config = function()
-		require("strudel").setup({
-			update_on_save = true,
-		})
-		vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-			pattern = "*.str",
-			callback = function()
-				-- when opened buffer anew
-				setup_strudel_keybinds()
-			end,
-		})
-		local group = vim.api.nvim_create_augroup("PersistedHooks", {})
-		vim.api.nvim_create_autocmd({ "User" }, {
-			pattern = "PersistedLoadPost",
-			group = group,
-			callback = function(args)
-				-- when loading session
-				local name = vim.api.nvim_buf_get_name(args.buf)
+vim.pack.add({ "https://github.com/gruvw/strudel.nvim" }, { confirm = false })
 
-				if string.match(name, "%.str$") then
-					setup_strudel_keybinds()
-				end
-			end,
-		})
+require("strudel").setup({
+	update_on_save = true,
+})
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+	pattern = "*.str",
+	callback = function()
+		-- when opened buffer anew
+		setup_strudel_keybinds()
 	end,
-}
+})
+local group = vim.api.nvim_create_augroup("PersistedHooks", {})
+vim.api.nvim_create_autocmd({ "User" }, {
+	pattern = "PersistedLoadPost",
+	group = group,
+	callback = function(args)
+		-- when loading session
+		local name = vim.api.nvim_buf_get_name(args.buf)
+
+		if string.match(name, "%.str$") then
+			setup_strudel_keybinds()
+		end
+	end,
+})

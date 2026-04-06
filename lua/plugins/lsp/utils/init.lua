@@ -55,6 +55,23 @@ function M.client_supports_method(client, method, bufnr)
 	end
 end
 
+
+local function join(...)
+  return table.concat({...}, "/")
+end
+
+---get the path for a plugin
+---@param name name of the plugin
+---@return string
+function M.get_plugin_path(name)
+	local data = vim.fn.stdpath("data")
+	local opt = join(data, "site", "pack", "core", "opt", name)
+	if vim.fn.isdirectory(opt) == 1 then
+		return opt
+	end
+	return nil, ("plugin %s not found in pack/core (opt|start)"):format(name)
+end
+
 M.get_client_by_name = function(client_name)
 	for _, client in ipairs(vim.lsp.get_clients()) do
 		if client.name == client_name then

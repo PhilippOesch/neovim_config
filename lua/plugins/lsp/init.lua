@@ -5,11 +5,11 @@ vim.pack.add({
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/williamboman/mason-lspconfig.nvim",
 	"https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim",
-})
+}, { confirm = false })
 
 local lspHelpers = require("plugins.lsp.utils")
 
-require("plugins.lsp.libs.typescript-tools")
+-- require("plugins.lsp.libs.typescript-tools")
 
 --other lsps:
 vim.pack.add({
