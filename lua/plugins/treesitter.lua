@@ -9,7 +9,9 @@ vim.pack.add({
 
 vim.cmd.packadd("nvim-treesitter")
 
-require("nvim-treesitter").setup({})
+local treesitter = require('nvim-treesitter')
+
+treesitter.setup({})
 
 local ensureInstalled = {
 	"c",
@@ -47,7 +49,7 @@ else
 	vim.notify(msg, vim.log.levels.WARN, { title = "Treesitter" })
 end
 
-require("nvim-treesitter").update()
+-- require("nvim-treesitter").update()
 
 -- auto-start highlights & indentation
 vim.api.nvim_create_autocmd("FileType", {
