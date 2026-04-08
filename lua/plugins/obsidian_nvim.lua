@@ -1,5 +1,3 @@
-vim.pack.add({ "https://github.com/obsidian-nvim/obsidian.nvim" }, { confirm = false })
-
 local obsidian_opts = {
 	workspaces = {
 		{

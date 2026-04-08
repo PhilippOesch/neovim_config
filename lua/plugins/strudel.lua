@@ -24,8 +24,6 @@ local function setup_strudel_keybinds()
 	map("n", "<leader>sx", strudel.execute, "Strudel set current buffer and update", icon)
 end
 
-vim.pack.add({ "https://github.com/gruvw/strudel.nvim" }, { confirm = false })
-
 require("strudel").setup({
 	update_on_save = true,
 })

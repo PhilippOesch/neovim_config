@@ -1,5 +1,3 @@
-vim.pack.add({ "https://github.com/rebelot/heirline.nvim" }, { confirm = false })
-
 local conditions = require("heirline.conditions")
 local utils = require("heirline.utils")
 
@@ -212,6 +210,9 @@ local DefaultStatusLine = {
 local oil = require("plugins.heirline.oil")
 
 local WinBars = {
+	condition = function()
+		return vim.bo and vim.bo.filetype
+	end,
 	init = function(self)
 		self.filetype = vim.bo.filetype
 	end,
@@ -264,6 +265,9 @@ require("heirline").setup({
 	opts = {
 		colors = setup_colors(),
 		disable_winbar_cb = function(args)
+			if not vim.bo then
+				return true
+			end
 			local buf = args.buf
 			local buftype = vim.tbl_contains({ "prompt", "nofile", "help" }, vim.bo.buftype)
 			local filetype =

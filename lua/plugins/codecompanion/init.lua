@@ -23,15 +23,6 @@ local model_mapping = {
 	},
 }
 
-vim.pack.add({
-	"https://github.com/olimorris/codecompanion.nvim",
-	"https://github.com/nvim-lua/plenary.nvim",
-	"https://github.com/nvim-treesitter/nvim-treesitter",
-	"https://github.com/ravitemer/codecompanion-history.nvim",
-	"https://github.com/zbirenbaum/copilot.lua",
-	"https://github.com/j-hui/fidget.nvim",
-}, { confirm = false })
-
 local opts = {
 	log_level = "TRACE", -- TRACE|DEBUG|ERROR|INFO
 	mcp = {

@@ -1,9 +1,3 @@
-vim.pack.add({ "https://github.com/folke/snacks.nvim" }, { confirm = false })
--- return {
--- 	"folke/snacks.nvim",
--- 	priority = 1000,
--- 	lazy = false,
--- 	---@type snacks.Config
 local opts = {
 	bigfile = { enabled = true },
 	dashboard = { enabled = false },

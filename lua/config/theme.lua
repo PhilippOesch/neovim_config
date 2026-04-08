@@ -1,5 +1,3 @@
-vim.pack.add({ "https://github.com/folke/tokyonight.nvim" }, { confirm = false })
-
 local tokyonight = require("tokyonight")
 
 local opts = {

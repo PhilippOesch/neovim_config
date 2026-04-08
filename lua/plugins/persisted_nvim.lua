@@ -1,5 +1,3 @@
--- return {
-vim.pack.add({ "https://github.com/olimorris/persisted.nvim" }, { confirm = false })
 local opts = {
 
 	autostart = true, -- Automatically start the plugin on load?

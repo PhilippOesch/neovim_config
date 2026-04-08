@@ -1,4 +1,3 @@
-vim.pack.add({ "https://github.com/MeanderingProgrammer/render-markdown.nvim" }, { confirm = false })
 local opts = {
 	heading = {
 		-- sign = false,

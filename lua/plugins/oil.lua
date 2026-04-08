@@ -1,8 +1,3 @@
-vim.pack.add({
-	"https://github.com/stevearc/oil.nvim",
-	"https://github.com/refractalize/oil-git-status.nvim",
-}, { confirm = false })
---
 require("oil").setup({
 	default_file_explorer = false,
 	keymaps = {

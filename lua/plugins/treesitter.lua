@@ -1,14 +1,3 @@
-vim.pack.add({
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
-	"https://github.com/nvim-treesitter/nvim-treesitter-context",
-	{
-		src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
-		version = "main",
-	},
-}, { confirm = false })
-
-vim.cmd.packadd("nvim-treesitter")
-
 local ensureInstalled = {
 	"c",
 	"cpp",

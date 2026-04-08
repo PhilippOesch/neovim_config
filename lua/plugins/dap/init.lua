@@ -1,14 +1,3 @@
-vim.pack.add({
-	"https://github.com/mfussenegger/nvim-dap",
-	"https://github.com/rcarriga/nvim-dap-ui",
-
-	"https://github.com/leoluz/nvim-dap-go",
-	"https://github.com/jay-babu/mason-nvim-dap.nvim",
-
-	{ src = "https://github.com/microsoft/vscode-js-debug", version = "v1.112.0" },
-	"https://github.com/theHamsta/nvim-dap-virtual-text",
-}, { confirm = false })
-
 local dap = require("dap")
 local dapui = require("dapui")
 local utils = require("utils")

@@ -1,5 +1,3 @@
--- return {
-vim.pack.add({ "https://github.com/folke/todo-comments.nvim" }, { confirm = false })
 require("todo-comments").setup({})
 
 vim.keymap.set("n", "<leader>st", function()

@@ -1,8 +1,3 @@
-vim.pack.add({
-	{ src = "https://github.com/saghen/blink.cmp", version = "v1.10.2" },
-	"https://github.com/L3MON4D3/LuaSnip",
-	"https://github.com/rafamadriz/friendly-snippets",
-}, { confirm = false })
 local opts = {
 	-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
 	-- 'super-tab' for mappings similar to vscode (tab to accept)

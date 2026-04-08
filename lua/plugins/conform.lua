@@ -1,5 +1,3 @@
-vim.pack.add({ "https://github.com/stevearc/conform.nvim" }, { confirm = false })
-
 local prettierSetting = { "prettier", "prettierd", stop_after_first = true }
 
 local prettierLanguages = {

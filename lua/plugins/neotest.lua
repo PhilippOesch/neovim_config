@@ -1,15 +1,3 @@
-vim.pack.add({
-	"https://github.com/nvim-neotest/neotest",
-	"https://github.com/nvim-neotest/nvim-nio",
-	"https://github.com/nvim-lua/plenary.nvim",
-	"https://github.com/antoinemadec/FixCursorHold.nvim",
-	"https://github.com/haydenmeade/neotest-jest",
-	"https://github.com/Nsidorenco/neotest-vstest",
-	"https://github.com/rcasia/neotest-java",
-	"https://github.com/nvim-neotest/neotest-go",
-	"https://github.com/marilari88/neotest-vitest",
-}, { confirm = false })
-
 require("neotest").setup({
 	loglevel = 1,
 	adapters = {
