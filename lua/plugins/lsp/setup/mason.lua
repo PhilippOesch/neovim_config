@@ -9,27 +9,8 @@ require("mason").setup({
 local vue_ls_share = vim.fn.expand("$MASON/packages/vue-language-server")
 local vue_language_server_path = vue_ls_share .. "/node_modules/@vue/language-server"
 
-local vue_plugin = {
-	name = "@vue/typescript-plugin",
-	languages = { "javascript", "typescript", "vue" },
-	location = vue_language_server_path,
-	configNamespace = "typescript",
-}
-
 -- Enable the following language servers
 local servers = {
-	-- vtsls = {
-	-- 	settings = {
-	-- 		vtsls = {
-	-- 			tsserver = {
-	-- 				globalPlugins = {
-	-- 					vue_plugin,
-	-- 				},
-	-- 			},
-	-- 		},
-	-- 	},
-	-- 	filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-	-- },
 	html = {
 		filetypes = { "html", "twig", "hbs", "tsx" },
 	},
@@ -78,7 +59,6 @@ local mason_tool_installer = require("mason-tool-installer")
 local ensure_tools_installed = {}
 local other_tools = {
 	"roslyn",
-	"vale",
 	"java-test",
 	"golangci-lint",
 	"tree-sitter-cli",

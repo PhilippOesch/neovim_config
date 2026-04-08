@@ -1,4 +1,1 @@
-return {
-  "sphamba/smear-cursor.nvim",
-  opts = {},
-}
+require('smear_cursor').setup({})

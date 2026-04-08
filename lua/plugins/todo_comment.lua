@@ -1,23 +1,8 @@
-return {
-	"folke/todo-comments.nvim",
-	dependencies = { "nvim-lua/plenary.nvim" },
-	keys = {
-		{
-			"<leader>st",
-			function()
-				Snacks.picker.todo_comments()
-			end,
-			desc = "Todo",
-		},
-		{
-			"<leader>sT",
-			function()
-				Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
-			end,
-			desc = "Todo/Fix/Fixme",
-		},
-	},
-	config = function(_, opts)
-		require("todo-comments").setup(opts)
-	end,
-}
+require("todo-comments").setup({})
+
+vim.keymap.set("n", "<leader>st", function()
+	require("snacks").picker.todo_comments()
+end, { noremap = true, desc = "Todo" })
+vim.keymap.set("n", "<leader>st", function()
+	require("snacks").picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
+end, { noremap = true, desc = "Todo/Fix/Fixme" })

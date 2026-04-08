@@ -1,1 +1,1 @@
-return { "SmiteshP/nvim-navic" }
+require('nvim-navic').setup({})

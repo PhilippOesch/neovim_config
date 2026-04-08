@@ -1,6 +1,1 @@
-return {
-	"echasnovski/mini.surround",
-	config = function()
-		require("mini.surround").setup()
-	end,
-}
+require("mini.surround").setup()
