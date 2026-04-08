@@ -34,8 +34,6 @@ else
 	vim.notify(msg, vim.log.levels.WARN, { title = "Treesitter" })
 end
 
-require("nvim-treesitter").update()
-
 -- auto-start highlights & indentation
 vim.api.nvim_create_autocmd("FileType", {
 	desc = "User: enable treesitter highlighting",
