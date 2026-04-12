@@ -12,7 +12,7 @@
 ---@field callback fun(ev: Config.Plugin.Build.Event)
 
 ---@class Config.Plugin
----@field specs (string|vim.pack.Spec)[]
+---@field deps (string|vim.pack.Spec)[]
 ---@field build Config.Plugin.Build|nil
 ---@field init fun()
 
@@ -39,7 +39,7 @@ M.setup = function(plugins)
 		elseif type(plugin) == "table" and plugin.src then
 			table.insert(packages, plugin)
 		else
-			vim.list_extend(packages, plugin.specs)
+			vim.list_extend(packages, plugin.deps)
 			if plugin.build then
 				build_definitions[plugin.build.plugin_name] = {
 					kind = plugin.build.kind,

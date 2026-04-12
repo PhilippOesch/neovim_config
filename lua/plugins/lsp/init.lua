@@ -1,6 +1,6 @@
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/pmizio/typescript-tools.nvim",
 		"https://github.com/neovim/nvim-lspconfig",
 		"https://github.com/williamboman/mason.nvim",

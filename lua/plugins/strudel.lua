@@ -26,7 +26,7 @@ end
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/gruvw/strudel.nvim",
 	},
 	build = {

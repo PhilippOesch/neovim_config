@@ -30,7 +30,7 @@ formattingConfig["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/stevearc/conform.nvim",
 	},
 	init = function()

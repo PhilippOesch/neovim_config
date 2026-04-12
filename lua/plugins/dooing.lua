@@ -1,6 +1,6 @@
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/atiladefreitas/dooing",
 	},
 	init = function()

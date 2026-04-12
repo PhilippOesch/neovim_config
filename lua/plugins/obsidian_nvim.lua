@@ -40,7 +40,7 @@ local obsidian_opts = {
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/obsidian-nvim/obsidian.nvim",
 	},
 	init = function()

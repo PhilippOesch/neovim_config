@@ -31,7 +31,7 @@ local opts = {
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/folke/tokyonight.nvim",
 	},
 	init = function()

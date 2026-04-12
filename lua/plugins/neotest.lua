@@ -1,6 +1,6 @@
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/nvim-neotest/neotest",
 		"https://github.com/nvim-neotest/nvim-nio",
 		"https://github.com/antoinemadec/FixCursorHold.nvim",

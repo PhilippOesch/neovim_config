@@ -1,6 +1,6 @@
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/nvim-tree/nvim-web-devicons",
 	},
 	init = function()

@@ -14,7 +14,7 @@ local opts = {
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 	},
 	init = function()

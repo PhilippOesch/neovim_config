@@ -71,7 +71,7 @@ local opts = {
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/lewis6991/gitsigns.nvim",
 	},
 	init = function()

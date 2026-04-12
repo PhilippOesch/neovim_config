@@ -37,7 +37,7 @@ local opts = {
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/olimorris/persisted.nvim",
 	},
 	init = function()

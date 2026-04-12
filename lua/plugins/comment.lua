@@ -1,6 +1,6 @@
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/numToStr/Comment.nvim",
 		"https://github.com/JoosepAlviste/nvim-ts-context-commentstring",
 	},

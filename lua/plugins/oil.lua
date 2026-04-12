@@ -1,6 +1,6 @@
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/stevearc/oil.nvim",
 		"https://github.com/refractalize/oil-git-status.nvim",
 	},

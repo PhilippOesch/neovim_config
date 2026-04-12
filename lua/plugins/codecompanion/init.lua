@@ -295,7 +295,7 @@ local opts = {
 
 ---@type Config.Plugin
 return {
-	specs = {
+	deps = {
 		"https://github.com/olimorris/codecompanion.nvim",
 		"https://github.com/ravitemer/codecompanion-history.nvim",
 		"https://github.com/zbirenbaum/copilot.lua",
