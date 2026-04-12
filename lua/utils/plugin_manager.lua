@@ -3,6 +3,8 @@
 ---@field active boolean
 ---@field spec {name: string}
 
+---@alias Config.InitFunction fun()
+
 ---@class Config.Plugin.Build.Event
 ---@field data Config.Plugin.Build.Event.Data
 ---
@@ -12,11 +14,11 @@
 ---@field callback fun(ev: Config.Plugin.Build.Event)
 
 ---@class Config.Plugin
----@field deps (string|vim.pack.Spec|Config.Plugin)[]
+---@field deps Config.Plugin.Definition[]
 ---@field build Config.Plugin.Build|nil
----@field init fun()|nil
+---@field init Config.InitFunction|nil
 
----@alias Config.InitFunction fun()
+---@alias Config.Plugin.Definition Config.Plugin|string|vim.pack.Spec
 
 ---@class Config.Plugin.Manager
 ---@field setup fun(plugins: (Config.Plugin|vim.pack.Spec|string)[])
@@ -52,7 +54,7 @@ local function setup_build_hooks(build_definitions)
 end
 
 --- recurstively resolve all vim packages and build definitions
----@param plugins (Config.Plugin|vim.pack.Spec|string)[]
+---@param plugins Config.Plugin.Definition[]
 ---@param packages ((string|vim.pack.Spec)[])|nil
 ---@param build_definitions (table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>)|nil
 ---@return (string|vim.pack.Spec)[], table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>
