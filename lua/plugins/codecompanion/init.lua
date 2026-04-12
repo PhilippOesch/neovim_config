@@ -293,121 +293,131 @@ local opts = {
 	},
 }
 
----@type CodeCompanion
-local codecompanion = require("codecompanion")
-
-codecompanion.setup(opts)
-
-vim.keymap.set("n", "<leader>it", ":CodeCompanionChat Toggle<CR>", {
-	noremap = true,
-	desc = "Toggle CodeCompanion chat",
-})
-vim.keymap.set({ "v" }, "<leader>ia", ":CodeCompanionChat Add<CR>", {
-	noremap = true,
-	desc = "Add selection to chat",
-})
-vim.keymap.set({ "n" }, "<leader>in", ":CodeCompanionChat<CR>", {
-	noremap = true,
-	desc = "New CodeCompanion Chat",
-})
-vim.keymap.set({ "n", "v" }, "<leader>ic", ":CodeCompanionActions<CR>", {
-	noremap = true,
-	desc = "Call codecompanion action",
-})
-vim.keymap.set({ "n" }, "<leader>igc", ":CodeCompanion /commit<CR>", {
-	noremap = true,
-	desc = "Generate Commit Message",
-})
-
-vim.keymap.set({ "n" }, "<leader>is", function()
-	local chat = codecompanion.last_chat()
-
-	if not chat then
-		return
-	end
-
-	---@type Models
-	local current_adapter = _G.codecompanion_chat_metadata[chat.bufnr].adapter.name
-
-	local new_adapter = "Opencode"
-	--
-	if current_adapter == "OpenCode" then
-		new_adapter = "Copilot"
-	end
-	--
-	chat:change_adapter(string.lower(new_adapter))
-	vim.notify(string.format("Adapter changed to: %s", new_adapter), vim.log.levels.INFO)
-end, {
-	noremap = true,
-	desc = "Switch between adapters",
-})
-
-vim.keymap.set({ "n" }, "<leader>im", function()
-	local chat = codecompanion.last_chat()
-
-	if not chat then
-		return
-	end
-
-	---@type Models
-	local adapter_models = model_mapping[_G.codecompanion_chat_metadata[chat.bufnr].adapter.name]
-	--
-	local items = vim.iter(pairs(adapter_models))
-		:map(function(k, v)
-			return { type = k, name = v }
-		end)
-		:totable()
-	--
-	vim.ui.select(items, {
-		prompt = "Select Model from favorites",
-		format_item = function(item)
-			return string.format("%s - %s", item.type, item.name)
-		end,
-	}, function(item, _)
-		if not item then
-			return
-		end
-		chat:change_model({ model = item.name })
-	end)
-end, {
-	noremap = true,
-	desc = "Toggle between free an premium model",
-})
-
-require("which-key").add({
-	{
-		"<leader>i",
-		icon = "✨",
-		group = "artificial (i)ntelligence - codecompanion",
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/olimorris/codecompanion.nvim",
+		"https://github.com/ravitemer/codecompanion-history.nvim",
+		"https://github.com/zbirenbaum/copilot.lua",
 	},
-	{
-		"<leader>it",
-		icon = "✨󰭹",
-	},
-	{
-		"<leader>ia",
-		icon = "✨󰒅",
-		mode = { "v" },
-	},
-	{
-		"<leader>ic",
-		icon = "✨",
-		mode = { "n", "v" },
-	},
-	{
-		"<leader>in",
-		icon = "✨󱐏",
-	},
-	{
-		"<leader>igc",
-		icon = "✨",
-	},
-	{
-		"<leader>im",
-		icon = "✨✨",
-	},
-})
+	init = function()
+		---@type CodeCompanion
+		local codecompanion = require("codecompanion")
 
-vim.api.nvim_create_user_command("CodeCompanionLogs", function()
-	vim.cmd("tabnew ~/.local/state/nvim/codecompanion.log")
-end, {})
+		codecompanion.setup(opts)
+
+		vim.keymap.set("n", "<leader>it", ":CodeCompanionChat Toggle<CR>", {
+			noremap = true,
+			desc = "Toggle CodeCompanion chat",
+		})
+		vim.keymap.set({ "v" }, "<leader>ia", ":CodeCompanionChat Add<CR>", {
+			noremap = true,
+			desc = "Add selection to chat",
+		})
+		vim.keymap.set({ "n" }, "<leader>in", ":CodeCompanionChat<CR>", {
+			noremap = true,
+			desc = "New CodeCompanion Chat",
+		})
+		vim.keymap.set({ "n", "v" }, "<leader>ic", ":CodeCompanionActions<CR>", {
+			noremap = true,
+			desc = "Call codecompanion action",
+		})
+		vim.keymap.set({ "n" }, "<leader>igc", ":CodeCompanion /commit<CR>", {
+			noremap = true,
+			desc = "Generate Commit Message",
+		})
+
+		vim.keymap.set({ "n" }, "<leader>is", function()
+			local chat = codecompanion.last_chat()
+
+			if not chat then
+				return
+			end
+
+			---@type Models
+			local current_adapter = _G.codecompanion_chat_metadata[chat.bufnr].adapter.name
+
+			local new_adapter = "Opencode"
+			--
+			if current_adapter == "OpenCode" then
+				new_adapter = "Copilot"
+			end
+			--
+			chat:change_adapter(string.lower(new_adapter))
+			vim.notify(string.format("Adapter changed to: %s", new_adapter), vim.log.levels.INFO)
+		end, {
+			noremap = true,
+			desc = "Switch between adapters",
+		})
+
+		vim.keymap.set({ "n" }, "<leader>im", function()
+			local chat = codecompanion.last_chat()
+
+			if not chat then
+				return
+			end
+
+			---@type Models
+			local adapter_models = model_mapping[_G.codecompanion_chat_metadata[chat.bufnr].adapter.name]
+			--
+			local items = vim.iter(pairs(adapter_models))
+				:map(function(k, v)
+					return { type = k, name = v }
+				end)
+				:totable()
+			--
+			vim.ui.select(items, {
+				prompt = "Select Model from favorites",
+				format_item = function(item)
+					return string.format("%s - %s", item.type, item.name)
+				end,
+			}, function(item, _)
+				if not item then
+					return
+				end
+				chat:change_model({ model = item.name })
+			end)
+		end, {
+			noremap = true,
+			desc = "Toggle between free an premium model",
+		})
+
+		require("which-key").add({
+			{
+				"<leader>i",
+				icon = "✨",
+				group = "artificial (i)ntelligence - codecompanion",
+			},
+			{
+				"<leader>it",
+				icon = "✨󰭹",
+			},
+			{
+				"<leader>ia",
+				icon = "✨󰒅",
+				mode = { "v" },
+			},
+			{
+				"<leader>ic",
+				icon = "✨",
+				mode = { "n", "v" },
+			},
+			{
+				"<leader>in",
+				icon = "✨󱐏",
+			},
+			{
+				"<leader>igc",
+				icon = "✨",
+			},
+			{
+				"<leader>im",
+				icon = "✨✨",
+			},
+		})
+
+		vim.api.nvim_create_user_command("CodeCompanionLogs", function()
+			vim.cmd("tabnew ~/.local/state/nvim/codecompanion.log")
+		end, {})
+	end,
+}

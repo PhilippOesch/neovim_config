@@ -69,4 +69,12 @@ local opts = {
 	end,
 }
 
-require("gitsigns").setup(opts)
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/lewis6991/gitsigns.nvim",
+	},
+	init = function()
+		require("gitsigns").setup(opts)
+	end,
+}

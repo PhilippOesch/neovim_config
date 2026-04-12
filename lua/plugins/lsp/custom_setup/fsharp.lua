@@ -1,4 +1,3 @@
-require("ionide").setup({})
 
 local M = {}
 
@@ -10,6 +9,9 @@ function M.init()
 		pattern = "*.fs,*.fsx,*.fsi",
 		command = [[set filetype=fsharp]],
 	})
+
+	vim.lsp.config("ionide", {})
+	vim.lsp.enable("ionide")
 end
 
 return M

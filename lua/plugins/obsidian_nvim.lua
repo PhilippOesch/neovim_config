@@ -38,4 +38,12 @@ local obsidian_opts = {
 	},
 }
 
-require("obsidian").setup(obsidian_opts)
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/obsidian-nvim/obsidian.nvim",
+	},
+	init = function()
+		require("obsidian").setup(obsidian_opts)
+	end,
+}

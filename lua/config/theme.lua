@@ -1,5 +1,3 @@
-local tokyonight = require("tokyonight")
-
 local opts = {
 	style = "moon",
 	transparent = false,
@@ -30,7 +28,18 @@ local opts = {
 		}
 	end,
 }
-tokyonight.setup(opts)
-tokyonight.load(opts)
 
-vim.cmd.colorscheme("tokyonight")
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/folke/tokyonight.nvim",
+	},
+	init = function()
+		local tokyonight = require("tokyonight")
+
+		tokyonight.setup(opts)
+		tokyonight.load(opts)
+
+		vim.cmd.colorscheme("tokyonight")
+	end,
+}

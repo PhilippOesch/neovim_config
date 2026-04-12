@@ -11,4 +11,13 @@ local opts = {
 	},
 	file_types = { "markdown", "codecompanion" },
 }
-require("render-markdown").setup(opts)
+
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/MeanderingProgrammer/render-markdown.nvim",
+	},
+	init = function()
+		require("render-markdown").setup(opts)
+	end,
+}

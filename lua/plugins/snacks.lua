@@ -112,50 +112,58 @@ local opts = {
 	},
 }
 
-local snacks = require("snacks")
-snacks.setup(opts)
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/folke/snacks.nvim",
+	},
+	init = function()
+		local snacks = require("snacks")
+		snacks.setup(opts)
 
-local map = vim.keymap.set
+		local map = vim.keymap.set
 
-map("n", "<leader><space>", snacks.picker.buffers, { noremap = true, desc = "Find Open Buffers" })
-map("n", "<C-p>", snacks.picker.files, { noremap = true, desc = "Find Files" })
-map("n", "<leader>fp", function()
-	snacks.picker.projects({
-		projects = { "~/.config/nvim", "~/Documents/ObsidianVault" },
-		dev = { "~/dev/projects/", "~/.config/" },
-	})
-end, { noremap = true, desc = "Projects" })
-map("n", "<leader>fw", snacks.picker.grep, { noremap = true, desc = "Grep" })
-map("n", "<leader>:", snacks.picker.command_history, { noremap = true, desc = "command history" })
-map("n", "<leader>fr", snacks.picker.recent, { noremap = true, desc = "Recent" })
-map("n", "<leader>sC", snacks.picker.commands, { noremap = true, desc = "Commands" })
-map("n", "<leader>sj", snacks.picker.jumps, { noremap = true, desc = "Jumps" })
-map("n", "<leader>su", snacks.picker.undo, { noremap = true, desc = "Undo History" })
-map({ "n", "x" }, "<leader>sw", snacks.picker.grep_word, { noremap = true, desc = "Visual selection or word" })
-map("n", "<leader>lg", function()
-	snacks.lazygit()
-end, { noremap = true, desc = "Lazygit" })
-map("n", "<leader>gl", snacks.picker.git_log, { noremap = true, desc = "Git Log" })
-map("n", "<leader>gs", snacks.picker.git_status, { noremap = true, desc = "Git Status" })
-map("n", "<leader>gd", snacks.picker.git_diff, { noremap = true, desc = "Git Diff (Hunks)" })
-map("n", "gd", snacks.picker.lsp_definitions, { noremap = true, desc = "Goto Definition" })
-map("n", "gD", snacks.picker.lsp_declarations, { noremap = true, desc = "Goto Declaration" })
-map("n", "gr", snacks.picker.lsp_references, { noremap = true, nowait = true, desc = "References" })
-map("n", "gI", snacks.picker.lsp_implementations, { noremap = true, desc = "Goto Implementation" })
-map("n", "gy", snacks.picker.lsp_type_definitions, { noremap = true, desc = "Goto T[y]pe Definition" })
-map("n", "<leader>ss", snacks.picker.lsp_symbols, { noremap = true, desc = "LSP Symbols" })
-map("n", "<leader>sS", snacks.picker.lsp_workspace_symbols, { noremap = true, desc = "LSP Workspace Symbols" })
-map("n", "<leader>pc", snacks.picker.colorschemes, { noremap = true, desc = "LSP Workspace Symbols" })
-map("n", "<leader>sd", snacks.picker.diagnostics, { noremap = true, desc = "Diagnostics" })
-map("n", "<leader>sD", snacks.picker.diagnostics_buffer, { noremap = true, desc = "Buffer Diagnostics" })
-map("n", "<leader>sh", snacks.picker.help, { noremap = true, desc = "Help Pages" })
-map("n", '<leader>s"', snacks.picker.registers, { noremap = true, desc = "Registers" })
-map("n", "<leader>sH", snacks.picker.highlights, { noremap = true, desc = "Highlights" })
-map("n", "<leader>xx", snacks.bufdelete.all, { noremap = true, desc = "LSP Workspace Symbols" })
-map("n", "<leader>x", function()
-	snacks.bufdelete()
-end, { noremap = true, desc = "LSP Workspace Symbols" })
-map("n", "<leader>z", function()
-	snacks.zen()
-end, { noremap = true, desc = "Toggle Zen Mode" })
-map("n", "<leader>n", snacks.picker.notifications, { noremap = true, desc = "Notification History" })
+		map("n", "<leader><space>", snacks.picker.buffers, { noremap = true, desc = "Find Open Buffers" })
+		map("n", "<C-p>", snacks.picker.files, { noremap = true, desc = "Find Files" })
+		map("n", "<leader>fp", function()
+			snacks.picker.projects({
+				projects = { "~/.config/nvim", "~/Documents/ObsidianVault" },
+				dev = { "~/dev/projects/", "~/.config/" },
+			})
+		end, { noremap = true, desc = "Projects" })
+		map("n", "<leader>fw", snacks.picker.grep, { noremap = true, desc = "Grep" })
+		map("n", "<leader>:", snacks.picker.command_history, { noremap = true, desc = "command history" })
+		map("n", "<leader>fr", snacks.picker.recent, { noremap = true, desc = "Recent" })
+		map("n", "<leader>sC", snacks.picker.commands, { noremap = true, desc = "Commands" })
+		map("n", "<leader>sj", snacks.picker.jumps, { noremap = true, desc = "Jumps" })
+		map("n", "<leader>su", snacks.picker.undo, { noremap = true, desc = "Undo History" })
+		map({ "n", "x" }, "<leader>sw", snacks.picker.grep_word, { noremap = true, desc = "Visual selection or word" })
+		map("n", "<leader>lg", function()
+			snacks.lazygit()
+		end, { noremap = true, desc = "Lazygit" })
+		map("n", "<leader>gl", snacks.picker.git_log, { noremap = true, desc = "Git Log" })
+		map("n", "<leader>gs", snacks.picker.git_status, { noremap = true, desc = "Git Status" })
+		map("n", "<leader>gd", snacks.picker.git_diff, { noremap = true, desc = "Git Diff (Hunks)" })
+		map("n", "gd", snacks.picker.lsp_definitions, { noremap = true, desc = "Goto Definition" })
+		map("n", "gD", snacks.picker.lsp_declarations, { noremap = true, desc = "Goto Declaration" })
+		map("n", "gr", snacks.picker.lsp_references, { noremap = true, nowait = true, desc = "References" })
+		map("n", "gI", snacks.picker.lsp_implementations, { noremap = true, desc = "Goto Implementation" })
+		map("n", "gy", snacks.picker.lsp_type_definitions, { noremap = true, desc = "Goto T[y]pe Definition" })
+		map("n", "<leader>ss", snacks.picker.lsp_symbols, { noremap = true, desc = "LSP Symbols" })
+		map("n", "<leader>sS", snacks.picker.lsp_workspace_symbols, { noremap = true, desc = "LSP Workspace Symbols" })
+		map("n", "<leader>pc", snacks.picker.colorschemes, { noremap = true, desc = "LSP Workspace Symbols" })
+		map("n", "<leader>sd", snacks.picker.diagnostics, { noremap = true, desc = "Diagnostics" })
+		map("n", "<leader>sD", snacks.picker.diagnostics_buffer, { noremap = true, desc = "Buffer Diagnostics" })
+		map("n", "<leader>sh", snacks.picker.help, { noremap = true, desc = "Help Pages" })
+		map("n", '<leader>s"', snacks.picker.registers, { noremap = true, desc = "Registers" })
+		map("n", "<leader>sH", snacks.picker.highlights, { noremap = true, desc = "Highlights" })
+		map("n", "<leader>xx", snacks.bufdelete.all, { noremap = true, desc = "LSP Workspace Symbols" })
+		map("n", "<leader>x", function()
+			snacks.bufdelete()
+		end, { noremap = true, desc = "LSP Workspace Symbols" })
+		map("n", "<leader>z", function()
+			snacks.zen()
+		end, { noremap = true, desc = "Toggle Zen Mode" })
+		map("n", "<leader>n", snacks.picker.notifications, { noremap = true, desc = "Notification History" })
+	end,
+}

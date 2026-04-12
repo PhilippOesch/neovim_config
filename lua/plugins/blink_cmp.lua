@@ -50,15 +50,25 @@ local opts = {
 	fuzzy = { implementation = "prefer_rust_with_warning" },
 }
 
-local luasnip = require("luasnip")
+---@type Config.Plugin
+return {
+	specs = {
+		{ src = "https://github.com/saghen/blink.cmp", version = "v1.10.2" },
+		"https://github.com/L3MON4D3/LuaSnip",
+		"https://github.com/rafamadriz/friendly-snippets",
+	},
+	init = function()
+		local luasnip = require("luasnip")
 
-luasnip.filetype_extend("javascriptreact", { "html" })
-luasnip.filetype_extend("typescriptreact", { "html" })
-luasnip.filetype_extend("htmlangular", { "html" })
-luasnip.filetype_extend("vue", { "html" })
+		luasnip.filetype_extend("javascriptreact", { "html" })
+		luasnip.filetype_extend("typescriptreact", { "html" })
+		luasnip.filetype_extend("htmlangular", { "html" })
+		luasnip.filetype_extend("vue", { "html" })
 
-require("luasnip.loaders.from_vscode").lazy_load()
-require("luasnip.loaders.from_vscode").load({ paths = { "./snippets" } })
+		require("luasnip.loaders.from_vscode").lazy_load()
+		require("luasnip.loaders.from_vscode").load({ paths = { "./snippets" } })
 
-luasnip.config.setup()
-require("blink.cmp").setup(opts)
+		luasnip.config.setup()
+		require("blink.cmp").setup(opts)
+	end,
+}

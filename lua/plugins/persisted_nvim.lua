@@ -35,24 +35,32 @@ local opts = {
 	},
 }
 
-require("persisted").setup(opts)
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/olimorris/persisted.nvim",
+	},
+	init = function()
+		require("persisted").setup(opts)
 
-local group = vim.api.nvim_create_augroup("PersitedHooks", {})
+		local group = vim.api.nvim_create_augroup("PersitedHooks", {})
 
-vim.api.nvim_create_autocmd({ "User" }, {
-	pattern = "PersistedSavePre",
-	group = group,
-	callback = function()
-		local cc_available, codecompanion = pcall(require, "codecompanion")
+		vim.api.nvim_create_autocmd({ "User" }, {
+			pattern = "PersistedSavePre",
+			group = group,
+			callback = function()
+				local cc_available, codecompanion = pcall(require, "codecompanion")
 
-		if cc_available then
-			codecompanion.close_last_chat()
-		end
+				if cc_available then
+					codecompanion.close_last_chat()
+				end
 
-		local opencode_available, opencode = pcall(require, "opencode")
+				local opencode_available, opencode = pcall(require, "opencode")
 
-		if opencode_available then
-			opencode.stop()
-		end
+				if opencode_available then
+					opencode.stop()
+				end
+			end,
+		})
 	end,
-})
+}

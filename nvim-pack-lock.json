@@ -9,7 +9,7 @@
       "src": "https://github.com/antoinemadec/FixCursorHold.nvim"
     },
     "Ionide-vim": {
-      "rev": "99fc1f5878631bad3598ea90dab91419623be066",
+      "rev": "30aac182c9652f37b5ce65942e5cc32371595995",
       "src": "https://github.com/ionide/Ionide-vim"
     },
     "LuaSnip": {
@@ -26,7 +26,7 @@
       "src": "https://github.com/ravitemer/codecompanion-history.nvim"
     },
     "codecompanion.nvim": {
-      "rev": "7d7957c26d33a97085d3a0c82eeb0147a0f51314",
+      "rev": "680c445eb357c72129d175ea5d481aa9e92ae6a5",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
     "conform.nvim": {
@@ -34,7 +34,7 @@
       "src": "https://github.com/stevearc/conform.nvim"
     },
     "copilot.lua": {
-      "rev": "07aa57148ac28986bab9f55e87ee3d929e2726b1",
+      "rev": "ad7e729e9a6348f7da482be0271d452dbc4c8e2c",
       "src": "https://github.com/zbirenbaum/copilot.lua"
     },
     "dooing": {
@@ -74,7 +74,7 @@
       "src": "https://github.com/iamcco/markdown-preview.nvim"
     },
     "mason-lspconfig.nvim": {
-      "rev": "63a3c6a80538de1003373a619e29aeda27809ad3",
+      "rev": "0a3b42c3e503df87aef6d6513e13148381495c3a",
       "src": "https://github.com/williamboman/mason-lspconfig.nvim"
     },
     "mason-nvim-dap.nvim": {
@@ -150,7 +150,7 @@
       "src": "https://github.com/mfussenegger/nvim-jdtls"
     },
     "nvim-lspconfig": {
-      "rev": "fb5fa30626ae10f7f79f740059d3769993936ecb",
+      "rev": "3c156abc4f7912f66d8687512d75b939b14fbc42",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-navic": {
@@ -180,11 +180,11 @@
       "src": "https://github.com/JoosepAlviste/nvim-ts-context-commentstring"
     },
     "nvim-web-devicons": {
-      "rev": "95b7a002d5dba1a42eb58f5fac5c565a485eefd0",
+      "rev": "c72328a5494b4502947a022fe69c0c47e53b6aa6",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "obsidian.nvim": {
-      "rev": "dec6573816767eaa9596cabc1593f45a2f7821ee",
+      "rev": "197e639dc00d11b14f22f86042dc5360569008be",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "oil-git-status.nvim": {
@@ -196,15 +196,15 @@
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "persisted.nvim": {
-      "rev": "14cc1db0052ea26f2d2d2f1b861845dae58b7ead",
+      "rev": "1a8e9dcf277d61105619498b2002c287c50424b8",
       "src": "https://github.com/olimorris/persisted.nvim"
     },
     "plenary.nvim": {
-      "rev": "b9fd5226c2f76c951fc8ed5923d85e4de065e509",
+      "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
     },
     "render-markdown.nvim": {
-      "rev": "54d4b5431e9634ee3d8d30784e017239b5b89d41",
+      "rev": "f128369d10d68eb2a3963b6979f02b24af9d9c24",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
     "roslyn.nvim": {
@@ -220,7 +220,7 @@
       "src": "https://github.com/folke/snacks.nvim"
     },
     "strudel.nvim": {
-      "rev": "b54763e6b709b89138c4e60d65e78ad2ae928bdd",
+      "rev": "3a7e62c9048a318281328ad08d6269e50b884cd3",
       "src": "https://github.com/gruvw/strudel.nvim"
     },
     "todo-comments.nvim": {

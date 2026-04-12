@@ -1,16 +1,31 @@
-vim.g.mkdp_filetypes = { "markdown" }
-vim.g.mkdp_markdown_css = vim.fn.stdpath("config") .. "/md-preview/style.css"
-vim.g.mkdp_highlight_css = vim.fn.stdpath("config") .. "/md-preview/highlight.css"
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/iamcco/markdown-preview.nvim",
+	},
+	build = {
+		plugin_name = "markdown-preview.nvim",
+		kind = { "install", "update" },
+		callback = function(ev)
+			vim.fn.system("cd " .. ev.data.path .. " && cd app && yarn install")
+		end,
+	},
+	init = function()
+		vim.g.mkdp_filetypes = { "markdown" }
+		vim.g.mkdp_markdown_css = vim.fn.stdpath("config") .. "/md-preview/style.css"
+		vim.g.mkdp_highlight_css = vim.fn.stdpath("config") .. "/md-preview/highlight.css"
 
-vim.keymap.set("n", "<leader>mo", "<cmd> MarkdownPreview<CR>", {
-	noremap = true,
-	desc = "Open Markdown Preview",
-})
-vim.keymap.set("n", "<leader>ms", "<cmd> MarkdownPreviewStop<CR>", {
-	noremap = true,
-	desc = "Open Markdown Preview",
-})
-vim.keymap.set("n", "<leader>mt", "<cmd> MarkdownPreview<CR>", {
-	noremap = true,
-	desc = "Toggle Markdown",
-})
+		vim.keymap.set("n", "<leader>mo", "<cmd> MarkdownPreview<CR>", {
+			noremap = true,
+			desc = "Open Markdown Preview",
+		})
+		vim.keymap.set("n", "<leader>ms", "<cmd> MarkdownPreviewStop<CR>", {
+			noremap = true,
+			desc = "Open Markdown Preview",
+		})
+		vim.keymap.set("n", "<leader>mt", "<cmd> MarkdownPreview<CR>", {
+			noremap = true,
+			desc = "Toggle Markdown",
+		})
+	end,
+}

@@ -1,8 +1,16 @@
-require("todo-comments").setup({})
+---@type Config.Plugin
+return {
+	specs = {
+		"https://github.com/folke/todo-comments.nvim",
+	},
+	init = function()
+		require("todo-comments").setup({})
 
-vim.keymap.set("n", "<leader>st", function()
-	require("snacks").picker.todo_comments()
-end, { noremap = true, desc = "Todo" })
-vim.keymap.set("n", "<leader>st", function()
-	require("snacks").picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
-end, { noremap = true, desc = "Todo/Fix/Fixme" })
+		vim.keymap.set("n", "<leader>st", function()
+			require("snacks").picker.todo_comments()
+		end, { noremap = true, desc = "Todo" })
+		vim.keymap.set("n", "<leader>st", function()
+			require("snacks").picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
+		end, { noremap = true, desc = "Todo/Fix/Fixme" })
+	end,
+}
