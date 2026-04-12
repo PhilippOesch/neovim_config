@@ -1,5 +1,5 @@
 return {
-	specs = {
+	deps = {
 		"https://github.com/folke/which-key.nvim",
 	},
 	init = function()

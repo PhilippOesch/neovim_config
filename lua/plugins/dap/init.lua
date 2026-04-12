@@ -5,15 +5,19 @@ return {
 		"https://github.com/rcarriga/nvim-dap-ui",
 		"https://github.com/leoluz/nvim-dap-go",
 		"https://github.com/jay-babu/mason-nvim-dap.nvim",
-		{ src = "https://github.com/microsoft/vscode-js-debug", version = "v1.112.0" },
+		{
+			deps = { { src = "https://github.com/microsoft/vscode-js-debug", version = "v1.112.0" } },
+			build = {
+				plugin_name = "vscode-js-debug",
+				kind = { "install", "update" },
+				callback = function(ev)
+					vim.fn.system(
+						"cd " .. ev.data.path .. " && npm i && npm run compile vsDebugServerBundle && mv dist out"
+					)
+				end,
+			},
+		},
 		"https://github.com/theHamsta/nvim-dap-virtual-text",
-	},
-	build = {
-		plugin_name = "vscode-js-debug",
-		kind = { "install", "update" },
-		callback = function(ev)
-			vim.fn.system("cd " .. ev.data.path .. " && npm i && npm run compile vsDebugServerBundle && mv dist out")
-		end,
 	},
 	init = function()
 		---@type Config.Plugin

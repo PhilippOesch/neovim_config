@@ -1,5 +1,5 @@
 return {
-	specs = {
+	deps = {
 		"https://github.com/ThePrimeagen/harpoon",
 	},
 	init = function()
