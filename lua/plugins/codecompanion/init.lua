@@ -98,25 +98,6 @@ local opts = {
 					auto_submit_success = true, -- Send any successful output to the LLM automatically?
 				},
 				groups = {
-					["full_stack_dev"] = {
-						description = "Full Stack Developer - Can run code, edit code and modify files",
-						prompt = "I'm giving you access to the ${tools} to help you perform coding tasks",
-						tools = {
-							"cmd_runner",
-							"create_file",
-							"delete_file",
-							"file_search",
-							"get_changed_files",
-							"grep_search",
-							"insert_edit_into_file",
-							"list_code_usages",
-							"read_file",
-							"problems",
-						},
-						opts = {
-							collapse_tools = true,
-						},
-					},
 					["review"] = {
 						description = "Expert Reviewer - Senior Software Engineer ",
 						tools = {
