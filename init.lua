@@ -7,9 +7,7 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-local plugin_manager = require("utils.plugin_manager")
-
-plugin_manager.setup({
+local plugins = require("utils.plugin_manager").new({
 	"https://github.com/tpope/vim-fugitive",
 	"https://github.com/tpope/vim-rhubarb",
 	"https://github.com/tpope/vim-sleuth",
@@ -52,4 +50,4 @@ plugin_manager.setup({
 require("config.general")
 require("config.keymaps")
 
-plugin_manager.initialize()
+plugins:init()

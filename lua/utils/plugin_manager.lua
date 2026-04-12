@@ -21,46 +21,23 @@
 ---@alias Config.Plugin.Definition Config.Plugin|string|vim.pack.Spec
 
 ---@class Config.Plugin.Manager
----@field setup fun(plugins: (Config.Plugin|vim.pack.Spec|string)[])
----@field initialize Config.InitFunction
+---@field new fun(plugins: (Config.Plugin|vim.pack.Spec|string)[])
+---@field init fun(self: Config.Plugin.Manager)
 
----@type Config.Plugin.Manager
 local M = {}
+local Manager = {}
+Manager.__index = Manager
 
----@type Config.InitFunction[]
-local init_setups = {}
-
---- setup build hooks
---- @param build_definitions table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>
-local function setup_build_hooks(build_definitions)
-	if next(build_definitions) then
-		vim.api.nvim_create_autocmd("PackChanged", {
-			callback = function(ev)
-				local script = build_definitions[ev.data.spec.name]
-
-				if not script or not vim.tbl_contains(script.kind, ev.data.kind) then
-					return
-				end
-
-				if script and vim.tbl_contains(script.kind, ev.data.kind) then
-					local ok, err = pcall(script.callback, ev)
-					if not ok then
-						vim.notify("Build failed for " .. ev.data.spec.name .. ": " .. err, vim.log.levels.ERROR)
-					end
-				end
-			end,
-		})
-	end
-end
-
---- recurstively resolve all vim packages and build definitions
+--- resolve plugin config recursively (collects packages, build defs, init hooks)
 ---@param plugins Config.Plugin.Definition[]
 ---@param packages ((string|vim.pack.Spec)[])|nil
 ---@param build_definitions (table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>)|nil
----@return (string|vim.pack.Spec)[], table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>
-local function resolve_plugin_config(plugins, packages, build_definitions)
+---@param init_setups Config.InitFunction[]|nil
+---@return (string|vim.pack.Spec)[], table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>, Config.InitFunction[]
+local function resolve_plugin_config(plugins, packages, build_definitions, init_setups)
 	packages = packages or {}
 	build_definitions = build_definitions or {}
+	init_setups = init_setups or {}
 
 	for _, plugin in ipairs(plugins) do
 		if type(plugin) == "string" then
@@ -68,12 +45,12 @@ local function resolve_plugin_config(plugins, packages, build_definitions)
 			goto continue
 		elseif type(plugin) == "table" then
 			if plugin.deps and type(plugin.deps) == "table" then
-				resolve_plugin_config(plugin.deps, packages, build_definitions)
+				resolve_plugin_config(plugin.deps, packages, build_definitions, init_setups)
 			elseif plugin.src then
 				table.insert(packages, plugin)
 			end
 
-			if plugin.build and type(plugin.build) == table then
+			if plugin.build and type(plugin.build) == "table" then
 				build_definitions[plugin.build.plugin_name] = {
 					kind = plugin.build.kind,
 					callback = plugin.build.callback,
@@ -88,23 +65,59 @@ local function resolve_plugin_config(plugins, packages, build_definitions)
 		::continue::
 	end
 
-	return packages, build_definitions
+	return packages, build_definitions, init_setups
 end
 
-M.setup = function(plugins)
+--- Create autocmd for PackChanged that will invoke build callbacks from build_definitions
+---@param build_definitions table<string, {kind: string[], callback: fun(ev: Config.Plugin.Build.Event)}>
+local function setup_build_hooks(build_definitions)
+	if next(build_definitions) then
+		vim.api.nvim_create_autocmd("PackChanged", {
+			callback = function(ev)
+				local script = build_definitions[ev.data.spec.name]
+
+				if not script or not vim.tbl_contains(script.kind, ev.data.kind) then
+					return
+				end
+
+				local ok, err = pcall(script.callback, ev)
+				if not ok then
+					vim.notify("Build failed for " .. ev.data.spec.name .. ": " .. err, vim.log.levels.ERROR)
+				end
+			end,
+		})
+	end
+end
+
+--- Construct a new plugin manager and perform initial setup (collect inits, hooks, install packages)
+---@param plugins (Config.Plugin|vim.pack.Spec|string)[]
+---@return Config.Plugin.Manager
+function M.new(plugins)
 	if type(plugins) ~= "table" then
-		error("setup() requires a table of plugins")
+		error("new() requires a table of plugins")
 	end
 
-	local packages, build_definitions = resolve_plugin_config(plugins)
+	local self = setmetatable({}, Manager)
 
-	setup_build_hooks(build_definitions)
+	-- collect packages, build_definitions and init hooks
+	local packages, build_definitions, init_setups = resolve_plugin_config(plugins)
 
-	vim.pack.add(packages, { confirm = false })
+	self.packages = packages
+	self.build_definitions = build_definitions
+	self.init_setups = init_setups
+
+	-- setup autocmds for builds
+	setup_build_hooks(self.build_definitions)
+
+	-- add packages
+	vim.pack.add(self.packages, { confirm = false })
+
+	return self
 end
 
-M.initialize = function()
-	for _, plugin_init in ipairs(init_setups) do
+--- Call all plugin init hooks collected during construction
+function Manager:init()
+	for _, plugin_init in ipairs(self.init_setups or {}) do
 		local ok, err = pcall(plugin_init)
 		if not ok then
 			vim.notify("Plugin init failed: " .. err, vim.log.levels.ERROR)
