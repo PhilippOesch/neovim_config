@@ -8,6 +8,13 @@
           "csharp"
         ],
         "path": "./csharp.json"
+      },
+      {
+        "language": [
+          "md",
+          "markdown"
+        ],
+        "path": "./markdown.json"
       }
     ]
   }
