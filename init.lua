@@ -16,7 +16,7 @@ local plugins = require("utils.plugin_manager").new({
 	"https://github.com/esmuellert/vscode-diff.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
 	require("plugins.whichkey"),
-	require("plugins.dooing"),
+	require("plugins.todo"),
 	require("plugins.webdev_icons"),
 	require("plugins.blink_cmp"),
 	require("config.theme"),

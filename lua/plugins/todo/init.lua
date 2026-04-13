@@ -81,6 +81,24 @@ local function ensure_file_exists(file_path)
 end
 
 ---comment
+---@param buf integer
+local function set_todo_filetype(state)
+	vim.bo[state.buf].syntax = "markdown"
+	vim.bo[state.buf].filetype = "todo" -- keep filetype for ftplugin logic
+
+	if vim.treesitter and vim.treesitter.language then
+		pcall(vim.treesitter.language.register, "markdown", "todo")
+	end
+
+	-- Common markdown-like buffer options (optional but recommended)
+	vim.wo[state.win].spell = true
+	vim.wo[state.win].foldmethod = "expr"
+	vim.wo[state.win].foldexpr = "nvim_treesitter#foldexpr()"
+	-- Keep commentstring compatible with markdown
+	vim.bo[state.buf].commentstring = "<!-- %s -->"
+end
+
+---comment
 ---@param state Todo.State
 local function create_floating_window(state)
 	-- Get editor dimensions
@@ -139,6 +157,8 @@ local function create_floating_window(state)
 
 	-- Create window
 	state.win = vim.api.nvim_open_win(state.buf, true, opts)
+
+	set_todo_filetype(state)
 
 	-- Set window-local options
 	vim.api.nvim_set_option_value("winblend", 0, { win = state.win })

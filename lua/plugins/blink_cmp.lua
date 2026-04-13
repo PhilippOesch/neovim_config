@@ -64,6 +64,7 @@ return {
 		luasnip.filetype_extend("typescriptreact", { "html" })
 		luasnip.filetype_extend("htmlangular", { "html" })
 		luasnip.filetype_extend("vue", { "html" })
+		luasnip.filetype_extend("todo", { "markdown" })
 
 		require("luasnip.loaders.from_vscode").lazy_load()
 		require("luasnip.loaders.from_vscode").load({ paths = { "./snippets" } })
