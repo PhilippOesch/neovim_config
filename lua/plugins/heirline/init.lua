@@ -57,7 +57,7 @@ return {
 			provider = nil,
 		}
 
-		local tool_list = { "lazy", "mason", "mcphub", "oil_preview", "harpoon", "todo" }
+		local tool_list = { "lazy", "mason", "mcphub", "oil_preview", "harpoon" }
 		local Tool = {
 			condition = function(self)
 				return vim.tbl_contains(tool_list, vim.bo.filetype)
@@ -275,8 +275,10 @@ return {
 					end
 					local buf = args.buf
 					local buftype = vim.tbl_contains({ "prompt", "nofile", "help" }, vim.bo.buftype)
-					local filetype =
-						vim.tbl_contains({ "gitcommit", "fugitive", "Trouble", "packer", "dashboard" }, vim.bo.filetype)
+					local filetype = vim.tbl_contains(
+						{ "gitcommit", "fugitive", "Trouble", "packer", "dashboard", "todo" },
+						vim.bo.filetype
+					)
 					local include = vim.tbl_contains({ "codecompanion" }, vim.bo.filetype)
 					return (buftype or filetype) and not include
 				end,
