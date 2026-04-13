@@ -1,13 +1,28 @@
+---@class Todo.Config.Win.Keymaps
+---@field close? string
+
+---@class Todo.Config.Win
+---@field keymaps? Todo.Config.Win.Keymaps
+
 ---@class Todo.Config
 ---@field todo_file? string
 ---@field width? number
 ---@field height? number
+---@field win? Todo.Config.Win
 
+---get the default configuration
+---@return Todo.Config
 local get_default_config = function()
+	---@type Todo.Config
 	return {
 		todo_file = vim.fn.stdpath("data") .. "/todo.md",
 		width = 0.6,
 		height = 0.6,
+		win = {
+			keymaps = {
+				close = "q",
+			},
+		},
 	}
 end
 
@@ -16,6 +31,7 @@ local default_file_content = [[# Todos
 
 local M = {}
 
+---@type Todo.Config
 local config = nil
 
 ---@class Todo.State
@@ -36,7 +52,7 @@ local function save_todo_file(state)
 	if file then
 		file:write(table.concat(lines, "\n") .. "\n")
 		file:close()
-		vim.api.nvim_buf_set_option(state.buf, "modified", false)
+		vim.api.nvim_set_option_value("modified", false, { buf = state.buf })
 	else
 		vim.notify("Failed to save todo file", vim.log.levels.ERROR)
 	end
@@ -80,9 +96,9 @@ local function create_floating_window(state)
 	state.buf = vim.api.nvim_create_buf(false, false)
 
 	-- Set buffer options
-	vim.api.nvim_buf_set_option(state.buf, "filetype", "markdown")
-	vim.api.nvim_buf_set_option(state.buf, "bufhidden", "hide")
-	vim.api.nvim_buf_set_option(state.buf, "buftype", "acwrite")
+	vim.api.nvim_set_option_value("filetype", "markdown", { buf = state.buf })
+	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = state.buf })
+	vim.api.nvim_set_option_value("buftype", "acwrite", { buf = state.buf })
 
 	-- Set buffer name with timestamp to ensure uniqueness
 	local buf_name = string.format("todo://%s#%s", config.todo_file, vim.loop.hrtime())
@@ -100,7 +116,9 @@ local function create_floating_window(state)
 	vim.api.nvim_create_autocmd({ "BufLeave", "WinClosed", "BufUnload" }, {
 		buffer = state.buf,
 		callback = function()
-			if vim.api.nvim_buf_is_valid(state.buf) and vim.api.nvim_buf_get_option(state.buf, "modified") then
+			if
+				vim.api.nvim_buf_is_valid(state.buf) and vim.api.nvim_get_option_value("modified", { buf = state.buf })
+			then
 				save_todo_file(state)
 			end
 		end,
@@ -123,7 +141,7 @@ local function create_floating_window(state)
 	state.win = vim.api.nvim_open_win(state.buf, true, opts)
 
 	-- Set window-local options
-	vim.api.nvim_win_set_option(state.win, "winblend", 0)
+	vim.api.nvim_set_option_value("winblend", 0, { win = state.win })
 
 	-- Load file content
 	local file_path = vim.fn.expand(config.todo_file)
@@ -136,10 +154,10 @@ local function create_floating_window(state)
 		file:close()
 	end
 	vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
-	vim.api.nvim_buf_set_option(state.buf, "modified", false)
+	vim.api.nvim_set_option_value("modified", false, { buf = state.buf })
 
 	-- Set buffer-local keymap for closing with 'q'
-	vim.keymap.set("n", "q", function()
+	vim.keymap.set("n", config.win.keymaps.close, function()
 		M.close()
 	end, { buffer = state.buf, noremap = true, silent = true, desc = "Close todo window" })
 end
@@ -155,32 +173,19 @@ function M.setup(opts)
 			if
 				state.win
 				and vim.api.nvim_buf_is_valid(state.buf)
-				and vim.api.nvim_buf_get_option(state.buf, "modified")
+				and vim.api.nvim_get_option_value("modified", { buf = state.buf })
 			then
 				save_todo_file(state)
 			end
 		end,
 		desc = "Auto-save todo file before exiting Neovim",
 	})
-
-	-- todo setup global keumap seperatly
-	vim.keymap.set("n", "<leader>do", function()
-		M.toggle()
-	end, { noremap = true, silent = true, desc = "Toggle todo" })
-
-	-- Which-key integration
-	require("which-key").add({
-		{
-			"<leader>do",
-			icon = "",
-		},
-	})
 end
 
 -- Open todo window
 function M.open()
 	-- Don't open if already open
-	if todo_win and vim.api.nvim_win_is_valid(todo_win) then
+	if state.win and vim.api.nvim_win_is_valid(state.win) then
 		return
 	end
 
