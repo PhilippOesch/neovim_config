@@ -37,9 +37,32 @@ local config = nil
 ---@class Todo.State
 ---@field buf? integer
 ---@field win? integer
+---@field cursor_pos? [integer, integer]
 
 ---@type Todo.State
 local state = {}
+
+---comment
+---@param state Todo.State
+local function save_cursor_position(state)
+	if state.win and vim.api.nvim_win_is_valid(state.win) then
+		local ok, cur = pcall(vim.api.nvim_win_get_cursor, state.win)
+		if ok then
+			state.cursor_pos = cur
+		end
+	end
+end
+---
+---comment
+---@param state Todo.State
+local function restore_cursor_position(state)
+	if state.cursor_pos then
+		pcall(vim.api.nvim_win_set_cursor, state.win, state.cursor_pos)
+	else
+		-- default to start of file
+		pcall(vim.api.nvim_win_set_cursor, state.win, { 1, 0 })
+	end
+end
 
 ---@param state Todo.State
 local function save_todo_file(state)
@@ -127,6 +150,7 @@ local function create_floating_window(state)
 		buffer = state.buf,
 		callback = function()
 			save_todo_file(state)
+			save_cursor_position(state)
 		end,
 	})
 
@@ -134,6 +158,8 @@ local function create_floating_window(state)
 	vim.api.nvim_create_autocmd({ "BufLeave", "WinClosed", "BufUnload" }, {
 		buffer = state.buf,
 		callback = function()
+			save_cursor_position(state)
+
 			if
 				vim.api.nvim_buf_is_valid(state.buf) and vim.api.nvim_get_option_value("modified", { buf = state.buf })
 			then
@@ -176,6 +202,8 @@ local function create_floating_window(state)
 	vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
 	vim.api.nvim_set_option_value("modified", false, { buf = state.buf })
 
+	restore_cursor_position(state)
+
 	-- Set buffer-local keymap for closing with 'q'
 	vim.keymap.set("n", config.win.keymaps.close, function()
 		M.close()
@@ -216,6 +244,7 @@ end
 -- Close todo window with buffer cleanup
 function M.close()
 	if state.win and vim.api.nvim_win_is_valid(state.win) then
+		save_cursor_position(state)
 		vim.api.nvim_win_close(state.win, true)
 		state.win = nil
 	end

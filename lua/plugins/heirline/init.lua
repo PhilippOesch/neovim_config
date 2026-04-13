@@ -57,7 +57,7 @@ return {
 			provider = nil,
 		}
 
-		local tool_list = { "lazy", "mason", "mcphub", "oil_preview", "harpoon" }
+		local tool_list = { "lazy", "mason", "mcphub", "oil_preview", "harpoon", "todo" }
 		local Tool = {
 			condition = function(self)
 				return vim.tbl_contains(tool_list, vim.bo.filetype)
