@@ -14,7 +14,7 @@
 ---@field callback fun(ev: Config.Plugin.Build.Event)
 
 ---@class Config.Plugin
----@field deps Config.Plugin.Definition[]
+---@field deps (Config.Plugin.Definition[]|nil)
 ---@field build Config.Plugin.Build|nil
 ---@field init Config.InitFunction|nil
 
