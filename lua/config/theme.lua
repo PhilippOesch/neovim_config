@@ -32,14 +32,18 @@ local opts = {
 ---@type Config.Plugin
 return {
 	deps = {
-		"https://github.com/folke/tokyonight.nvim",
+		"https://github.com/scottmckendry/cyberdream.nvim",
+		-- "https://github.com/folke/tokyonight.nvim",
 	},
 	init = function()
-		local tokyonight = require("tokyonight")
+		require("cyberdream").setup()
 
-		tokyonight.setup(opts)
-		tokyonight.load(opts)
-
-		vim.cmd.colorscheme("tokyonight")
+		vim.cmd.colorscheme("cyberdream")
+		-- local tokyonight = require("tokyonight")
+		--
+		-- tokyonight.setup(opts)
+		-- tokyonight.load(opts)
+		--
+		-- vim.cmd.colorscheme("tokyonight")
 	end,
 }
