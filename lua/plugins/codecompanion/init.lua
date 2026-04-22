@@ -55,6 +55,7 @@ local opts = {
 				".windsurfrules",
 				"$XDG_CONFIG_HOME/AGENTS.md",
 				".github/copilot-instructions.md",
+				".copilot-instructions.md",
 				"AGENT.md",
 				"AGENTS.md",
 				{ path = "CLAUDE.md", parser = "claude" },
