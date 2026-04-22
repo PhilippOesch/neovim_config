@@ -33,17 +33,39 @@ local opts = {
 return {
 	deps = {
 		"https://github.com/scottmckendry/cyberdream.nvim",
-		-- "https://github.com/folke/tokyonight.nvim",
+		"https://github.com/folke/tokyonight.nvim",
+		"https://github.com/navarasu/onedark.nvim",
+		"https://github.com/olivercederborg/poimandres.nvim",
 	},
 	init = function()
+		--cyberdream
 		require("cyberdream").setup()
 
-		vim.cmd.colorscheme("cyberdream")
-		-- local tokyonight = require("tokyonight")
-		--
-		-- tokyonight.setup(opts)
-		-- tokyonight.load(opts)
-		--
-		-- vim.cmd.colorscheme("tokyonight")
+		--tokyonight
+		local tokyonight = require("tokyonight")
+		tokyonight.setup(opts)
+
+		--onedark
+		require("onedark").setup({
+			style = "deep",
+		})
+
+		--poimandres
+		require("poimandres").setup({
+		})
+
+		-- set cyberdream
+		-- vim.cmd.colorscheme("cyberdream")
+
+		-- set tokyonight
+		tokyonight.load(opts)
+		vim.cmd.colorscheme("tokyonight")
+
+		-- set onedark
+		-- require("onedark").load()
+		-- vim.cmd.colorscheme("onedark")
+		
+		-- -- set poimandres
+		-- vim.cmd.colorscheme("poimandres")
 	end,
 }
