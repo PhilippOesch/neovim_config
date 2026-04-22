@@ -24,9 +24,14 @@ return {
 				diag_info = utils.get_highlight("DiagnosticInfo").fg,
 				git_del = utils.get_highlight("DiffDelete").fg
 					or utils.get_highlight("diffRemoved").fg
-					or utils.get_highlight("DiffDeleted").fg,
-				git_add = utils.get_highlight("DiffAdd").fg or utils.get_highlight("diffAdded").fg,
-				git_change = utils.get_highlight("DiffChange").fg or utils.get_highlight("diffChanged").fg,
+					or utils.get_highlight("DiffDeleted").fg
+					or utils.get_highlight("Removed").fg,
+				git_add = utils.get_highlight("DiffAdd").fg
+					or utils.get_highlight("diffAdded").fg
+					or utils.get_highlight("Added").fg,
+				git_change = utils.get_highlight("DiffChange").fg
+					or utils.get_highlight("diffChanged").fg
+					or utils.get_highlight("Changed").fg,
 			}
 		end
 
