@@ -106,6 +106,10 @@ function Win:open()
 		return
 	end
 
+	if vim.g.todo_path then
+		config.config.todo_file = vim.g.todo_path
+	end
+
 	ensure_file_exists(config.config.todo_file)
 	self:create_floating_window()
 end
