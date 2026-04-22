@@ -154,7 +154,23 @@ return {
 		map("n", "<leader>pc", snacks.picker.colorschemes, { noremap = true, desc = "LSP Workspace Symbols" })
 		map("n", "<leader>sd", snacks.picker.diagnostics, { noremap = true, desc = "Diagnostics" })
 		map("n", "<leader>sD", snacks.picker.diagnostics_buffer, { noremap = true, desc = "Buffer Diagnostics" })
-		map("n", "<leader>sh", snacks.picker.help, { noremap = true, desc = "Help Pages" })
+		map("n", "<leader>sh", function()
+			snacks.picker.help({
+				finder = "help",
+				format = "text",
+				previewers = {
+					file = { ft = "help" },
+				},
+				win = { preview = { minimal = true } },
+				confirm = function(picker, item, action)
+					require("snacks.picker.actions").help(
+						picker,
+						item,
+						vim.tbl_extend("force", action, { cmd = "vsplit" })
+					)
+				end,
+			})
+		end, { noremap = true, desc = "Help Pages" })
 		map("n", '<leader>s"', snacks.picker.registers, { noremap = true, desc = "Registers" })
 		map("n", "<leader>sH", snacks.picker.highlights, { noremap = true, desc = "Highlights" })
 		map("n", "<leader>xx", snacks.bufdelete.all, { noremap = true, desc = "LSP Workspace Symbols" })
