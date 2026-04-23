@@ -4,6 +4,10 @@ local obsidian_opts = {
 			name = "personal",
 			path = "~/Documents/ObsidianVault/",
 		},
+		{
+			name = "work",
+			path = "/mnt/c/Dev/obsidian/",
+		},
 	},
 	completion = {
 		-- Set to false to disable completion.

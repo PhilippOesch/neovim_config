@@ -48,12 +48,14 @@ local opts = {
 		default = {
 			description = "Collection of common files for all projects",
 			files = {
+				"$XDG_CONFIG_HOME/AGENTS.md",
+				"$XDG_CONFIG_HOME/opencode/AGENTS.md",
+				"$XDG_CONFIG_HOME/opencode/Agents.md",
 				".clinerules",
 				".cursorrules",
 				".goosehints",
 				".rules",
 				".windsurfrules",
-				"$XDG_CONFIG_HOME/AGENTS.md",
 				".github/copilot-instructions.md",
 				".copilot-instructions.md",
 				"AGENT.md",
