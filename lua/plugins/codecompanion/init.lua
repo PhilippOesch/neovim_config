@@ -12,13 +12,13 @@ end
 ---@field OpenCode Models
 local model_mapping = {
 	Copilot = {
-		default = "gpt-5-mini",
-		premium = "claude-sonnet-4.5",
+		default = "gpt-4.1",
+		premium = "claude-sonnet-4.6",
 		opus = "claude-opus-4.6",
 	},
 	OpenCode = {
-		default = "github-copilot/gpt-5-mini",
-		premium = "github-copilot/claude-sonnet-4.5",
+		default = "github-copilot/gpt-4.1",
+		premium = "github-copilot/claude-sonnet-4.6",
 		opus = "github-copilot/claude-opus-4.6",
 	},
 }
