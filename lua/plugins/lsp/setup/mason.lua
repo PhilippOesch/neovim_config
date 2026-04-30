@@ -21,7 +21,19 @@ local servers = {
 	jdtls = {},
 	golangci_lint_ls = {},
 	vue_ls = {},
-	["eslint@4.8.0"] = {},
+	["eslint@4.8.0"] = {
+		filetypes = {
+			"typescript.tsx",
+			"vue",
+			"html",
+			"htmlangular",
+			"javascriptreact",
+			"typescriptreact",
+			"css",
+			"scss",
+			"sass",
+		},
+	},
 	tailwindcss = {
 		classAttributes = { "class", "className", "class:list", "classList", "ngClass", "placeholderClassName" },
 		filetypes = {
