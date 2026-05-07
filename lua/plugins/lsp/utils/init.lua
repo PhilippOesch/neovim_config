@@ -3,10 +3,11 @@ local M = {}
 local disable_mapping = {
 	marksman = {
 		"$HOME/Documents/ObsidianVault/",
+		"/mnt/c/Dev/obsidian/",
 	},
 }
 
-local active_typescript_lsp = "typescript-tools"
+local active_typescript_lsp = "ts_ls"
 
 ---comment
 ---@param client_name string
