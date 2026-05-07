@@ -44,6 +44,7 @@ return {
 			"vue",
 			"angular",
 			"go",
+			"sql",
 		}
 
 		if vim.fn.executable("tree-sitter") == 1 then

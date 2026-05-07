@@ -6,8 +6,22 @@ require("mason").setup({
 	registries = { "github:Crashdummyy/mason-registry", "github:mason-org/mason-registry" },
 })
 
-local vue_ls_share = vim.fn.expand("$MASON/packages/vue-language-server")
-local vue_language_server_path = vue_ls_share .. "/node_modules/@vue/language-server"
+-- If you are using mason.nvim, you can get the ts_plugin_path like this
+-- For Mason v1,
+-- local mason_registry = require('mason-registry')
+-- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+-- For Mason v2,
+local vue_language_server_path = vim.fn.expand("$MASON/packages")
+	.. "/vue-language-server"
+	.. "/node_modules/@vue/language-server"
+-- or even
+-- local vue_language_server_path = vim.fn.stdpath('data') .. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
+local vue_plugin = {
+	name = "@vue/typescript-plugin",
+	location = vue_language_server_path,
+	languages = { "vue" },
+	configNamespace = "typescript",
+}
 
 -- Enable the following language servers
 local servers = {
@@ -21,19 +35,33 @@ local servers = {
 	jdtls = {},
 	golangci_lint_ls = {},
 	vue_ls = {},
-	["eslint@4.8.0"] = {
+	ts_ls = {
+		plugins = {
+			vue_plugin,
+		},
 		filetypes = {
+			"javascript",
+			"javascriptreact",
+			"javascript.jsx",
+			"typescript",
+			"typescriptreact",
 			"typescript.tsx",
 			"vue",
-			"html",
-			"htmlangular",
-			"javascriptreact",
-			"typescriptreact",
-			"css",
-			"scss",
-			"sass",
 		},
 	},
+	["eslint@4.8.0"] = {},
+	-- ["eslint"] = {
+	-- 	-- settings = {
+	-- 	-- 	experimental = {
+	-- 	-- 		-- If you want to use flat config on >= 8.21, < 9.0
+	-- 	-- 		useFlatConfig = true,
+	-- 	-- 		-- Or if you want to use eslintrc on 9.*
+	-- 	-- 		-- useFlatConfig = false,
+	-- 	-- 	},
+	-- 	-- },
+	-- 	-- root_markers = { ".git", "package.json" },
+	-- 	workingDirectory = { mode = "location" },
+	-- },
 	tailwindcss = {
 		classAttributes = { "class", "className", "class:list", "classList", "ngClass", "placeholderClassName" },
 		filetypes = {
