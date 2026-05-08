@@ -5,8 +5,8 @@ local M = {}
 
 --
 local function get_debugger()
-	-- return home .. "/dev/projects/netcoredbg/build/src/netcoredbg"
-	return "/usr/local/netcoredbg"
+	local netcoredbg_path = vim.fn.expand("$MASON/packages") .. "/netcoredbg/netcoredbg"
+	return netcoredbg_path
 end
 
 function M.init()
@@ -36,4 +36,4 @@ function M.init()
 	}
 end
 
-return M;
+return M
