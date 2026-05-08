@@ -7,6 +7,11 @@ local config = require("plugins.todo.config")
 ---@field close fun(self: Todo.Win)
 ---@field toggle fun(self: Todo.Win)
 
+
+local function get_todo_path()
+	return _G.todo_path or config.config.todo_file
+end
+
 ---comment
 ---@param state Todo.State
 local function restore_cursor_position(state)
@@ -43,7 +48,7 @@ local function save_todo_file(state)
 	end
 
 	local lines = vim.api.nvim_buf_get_lines(state.buf, 0, -1, false)
-	local file = io.open(vim.fn.expand(config.config.todo_file), "w")
+	local file = io.open(vim.fn.expand(get_todo_path()), "w")
 	if file then
 		file:write(table.concat(lines, "\n") .. "\n")
 		file:close()
@@ -106,7 +111,7 @@ function Win:open()
 		return
 	end
 
-	ensure_file_exists(config.config.todo_file)
+	ensure_file_exists(get_todo_path())
 	self:create_floating_window()
 end
 
@@ -170,7 +175,7 @@ function Win:create_floating_window()
 	vim.api.nvim_set_option_value("buftype", "acwrite", { buf = self.state.buf })
 
 	-- Set buffer name with timestamp to ensure uniqueness
-	local buf_name = string.format("todo://%s#%s", config.config.todo_file, vim.loop.hrtime())
+	local buf_name = string.format("todo://%s#%s", get_todo_path(), vim.loop.hrtime())
 	pcall(vim.api.nvim_buf_set_name, self.state.buf, buf_name)
 
 	-- Setup write command for :w support
@@ -219,7 +224,7 @@ function Win:create_floating_window()
 	vim.api.nvim_set_option_value("winblend", 0, { win = self.state.win })
 
 	-- Load file content
-	local file_path = vim.fn.expand(config.config.todo_file)
+	local file_path = vim.fn.expand(get_todo_path())
 	local lines = {}
 	local file = io.open(file_path, "r")
 	if file then
@@ -238,5 +243,6 @@ function Win:create_floating_window()
 		self:close()
 	end, { buffer = self.state.buf, noremap = true, silent = true, desc = "Close todo window" })
 end
+
 
 return Win
