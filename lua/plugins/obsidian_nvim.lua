@@ -2,11 +2,7 @@ local obsidian_opts = {
 	workspaces = {
 		{
 			name = "personal",
-			path = "~/Documents/ObsidianVault/",
-		},
-		{
-			name = "work",
-			path = "/mnt/c/Dev/obsidian/",
+			path = "$OBSIDIAN_PATH",
 		},
 	},
 	completion = {
