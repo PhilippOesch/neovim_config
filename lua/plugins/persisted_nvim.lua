@@ -49,16 +49,14 @@ return {
 			pattern = "PersistedSavePre",
 			group = group,
 			callback = function()
-				local cc_available, codecompanion = pcall(require, "codecompanion")
+				for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+					if vim.bo[buf].filetype == "codecompanion" then
+						vim.api.nvim_buf_delete(buf, { force = true })
+					end
 
-				if cc_available then
-					codecompanion.close_last_chat()
-				end
-
-				local opencode_available, opencode = pcall(require, "opencode")
-
-				if opencode_available then
-					opencode.stop()
+					if vim.bo[buf].filetype == "sidekick_terminal" then
+						vim.api.nvim_buf_delete(buf, { force = true })
+					end
 				end
 			end,
 		})

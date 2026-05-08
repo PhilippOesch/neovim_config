@@ -54,7 +54,7 @@ return {
 			provider = "Local List:",
 		}
 
-		local ignore_list = { "snacks_dashboard" }
+		local ignore_list = { "snacks_dashboard", "sidekick_terminal" }
 		IgnoreWinBar = {
 			condition = function(self)
 				return vim.tbl_contains(ignore_list, vim.bo.filetype)
@@ -281,7 +281,7 @@ return {
 					local buf = args.buf
 					local buftype = vim.tbl_contains({ "prompt", "nofile", "help" }, vim.bo.buftype)
 					local filetype = vim.tbl_contains(
-						{ "gitcommit", "fugitive", "Trouble", "packer", "dashboard", "todo" },
+						{ "gitcommit", "fugitive", "Trouble", "packer", "dashboard", "todo", "sidekick_terminal" },
 						vim.bo.filetype
 					)
 					local include = vim.tbl_contains({ "codecompanion" }, vim.bo.filetype)
