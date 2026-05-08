@@ -4,7 +4,7 @@ This project contains a modular, plugin-driven Neovim configuration, optimized f
 
 ## Features
 
-- **Plugin Management:** Uses [lazy.nvim](https://github.com/folke/lazy.nvim) for fast, lazy-loaded plugin management.
+- **Plugin Management:** Uses Neovim’s built-in [vim.pack](https://neovim.io/) for fast, native plugin management, with a minimal wrapper for modular config and advanced features (see `lua/utils/plugin_manager.lua`).
 - **Language Support:**
   - Treesitter for advanced syntax highlighting and code navigation (supports C, C++, Java, JSON, SCSS, CSS, Lua, Diff, Python, Rust, TSX, JavaScript, TypeScript, Bash, XML, C#, Vue, Angular, Go, and more).
   - LSP integration for diagnostics, code actions, and autocompletion.
@@ -31,13 +31,20 @@ This project contains a modular, plugin-driven Neovim configuration, optimized f
    git clone <repo-url> ~/.config/nvim
    ```
 2. **Install [Neovim 0.12.0](https://neovim.io/)** or newer.
-3. **Start Neovim**. Plugins will be installed automatically on first launch via `lazy.nvim`.
+3. **Start Neovim.** Plugins will be installed automatically on first launch using the native vim.pack system.
 4. **(Optional) Install language servers and external tools** for full LSP and formatting support (see plugin docs for details).
+
+## Plugin Management
+
+- Plugins are defined as modular Lua tables in `lua/plugins/`.
+- All plugin specs are loaded via a custom wrapper (`lua/utils/plugin_manager.lua`) that builds on top of vim.pack. This allows for custom build steps, dependency resolution, and `init` hooks.
+- To add or customize a plugin, add/modify the relevant Lua file in `lua/plugins/` and refer to `plugin_manager.lua` for advanced options and extension points.
+- The plugin manager uses `nvim-pack-lock.json` to keep plugin versions consistent. Normally, this is managed automatically, but you can delete it to force a full resync on your next launch if needed.
 
 ## Usage
 
 - `<Space>` is the leader key.
-- Use `:Lazy` to manage plugins.
+- Use Neovim commands to work with plugins (see [`vim.pack`](https://neovim.io/)), .
 - Use `<leader>wv`/`<leader>wh` to split windows vertically/horizontally.
 - Use `<leader>h` and `<leader>'` for Harpoon quick navigation.
 - Use `<leader>mo` to open Markdown Preview.
@@ -48,13 +55,18 @@ This project contains a modular, plugin-driven Neovim configuration, optimized f
 - `init.lua` – Main entry point
 - `lua/config/` – General settings and keymaps
 - `lua/plugins/` – Plugin specifications and configs
+- `lua/utils/plugin_manager.lua` – Wrapper for plugin management (recommend reviewing for advanced usage)
 - `md-preview/` – Custom CSS for markdown preview
 - `snippets/` – Code snippets for supported languages
 - `ftplugin/` – Filetype-specific settings
 
+## Migration Notes
+
+- **This config previously used lazy.nvim but now relies entirely on vim.pack.** Plugin specification and loading syntax have changed to be compatible with vim.pack and the custom wrapper. See the `lua/plugins/` examples for the current format.
+
 ## Contributing
 
-Feel free to open issues or PRs for improvements, new plugins, or bug fixes.
+Feel free to open issues or PRs for improvements, new plugins, or bug fixes. New plugins should be defined as modular Lua specs under `lua/plugins/`, and advanced integration can leverage features in `lua/utils/plugin_manager.lua`.
 
 ## License
 
