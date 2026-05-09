@@ -21,6 +21,7 @@ return {
 	init = function()
 		local ensureInstalled = {
 			"c",
+			"toml",
 			"cpp",
 			"java",
 			"json",

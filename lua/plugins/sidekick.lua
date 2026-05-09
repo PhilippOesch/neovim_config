@@ -10,8 +10,8 @@ return {
 			},
 			cli = {
 				mux = {
-					backend = "tmux",
-					enabled = true,
+					-- backend = "tmux",
+					enabled = false,
 				},
 				win = {
 					config = function(terminal)
@@ -19,6 +19,7 @@ return {
 						function terminal:open_win()
 							orig_open_win(self)
 							if self.win and vim.api.nvim_win_is_valid(self.win) then
+								vim.cmd("redraw!")
 								vim.api.nvim_win_call(self.win, function()
 									vim.fn.winrestview({ leftcol = 0 })
 								end)
@@ -38,6 +39,7 @@ return {
 			},
 			tools = {
 				opencode = {},
+				gemini = {},
 			},
 		})
 

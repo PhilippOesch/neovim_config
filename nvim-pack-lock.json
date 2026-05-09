@@ -223,6 +223,10 @@
       "rev": "f2ec6ee6384c3b611ddc817b9e78b20cd0334bbb",
       "src": "https://github.com/seblj/roslyn.nvim"
     },
+    "sidekick.nvim": {
+      "rev": "208e1c5b8170c01fd1d07df0139322a76479b235",
+      "src": "https://github.com/folke/sidekick.nvim"
+    },
     "smear-cursor.nvim": {
       "rev": "c85bdbb25db096fbcf616bc4e1357bd61fe2c199",
       "src": "https://github.com/sphamba/smear-cursor.nvim"
