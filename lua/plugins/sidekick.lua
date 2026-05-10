@@ -10,22 +10,16 @@ return {
 			},
 			cli = {
 				mux = {
-					-- backend = "tmux",
+					backend = "tmux",
 					enabled = false,
+					create = "split",
 				},
 				win = {
-					config = function(terminal)
-						local orig_open_win = terminal.open_win
-						function terminal:open_win()
-							orig_open_win(self)
-							if self.win and vim.api.nvim_win_is_valid(self.win) then
-								vim.cmd("redraw!")
-								vim.api.nvim_win_call(self.win, function()
-									vim.fn.winrestview({ leftcol = 0 })
-								end)
-							end
-						end
-					end,
+					layout = "right",
+					split = {
+						width = 80, -- set to 0 for default split width
+						height = 20, -- set to 0 for default split height
+					},
 				},
 			},
 			copilot = {

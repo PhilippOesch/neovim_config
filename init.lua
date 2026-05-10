@@ -46,7 +46,6 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.neotest"),
 	require("plugins.persisted_nvim"),
 	require("plugins.nvimcolorizer"),
-	-- require("plugins.codecompanion"),
 	require("plugins.heirline.init"),
 	require("plugins.sidekick"),
 })

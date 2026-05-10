@@ -54,7 +54,7 @@ return {
 			provider = "Local List:",
 		}
 
-		local ignore_list = { "snacks_dashboard", "sidekick_terminal" }
+		local ignore_list = { "snacks_dashboard" }
 		IgnoreWinBar = {
 			condition = function(self)
 				return vim.tbl_contains(ignore_list, vim.bo.filetype)
@@ -62,7 +62,7 @@ return {
 			provider = nil,
 		}
 
-		local tool_list = { "lazy", "mason", "mcphub", "oil_preview", "harpoon" }
+		local tool_list = { "lazy", "mason", "mcphub", "oil_preview", "harpoon", "sidekick_terminal" }
 		local Tool = {
 			condition = function(self)
 				return vim.tbl_contains(tool_list, vim.bo.filetype)
@@ -191,9 +191,42 @@ return {
 		local dap = require("plugins.heirline.dap")
 		local Git = require("plugins.heirline.git")
 		local navic = require("plugins.heirline.navic")
+		local oil = require("plugins.heirline.oil")
+
+		local WinBars = {
+			condition = function()
+				return vim.bo and vim.bo.filetype
+			end,
+			init = function(self)
+				self.filetype = vim.bo.filetype
+			end,
+			fallthrough = false,
+			IgnoreWinBar,
+			oil.OilPreview,
+			Qflist,
+			Llist,
+			Tool,
+			oil.OilBlock,
+			{ -- A special winbar for terminals
+				condition = function()
+					return conditions.buffer_matches({ buftype = { "terminal" } })
+				end,
+				file.Type,
+			},
+			{ -- An inactive winbar for regular files
+				condition = function()
+					return not conditions.is_active()
+				end,
+				utils.insert({ hl = { fg = "gray", force = true }, file.NameBlock }),
+			},
+			-- A winbar for regular files
+			file.NameBlock,
+		}
 
 		local DefaultStatusLine = {
 			ViMode,
+			Space,
+			WinBars,
 			Space,
 			Git,
 			Space,
@@ -217,39 +250,6 @@ return {
 			ScrollBar,
 		}
 
-		local oil = require("plugins.heirline.oil")
-
-		local WinBars = {
-			condition = function()
-				return vim.bo and vim.bo.filetype
-			end,
-			init = function(self)
-				self.filetype = vim.bo.filetype
-			end,
-			fallthrough = false,
-			IgnoreWinBar,
-			oil.OilPreview,
-			Qflist,
-			Llist,
-			Tool,
-			oil.OilBlock,
-			codecompanion.Title,
-			{ -- A special winbar for terminals
-				condition = function()
-					return conditions.buffer_matches({ buftype = { "terminal" } })
-				end,
-				file.Type,
-			},
-			{ -- An inactive winbar for regular files
-				condition = function()
-					return not conditions.is_active()
-				end,
-				utils.insert({ hl = { fg = "gray", force = true }, file.NameBlock }),
-			},
-			-- A winbar for regular files
-			file.NameBlock,
-		}
-
 		local StatusLines = {
 
 			hl = function()
@@ -271,7 +271,7 @@ return {
 
 		require("heirline").setup({
 			statusline = StatusLines,
-			winbar = WinBars,
+			-- winbar = WinBars,
 			opts = {
 				colors = setup_colors(),
 				disable_winbar_cb = function(args)
@@ -289,6 +289,26 @@ return {
 				end,
 			},
 		})
+		-- require("heirline").setup({
+		-- 	statusline = StatusLines,
+		-- 	winbar = WinBars,
+		-- 	opts = {
+		-- 		colors = setup_colors(),
+		-- 		disable_winbar_cb = function(args)
+		-- 			if not vim.bo then
+		-- 				return true
+		-- 			end
+		-- 			local buf = args.buf
+		-- 			local buftype = vim.tbl_contains({ "prompt", "nofile", "help" }, vim.bo.buftype)
+		-- 			local filetype = vim.tbl_contains(
+		-- 				{ "gitcommit", "fugitive", "Trouble", "packer", "dashboard", "todo", "sidekick_terminal" },
+		-- 				vim.bo.filetype
+		-- 			)
+		-- 			local include = vim.tbl_contains({ "codecompanion" }, vim.bo.filetype)
+		-- 			return (buftype or filetype) and not include
+		-- 		end,
+		-- 	},
+		-- })
 
 		local group = vim.api.nvim_create_augroup("Heirline", { clear = true })
 		vim.api.nvim_create_autocmd("ColorScheme", {
