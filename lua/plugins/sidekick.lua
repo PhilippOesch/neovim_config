@@ -11,8 +11,8 @@ return {
 			cli = {
 				mux = {
 					backend = "tmux",
-					enabled = false,
-					create = "split",
+					enabled = true,
+					create = "terminal",
 				},
 				win = {
 					layout = "right",
