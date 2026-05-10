@@ -160,8 +160,6 @@ return {
 			Align,
 		}
 
-		local codecompanion = require("plugins.heirline.codecompanion")
-
 		local SpecialStatusline = {
 			condition = function()
 				return conditions.buffer_matches({
@@ -174,17 +172,6 @@ return {
 			Space,
 			HelpFileName,
 			Align,
-			codecompanion.Adapter,
-			Space,
-			codecompanion.Model,
-			Space,
-			codecompanion.Mode,
-			Space,
-			codecompanion.Billing,
-			Align,
-			codecompanion.Chat,
-			Space,
-			codecompanion.Status,
 		}
 
 		local lsp = require("plugins.heirline.lsp")
@@ -271,7 +258,6 @@ return {
 
 		require("heirline").setup({
 			statusline = StatusLines,
-			-- winbar = WinBars,
 			opts = {
 				colors = setup_colors(),
 				disable_winbar_cb = function(args)
@@ -289,26 +275,6 @@ return {
 				end,
 			},
 		})
-		-- require("heirline").setup({
-		-- 	statusline = StatusLines,
-		-- 	winbar = WinBars,
-		-- 	opts = {
-		-- 		colors = setup_colors(),
-		-- 		disable_winbar_cb = function(args)
-		-- 			if not vim.bo then
-		-- 				return true
-		-- 			end
-		-- 			local buf = args.buf
-		-- 			local buftype = vim.tbl_contains({ "prompt", "nofile", "help" }, vim.bo.buftype)
-		-- 			local filetype = vim.tbl_contains(
-		-- 				{ "gitcommit", "fugitive", "Trouble", "packer", "dashboard", "todo", "sidekick_terminal" },
-		-- 				vim.bo.filetype
-		-- 			)
-		-- 			local include = vim.tbl_contains({ "codecompanion" }, vim.bo.filetype)
-		-- 			return (buftype or filetype) and not include
-		-- 		end,
-		-- 	},
-		-- })
 
 		local group = vim.api.nvim_create_augroup("Heirline", { clear = true })
 		vim.api.nvim_create_autocmd("ColorScheme", {
