@@ -48,6 +48,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.nvimcolorizer"),
 	require("plugins.heirline.init"),
 	require("plugins.sidekick"),
+	-- require("plugins.my_statusline")
 })
 
 require("config.general")

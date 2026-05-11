@@ -8,11 +8,14 @@ end
 
 local statusline_builder = builder.new()
 statusline_builder
-	:add_surround("", "", function(bld)
-		bld:add_hl("Special", function(bld)
-			bld:add_mode()
-		end)
-	end)
+	:add_surround("󰽥", "󰽧", function(bld)
+		-- :add(function()
+		-- 	return "dsgdsg"
+		-- end, "Special")
+		-- bld:add_hl("Special", function(bld)
+		bld:add_mode()
+		-- end)
+	end, "Normal")
 	:add_space()
 	:add_filename()
 
