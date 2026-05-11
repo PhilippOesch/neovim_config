@@ -172,17 +172,6 @@ return {
 			Space,
 			HelpFileName,
 			Align,
-			codecompanion.Adapter,
-			Space,
-			codecompanion.Model,
-			Space,
-			codecompanion.Mode,
-			Space,
-			codecompanion.Billing,
-			Align,
-			codecompanion.Chat,
-			Space,
-			codecompanion.Status,
 		}
 
 		local lsp = require("plugins.heirline.lsp")
