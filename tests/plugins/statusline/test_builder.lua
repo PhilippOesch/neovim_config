@@ -193,4 +193,70 @@ T["builder"]["add_hl_end - does not end group if nothing to group"] = function()
 	MiniTest.expect.equality(ok, "")
 end
 
+T["builder"]["add_surround - surrounds text with surrounding characters"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_surround('(',')',function(bld)
+			bld:add('abc')
+		end)
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "(abc)")
+end
+
+T["builder"]["add_surround - surrounds text with surrounding characters and inverts highlight group properly"] = function()
+	local result = child.lua([[
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			load_colors = function() end,                                  
+			get_highlight = function(name) return {} end,                  
+		}                                                                  
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_surround('(',')',function(bld)
+			bld:add('abc')
+		end, {fg = 'MockHl'})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_MockHl#(%*%#MockHl_noFg#abc%*%#noBg_MockHl#)%*")
+end
+
+T["builder"]["add_mode - gets vim mode"] = function()
+	local result = child.lua([[
+		vim.fn.mode = function()
+			return 'n'
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_mode()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#MockHl#%(N%)%*")
+end
+
+T["builder"]["add_mode - surrounding keeps background color"] = function()
+	local result = child.lua([[
+		vim.fn.mode = function()
+			return 'n'
+		end
+
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			load_colors = function() end,                                  
+			get_highlight = function(name) return 'test' end,                  
+		}                                                                  
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_surround('(',')',function(bld)
+			bld:add_mode()
+		end, {fg = 'MockHl'})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_MockHl#(%*%#MockHl_noFg#%(N%)%*%#noBg_MockHl#)%*")
+end
+
 return T
