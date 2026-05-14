@@ -252,7 +252,10 @@ T["builder"]["add_mode - surrounding keeps background color"] = function()
 				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
 			end,                    
 			load_colors = function() end,                                  
-			get_highlight = function(name) return 'test' end,                  
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				return {fg = split[2], bg=split[1]}
+			end,                  
 		}                                                                  
 
 		local builder = require('plugins.statusline.builder')
