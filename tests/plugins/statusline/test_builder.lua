@@ -102,7 +102,7 @@ T["builder"]["add_align - align characters are added"] = function()
 	MiniTest.expect.error(result)
 end
 
-T["builder"]["add_hl_start - does return expected string on build"] = function()
+T["builder"]["add_hl_start - does not create highlight if no string set at allo"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add_hl_start(
@@ -110,7 +110,7 @@ T["builder"]["add_hl_start - does return expected string on build"] = function()
 		)
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl#")
+	MiniTest.expect.equality(result, "")
 end
 
 T["builder"]["add_hl_start - should add highlight to stack"] = function()
@@ -168,16 +168,16 @@ T["builder"]["stacking higlight groups works as expected"] = function()
 			:add_hl_end()
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl1#%#MockHl2#abc%*def%*")
+	MiniTest.expect.equality(result, "%#MockHl2#abc%*%#MockHl1#def%*")
 end
 
-T["builder"]["add_hl_end - does return expected string on build"] = function()
+T["builder"]["add_hl_end - does not end group if nothing to group"] = function()
 	local ok = child.lua([[
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add_hl_end()
 		return b:build()
 	]])
-	MiniTest.expect.equality(ok, "%*")
+	MiniTest.expect.equality(ok, "")
 end
 
 return T

@@ -99,9 +99,9 @@ function Builder:add_hl_start(hl)
 		end
 	end
 	table.insert(self.hl_stack, hl_fn)
-	table.insert(self.statusline, function()
-		return "%#" .. hl_fn() .. "#"
-	end)
+	-- table.insert(self.statusline, function()
+	-- 	return "%#" .. hl_fn() .. "#"
+	-- end)
 	return self
 end
 
@@ -110,7 +110,6 @@ function Builder:add_hl_end()
 	if #self.hl_stack > 0 then
 		table.remove(self.hl_stack, #self.hl_stack)
 	end
-	table.insert(self.statusline, "%*")
 	return self
 end
 
@@ -119,10 +118,17 @@ end
 ---@param hl? hl_val
 ---@return Builder
 function Builder:add(fn, hl)
+	hl = hl or (#self.hl_stack > 0 and self.hl_stack[#self.hl_stack])
+	local hl_fn = function()
+		if type(hl) == "table" then
+			return highlight.eval_hl(hl)
+		end
+		return hl()
+	end
 	if hl then
-		self:add_hl_start(hl)
+		table.insert(self.statusline, "%#" .. hl_fn() .. "#")
 		table.insert(self.statusline, fn)
-		self:add_hl_end()
+		table.insert(self.statusline, "%*")
 	else
 		table.insert(self.statusline, fn)
 	end
