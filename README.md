@@ -34,6 +34,23 @@ This project contains a modular, plugin-driven Neovim configuration, optimized f
 3. **Start Neovim.** Plugins will be installed automatically on first launch using the native vim.pack system.
 4. **(Optional) Install language servers and external tools** for full LSP and formatting support (see plugin docs for details).
 
+## Testing
+
+Unit tests for the custom statusline framework (and other Lua modules) are written with [`mini.test`](https://github.com/nvim-mini/mini.nvim) and run inside isolated headless Neovim child processes.
+
+### Running tests
+
+- **Run the full suite:**
+  ```sh
+  make test
+  ```
+- **Run a single test file:**
+  ```sh
+  make test_file FILE=tests/plugins/statusline/test_highlight.lua
+  ```
+
+The first run will automatically clone `mini.nvim` into `deps/`. Test files live under `tests/` and mirror the source structure in `lua/`.
+
 ## Plugin Management
 
 - Plugins are defined as modular Lua tables in `lua/plugins/`.
