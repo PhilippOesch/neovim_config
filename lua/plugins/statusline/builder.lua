@@ -72,9 +72,15 @@ function Builder:add_hl_start(hl)
 	local hl_fn = function()
 		return highlight.eval_hl(hl)
 	end
+
 	if type(hl) == "table" and #self.hl_stack > 0 then
+		local parent_hl = self.hl_stack[#self.hl_stack]
 		hl_fn = function()
-			return vim.tbl_extend("force", self.hl_stack[#self.hl_stack], hl)
+			local from_stack = resolve_dynamic_hl(parent_hl)
+			if type(from_stack) == "string" then
+				from_stack = highlight.get_highlight(from_stack)
+			end
+			return highlight.eval_hl(vim.tbl_extend("force", from_stack, hl))
 		end
 	end
 

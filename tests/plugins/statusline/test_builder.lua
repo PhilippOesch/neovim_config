@@ -145,13 +145,12 @@ T["builder"]["add - highlight should be processed as expected"] = function()
 	]])
 	MiniTest.expect.equality(result, "%#MockHl#abc%*")
 end
+
 T["builder"]["stacking higlight groups works as expected"] = function()
 	local result = child.lua([[
-		local count = 0
 		package.loaded['plugins.statusline.highlight'] = {                 
 		    eval_hl = function(hl) 
-				count = count + 1
-				return 'MockHl' .. count
+				return hl.fg
 		    end,                    
 		    load_colors = function() end,                                  
 		    get_highlight = function(name) return {} end,                  
@@ -159,17 +158,17 @@ T["builder"]["stacking higlight groups works as expected"] = function()
 
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new()
-			:add_hl_start({fg= "#00FF00"})
+			:add_hl_start({fg= "MockHl1"})
 			:add(function()
 				return "abc"
-			end, {fg= "#00FF00"})
+			end, {fg= "MockHl2"})
 			:add(function()
 				return "def"
 			end)
 			:add_hl_end()
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl1#%#MockHl2#abc%*%*")
+	MiniTest.expect.equality(result, "%#MockHl1#%#MockHl2#abc%*def%*")
 end
 
 T["builder"]["add_hl_end - does return expected string on build"] = function()
