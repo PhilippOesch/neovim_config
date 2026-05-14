@@ -1,19 +1,24 @@
+local highlight = require("plugins.statusline.highlight")
+
 local Builder = {}
 Builder.__index = Builder
 
 ---@class Builder
 ---@field statusline eval_fun[]
+---@field hl_stack (string|table)[]
 ---@field new fun(): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: string): Builder
 ---@field add_filename fun(self: Builder): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
 ---@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?:string): Builder
+---@field add_conditional fun(self: Builder, fn: eval_fun_builder, predicate: condition_fun): Builder
 ---@field add_mode fun(self: Builder, hl?:string): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
 ---@alias eval_fun_builder fun(self: Builder)
+---@alias condition_fun fun():boolean
 
 ---@return Builder
 function Builder.new()
@@ -21,16 +26,53 @@ function Builder.new()
 
 	---@type eval_fun[]
 	self.statusline = {}
+	self.hl_stack = {}
 
 	return self
 end
 
+local function deepcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == "table" then
+		copy = {}
+		for orig_key, orig_value in next, orig, nil do
+			copy[deepcopy(orig_key)] = deepcopy(orig_value)
+		end
+		setmetatable(copy, deepcopy(getmetatable(orig)))
+	else
+		copy = orig
+	end
+	return copy
+end
+
 function Builder:add_hl_start(hl)
+	local hl_fn = function()
+		return highlight.eval_hl(hl)
+	end
+	if type(hl) == "table" and #self.hl_stack > 0 then
+		hl = vim.tbl_extend("force", self.hl_stack[#self.hl_stack], hl)
+	end
+
+	if type(hl) == "function" then
+		local current_stack = deepcopy(self.hl_stack)
+		hl_fn = function()
+			local evaluated_hl = hl()
+			if type(evaluated_hl) == "table" and #current_stack > 0 then
+				evaluated_hl = vim.tbl_extend("force", current_stack[#current_stack], evaluated_hl)
+			end
+			return highlight.eval_hl(evaluated_hl)
+		end
+	end
+	table.insert(self.hl_stack, hl)
 	table.insert(self.statusline, function()
-		return "%#" .. hl .. "#"
+		return "%#" .. hl_fn() .. "#"
 	end)
 end
 function Builder:add_hl_end()
+	if #self.hl_stack > 0 then
+		table.remove(self.hl_stack, #self.hl_stack)
+	end
 	table.insert(self.statusline, function()
 		return "%*"
 	end)
@@ -41,7 +83,7 @@ end
 ---@param hl? string
 ---@return Builder
 function Builder:add(fn, hl)
-	if hl ~= nil then
+	if hl then
 		self:add_hl_start(hl)
 		table.insert(self.statusline, fn)
 		self:add_hl_end()
@@ -49,6 +91,15 @@ function Builder:add(fn, hl)
 		table.insert(self.statusline, fn)
 	end
 	return self
+end
+
+---@param fn eval_fun_builder
+---@param predicate condition_fun
+---@return Builder
+function Builder:add_conditional(fn, predicate)
+	if predicate() then
+		fn(self)
+	end
 end
 
 ---@return Builder
@@ -85,15 +136,15 @@ end
 ---@return Builder
 function Builder:add_surround(left, right, fn, hl)
 	if hl then
-		self:add_hl_start(hl)
 		self:add(function()
 			return left
 		end, hl)
+		self:add_hl_start((type(hl) == "table" and { bg = hl.fg }))
 		fn(self)
+		self:add_hl_end()
 		self:add(function()
 			return right
 		end, hl)
-		self:add_hl_end()
 	else
 		self:add(function()
 			return left
@@ -164,7 +215,9 @@ function Builder:add_mode(hl)
 
 	self:add(function()
 		return "%(" .. mode_names[vim.fn.mode(1)] .. "%)"
-	end, mode_colors[vim.fn.mode(1)])
+	end, function()
+		return { fg = highlight.get_highlight(mode_colors[vim.fn.mode(1)]).fg }
+	end)
 	return self
 end
 
