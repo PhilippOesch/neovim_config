@@ -6,7 +6,7 @@ local Builder = {}
 Builder.__index = Builder
 
 ---@class Builder
----@field statusline eval_fun[]
+---@field statusline (eval_fun|string)[]
 ---@field hl_stack hl_val[]
 ---@field new fun(hl?: hl_val): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
@@ -85,13 +85,11 @@ function Builder:add_hl_end()
 	if #self.hl_stack > 0 then
 		table.remove(self.hl_stack, #self.hl_stack)
 	end
-	table.insert(self.statusline, function()
-		return "%*"
-	end)
+	table.insert(self.statusline, "%*")
 end
 
 ---add new eval function
----@param fn eval_fun
+---@param fn eval_fun|string
 ---@param hl? string
 ---@return Builder
 function Builder:add(fn, hl)
@@ -163,9 +161,7 @@ end
 
 ---@return Builder
 function Builder:add_align()
-	self:add(function()
-		return "%="
-	end)
+	self:add("%=")
 	return self
 end
 
@@ -174,9 +170,7 @@ end
 ---@param len? integer
 ---@return Builder
 function Builder:add_space(chars, len)
-	self:add(function()
-		return string.rep(chars or " ", len or 1)
-	end)
+	self:add(string.rep(chars or " ", len or 1))
 	return self
 end
 
@@ -219,7 +213,11 @@ end
 function Builder:build()
 	local res = ""
 	for _, value in ipairs(self.statusline) do
-		res = res .. value()
+		if type(value) == "string" then
+			res = res .. value
+		elseif type(value) == "function" then
+			res = res .. value()
+		end
 	end
 	return res
 end
