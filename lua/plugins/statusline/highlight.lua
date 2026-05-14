@@ -95,7 +95,7 @@ local function normalize_hl(hl)
 end
 
 function M.eval_hl(hl)
-	if type(hl) == "string" then
+	if type(hl) == "string" or hl == nil then
 		return hl
 	end
 

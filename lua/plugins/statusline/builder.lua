@@ -58,28 +58,44 @@ local function deepcopy(orig)
 	return copy
 end
 
+local function resolve_dynamic_hl(hl)
+	local hl = hl
+	while type(hl) == "function" do
+		hl = hl()
+	end
+	return hl
+end
+
+---@return Builder
 function Builder:add_hl_start(hl)
 	local hl_fn = function()
 		return highlight.eval_hl(hl)
 	end
 	if type(hl) == "table" and #self.hl_stack > 0 then
-		hl = vim.tbl_extend("force", self.hl_stack[#self.hl_stack], hl)
+		hl_fn = function()
+			return vim.tbl_extend("force", self.hl_stack[#self.hl_stack], hl)
+		end
 	end
 
 	if type(hl) == "function" then
 		local current_stack = deepcopy(self.hl_stack)
 		hl_fn = function()
-			local evaluated_hl = hl()
+			local evaluated_hl = resolve_dynamic_hl(hl)
 			if type(evaluated_hl) == "table" and #current_stack > 0 then
-				evaluated_hl = vim.tbl_extend("force", current_stack[#current_stack], evaluated_hl)
+				local from_stack = resolve_dynamic_hl(current_stack[#current_stack])
+				if type(from_stack) == "string" then
+					from_stack = highlight.get_highlight(from_stack)
+				end
+				evaluated_hl = vim.tbl_extend("force", from_stack, evaluated_hl)
 			end
 			return highlight.eval_hl(evaluated_hl)
 		end
 	end
-	table.insert(self.hl_stack, hl)
+	table.insert(self.hl_stack, hl_fn)
 	table.insert(self.statusline, function()
 		return "%#" .. hl_fn() .. "#"
 	end)
+	return self
 end
 function Builder:add_hl_end()
 	if #self.hl_stack > 0 then
@@ -184,7 +200,7 @@ function Builder:add_surround(left, right, fn, hl)
 		self:add(function()
 			return left
 		end, hl)
-		self:add_hl_start((type(hl) == "table" and { bg = hl.fg }))
+		self:add_hl_start(((type(hl) == "table" and hl.fg) and { bg = hl.fg }))
 		fn(self)
 		self:add_hl_end()
 		self:add(function()
@@ -202,9 +218,8 @@ function Builder:add_surround(left, right, fn, hl)
 	return self
 end
 
----@param hl? string
 ---@return Builder
-function Builder:add_mode(hl)
+function Builder:add_mode()
 	vimode.add_mode(self)
 	return self
 end
