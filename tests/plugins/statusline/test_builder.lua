@@ -163,10 +163,12 @@ T["builder"]["stacking higlight groups works as expected"] = function()
 	local result = child.lua([[
 		package.loaded['plugins.statusline.highlight'] = {                 
 		    eval_hl = function(hl) 
-				return hl.fg
+			return hl.fg
 		    end,                    
 		    load_colors = function() end,                                  
-		    get_highlight = function(name) return {} end,                  
+		    get_highlight = function(name) return 
+			{fg = name}
+		    end,                  
 		}                                                                  
 
 		local builder = require('plugins.statusline.builder')
@@ -211,7 +213,10 @@ T["builder"]["add_surround - surrounds text with surrounding characters and inve
 				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
 			end,                    
 			load_colors = function() end,                                  
-			get_highlight = function(name) return {} end,                  
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				return {fg = split[2], bg=split[1]}
+			end,                  
 		}                                                                  
 
 		local builder = require('plugins.statusline.builder')

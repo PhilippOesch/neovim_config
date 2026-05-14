@@ -99,9 +99,6 @@ function Builder:add_hl_start(hl)
 		end
 	end
 	table.insert(self.hl_stack, hl_fn)
-	-- table.insert(self.statusline, function()
-	-- 	return "%#" .. hl_fn() .. "#"
-	-- end)
 	return self
 end
 
@@ -118,16 +115,33 @@ end
 ---@param hl? hl_val
 ---@return Builder
 function Builder:add(fn, hl)
-	hl = hl or (#self.hl_stack > 0 and self.hl_stack[#self.hl_stack])
+	-- if type(hl) == "table" and type((#self.hl_stack > 0 and self.hl_stack[#self.hl_stack])) == "table" then
+	-- 	hl = vim.tbl_extend("force", self.hl_stack[#self.hl_stack], hl)
+	-- end
+	local stack_hl = nil
+	if #self.hl_stack then
+		stack_hl = self.hl_stack[#self.hl_stack]
+	end
+	hl = hl
 	local hl_fn = function()
 		local resolve_hl = resolve_dynamic_hl(hl)
-		if type(resolve_hl) == "table" then
-			return highlight.eval_hl(resolve_hl)
+		local resolve_stack_hl = resolve_dynamic_hl(stack_hl)
+		if resolve_stack_hl then
+			resolve_stack_hl = highlight.get_highlight(resolve_stack_hl)
 		end
-		return hl()
+		if type(resolve_hl) == "table" and type(resolve_stack_hl) == "table" then
+			local res = vim.tbl_extend("force", resolve_stack_hl, resolve_hl)
+			return highlight.eval_hl(res)
+		end
+		if type(resolve_hl) == "table" or type(resolve_stack_hl) == "table" then
+			return highlight.eval_hl(resolve_hl or resolve_stack_hl)
+		end
+		return resolve_hl or resolve_stack_hl
 	end
-	if hl then
-		table.insert(self.statusline, "%#" .. hl_fn() .. "#")
+	if hl or stack_hl then
+		table.insert(self.statusline, function()
+			return "%#" .. hl_fn() .. "#"
+		end)
 		table.insert(self.statusline, fn)
 		table.insert(self.statusline, "%*")
 	else
