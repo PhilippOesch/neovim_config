@@ -4,16 +4,18 @@ local Builder = {}
 Builder.__index = Builder
 
 ---@class Builder
----@field statusline (eval_fun)[]
----@field hl_stack (string|table)[]
----@field new fun(): Builder
----@field add fun(self: Builder, fn: eval_fun, hl?: string): Builder
+---@field statusline eval_fun[]
+---@field hl_stack (string|table|function)[]
+---@field new fun(hl?: string|table): Builder
+---@field add fun(self: Builder, fn: eval_fun, hl?: string|function|table): Builder
 ---@field add_filename fun(self: Builder): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
----@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?:string): Builder
+---@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?: string|table): Builder
 ---@field add_conditional fun(self: Builder, fn: eval_fun_builder, predicate: condition_fun): Builder
----@field add_mode fun(self: Builder, hl?:string): Builder
+---@field add_mode fun(self: Builder, hl?: string|function|table): Builder
+---@field add_hl_start fun(self: Builder, hl: string|table|function): Builder
+---@field add_hl_end fun(self: Builder): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
