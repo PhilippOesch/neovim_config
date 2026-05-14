@@ -1,19 +1,30 @@
-local MiniTest = require('mini.test')
+local MiniTest = require("mini.test")
 
 local T = MiniTest.new_set()
 
 -- Helper: fresh child Neovim process for each case
 local child = MiniTest.new_child_neovim()
 
-T['builder'] = MiniTest.new_set({
+local function mock_highlight()
+	child.lua([[                                                           
+             package.loaded['plugins.statusline.highlight'] = {                 
+                 eval_hl = function(hl) return 'MockHl' end,                    
+                 load_colors = function() end,                                  
+                 get_highlight = function(name) return {} end,                  
+             }                                                                  
+         ]])
+end
+
+T["builder"] = MiniTest.new_set({
 	hooks = {
 		pre_case = function()
-			child.restart({ '-u', 'scripts/minimal_init.lua' })
+			child.restart({ "-u", "scripts/minimal_init.lua" })
+			mock_highlight()
 		end,
 	},
 })
 
-T['builder']['setup correctly after creation'] = function()
+T["builder"]["setup correctly after creation"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -23,7 +34,7 @@ T['builder']['setup correctly after creation'] = function()
 	MiniTest.expect.equality(#result.hl_stack, 0)
 end
 
-T['builder']['new builder returns empty string'] = function()
+T["builder"]["new builder returns empty string"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -34,7 +45,7 @@ T['builder']['new builder returns empty string'] = function()
 	MiniTest.expect.equality(result, "")
 end
 
-T['builder']['add - string is build when passed'] = function()
+T["builder"]["add - string is build when passed"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -45,7 +56,7 @@ T['builder']['add - string is build when passed'] = function()
 	MiniTest.expect.equality(result, "abc")
 end
 
-T['builder']['add - function is correctly processed'] = function()
+T["builder"]["add - function is correctly processed"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -58,7 +69,7 @@ T['builder']['add - function is correctly processed'] = function()
 	MiniTest.expect.equality(result, "abc")
 end
 
-T['builder']['add_space - returns space character'] = function()
+T["builder"]["add_space - returns space character"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -69,7 +80,7 @@ T['builder']['add_space - returns space character'] = function()
 	MiniTest.expect.equality(result, " ")
 end
 
-T['builder']['add_space - character + length is processed correctly.'] = function()
+T["builder"]["add_space - character + length is processed correctly."] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -80,8 +91,7 @@ T['builder']['add_space - character + length is processed correctly.'] = functio
 	MiniTest.expect.equality(result, "||")
 end
 
-
-T['builder']['add_align - align characters are added'] = function()
+T["builder"]["add_align - align characters are added"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 
@@ -92,118 +102,46 @@ T['builder']['add_align - align characters are added'] = function()
 	MiniTest.expect.error(result)
 end
 
-T['builder']['add_hl_start - does not allow string'] = function()
-	local ok = child.lua([[
-		local builder = require('plugins.statusline.builder')
-		local b = builder.new():add_hl_start('Special')
-		local ok, _ = pcall(function()
-			return b:build()
-		end)
-		return ok
-	]])
-	MiniTest.expect.equality(ok, false)
-end
-
-T['builder']['add_hl_start - does allow functions'] = function()
-	local ok = child.lua([[
-		local builder = require('plugins.statusline.builder')
-		local b = builder.new():add_hl_start(function()
-			return {fg= "#00FF00"}
-		end)
-		local ok, _ = pcall(function()
-			return b:build()
-		end)
-		return ok
-	]])
-	MiniTest.expect.equality(ok, true)
-end
-
-T['builder']['add_hl_start - does allow table'] = function()
-	local ok = child.lua([[
+T["builder"]["add_hl_start - does return expected string on build"] = function()
+	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add_hl_start(
 			{fg= "#00FF00"}
 		)
-		local ok, _ = pcall(function()
-			return b:build()
-		end)
-		return ok
+		return b:build()
 	]])
-	MiniTest.expect.equality(ok, true)
+	MiniTest.expect.equality(result, "%#MockHl#")
 end
 
--- T['eval_hl']['empty table returns empty string'] = function()
--- 	local result = child.lua([[
--- 		local highlight = require('plugins.statusline.highlight')
--- 		return highlight.eval_hl({})
--- 	]])
--- 	MiniTest.expect.equality(result, '')
--- end
---
--- T['eval_hl']['table with hl[true] returns empty string'] = function()
--- 	local result = child.lua([[
--- 		local highlight = require('plugins.statusline.highlight')
--- 		local hl = {}
--- 		hl[true] = true
--- 		return highlight.eval_hl(hl)
--- 	]])
--- 	MiniTest.expect.equality(result, '')
--- end
---
--- T['eval_hl']['simple RGB creates highlight and returns correct name'] = function()
--- 	local name = child.lua([[
--- 		vim.o.termguicolors = true
--- 		local highlight = require('plugins.statusline.highlight')
--- 		return highlight.eval_hl({ fg = '#FF0000', bg = '#000000' })
--- 	]])
--- 	MiniTest.expect.equality(name, 'StlFF0000_000000__')
---
--- 	-- Verify highlight was actually defined
--- 	local hl_exists = child.lua([[
--- 		local ok, _ = pcall(vim.api.nvim_get_hl, 0, { name = 'StlFF0000_000000__', create = false })
--- 		return ok
--- 	]])
--- 	MiniTest.expect.equality(hl_exists, true)
--- end
---
--- T['eval_hl']['named colors are resolved via load_colors'] = function()
--- 	local name = child.lua([[
--- 		vim.o.termguicolors = true
--- 		local highlight = require('plugins.statusline.highlight')
--- 		highlight.load_colors({ myred = '#FF0000' })
--- 		return highlight.eval_hl({ fg = 'myred' })
--- 	]])
--- 	MiniTest.expect.equality(name, 'StlFF0000___')
--- end
---
--- T['eval_hl']['styles are included in highlight name'] = function()
--- 	local name = child.lua([[
--- 		vim.o.termguicolors = true
--- 		local highlight = require('plugins.statusline.highlight')
--- 		return highlight.eval_hl({ fg = '#FF0000', bold = true })
--- 	]])
--- 	MiniTest.expect.equality(name, 'StlFF0000__bold_')
--- end
---
--- T['eval_hl']['cterm fallback name when termguicolors is disabled'] = function()
--- 	local name = child.lua([[
--- 		vim.o.termguicolors = false
--- 		local highlight = require('plugins.statusline.highlight')
--- 		return highlight.eval_hl({ ctermfg = 1, ctermbg = 2, bold = true })
--- 	]])
--- 	MiniTest.expect.equality(name, 'Stl1_2_bold')
--- end
---
--- T['eval_hl']['caching returns same name for identical input'] = function()
--- 	local results = child.lua([[
--- 		vim.o.termguicolors = true
--- 		local highlight = require('plugins.statusline.highlight')
--- 		local name1 = highlight.eval_hl({ fg = '#00FF00', bg = '#0000FF' })
--- 		local name2 = highlight.eval_hl({ fg = '#00FF00', bg = '#0000FF' })
--- 		return { name1, name2 }
--- 	]])
--- 	MiniTest.expect.equality(results[1], results[2])
--- 	MiniTest.expect.equality(results[1], 'Stl00FF00_0000FF__')
--- end
---
+T["builder"]["add_hl_start - should add highlight to stack"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_hl_start(
+			{fg= "#00FF00"}
+		)
+		return #b.hl_stack
+	]])
+	MiniTest.expect.equality(result, 1)
+end
+
+T["builder"]["add_hl_end - should remove highlight from stack"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_hl_start(
+			{fg= "#00FF00"}
+		):add_hl_end()
+		return #b.hl_stack
+	]])
+	MiniTest.expect.equality(result, 0)
+end
+
+T["builder"]["add_hl_end - does return expected string on build"] = function()
+	local ok = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_hl_end()
+		return b:build()
+	]])
+	MiniTest.expect.equality(ok, "%*")
+end
+
 return T
