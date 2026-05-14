@@ -104,6 +104,34 @@ T['builder']['add_hl_start - does not allow string'] = function()
 	MiniTest.expect.equality(ok, false)
 end
 
+T['builder']['add_hl_start - does allow functions'] = function()
+	local ok = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_hl_start(function()
+			return {fg= "#00FF00"}
+		end)
+		local ok, _ = pcall(function()
+			return b:build()
+		end)
+		return ok
+	]])
+	MiniTest.expect.equality(ok, true)
+end
+
+T['builder']['add_hl_start - does allow table'] = function()
+	local ok = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_hl_start(
+			{fg= "#00FF00"}
+		)
+		local ok, _ = pcall(function()
+			return b:build()
+		end)
+		return ok
+	]])
+	MiniTest.expect.equality(ok, true)
+end
+
 -- T['eval_hl']['empty table returns empty string'] = function()
 -- 	local result = child.lua([[
 -- 		local highlight = require('plugins.statusline.highlight')

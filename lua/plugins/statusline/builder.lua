@@ -27,7 +27,7 @@ Builder.__index = Builder
 ---@alias eval_fun fun():string
 ---@alias eval_fun_builder fun(bld: Builder)
 ---@alias condition_fun fun():boolean
----@alias hl_val string|table|function
+---@alias hl_val table|function
 
 ---@param hl? hl_val
 ---@return Builder
