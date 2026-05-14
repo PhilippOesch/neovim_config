@@ -95,10 +95,6 @@ local function normalize_hl(hl)
 end
 
 function M.eval_hl(hl)
-	if type(hl) == "string" or hl == nil then
-		return hl
-	end
-
 	assert(type(hl) == "table")
 	if vim.tbl_isempty(hl) or hl[true] then
 		return ""

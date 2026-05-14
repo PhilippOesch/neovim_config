@@ -11,6 +11,7 @@ Builder.__index = Builder
 ---@field new fun(hl?: hl_val): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
 ---@field add_filename fun(self: Builder, hl?: hl_val): Builder
+---@field add_file_icon fun(self: Builder): Builder
 ---@field add_block fun(self: Builder, hl?: hl_val): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
@@ -155,12 +156,36 @@ function Builder:add_conditional(fn, predicate)
 	return self
 end
 
+local web_icons_available, web_icons = pcall(require, "nvim-web-devicons")
+
+---@return Builder
+function Builder:add_file_icon()
+	self:add_conditional(function(bld)
+		bld:add(function()
+			local filename = vim.api.nvim_buf_get_name(0)
+			local extension = vim.fn.fnamemodify(filename, ":e")
+			local icon, _ = web_icons.get_icon_color(filename, extension, { default = true })
+			return icon
+		end, function()
+			local filename = vim.api.nvim_buf_get_name(0)
+			local extension = vim.fn.fnamemodify(filename, ":e")
+			local _, icon_color = web_icons.get_icon_color(filename, extension, { default = true })
+			return { fg = icon_color }
+		end)
+	end, function()
+		return web_icons_available
+	end)
+	return self
+end
+
 ---@param hl hl_val
 ---@return Builder
 function Builder:add_filename(hl)
 	self:add(function()
 		return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-	end, hl)
+	end, function()
+		return hl
+	end)
 	return self
 end
 
