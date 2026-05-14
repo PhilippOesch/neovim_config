@@ -80,16 +80,6 @@ T['builder']['add_space - character + length is processed correctly.'] = functio
 	MiniTest.expect.equality(result, "||")
 end
 
-T['builder']['add_hl_start - does not allow string'] = function()
-	local ok, err = child.lua([[
-		local builder = require('plugins.statusline.builder')
-
-		new_builder = builder.new():add_hl_start('Special')
-
-		return new_builder:build()
-	]])
-	MiniTest.expect.equality(ok, nil)
-end
 
 T['builder']['add_align - align characters are added'] = function()
 	local result = child.lua([[
@@ -100,6 +90,18 @@ T['builder']['add_align - align characters are added'] = function()
 		return new_builder:build()
 	]])
 	MiniTest.expect.error(result)
+end
+
+T['builder']['add_hl_start - does not allow string'] = function()
+	local ok = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_hl_start('Special')
+		local ok, _ = pcall(function()
+			return b:build()
+		end)
+		return ok
+	]])
+	MiniTest.expect.equality(ok, false)
 end
 
 -- T['eval_hl']['empty table returns empty string'] = function()
