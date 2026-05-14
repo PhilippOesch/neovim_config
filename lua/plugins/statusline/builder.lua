@@ -11,6 +11,7 @@ Builder.__index = Builder
 ---@field new fun(hl?: hl_val): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
 ---@field add_filename fun(self: Builder, hl?: hl_val): Builder
+---@field add_block fun(self: Builder, hl?: hl_val): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
 ---@field add_scrollbar fun(self: Builder, hl?: hl_val): Builder
@@ -100,6 +101,24 @@ function Builder:add(fn, hl)
 		self:add_hl_end()
 	else
 		table.insert(self.statusline, fn)
+	end
+	return self
+end
+
+---add new eval function
+---@param fn eval_fun_builder
+---@param hl? string
+---@return Builder
+function Builder:add_block(fn, hl)
+	if #self.statusline > 0 then
+		self:add_align()
+	end
+	if hl then
+		self:add_hl_start(hl)
+		fn(self)
+		self:add_hl_end()
+	else
+		fn(self)
 	end
 	return self
 end
