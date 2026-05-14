@@ -1,4 +1,5 @@
 local highlight = require("plugins.statusline.highlight")
+local vimode = require("plugins.statusline.vimode")
 
 local Builder = {}
 Builder.__index = Builder
@@ -8,7 +9,7 @@ Builder.__index = Builder
 ---@field hl_stack hl_val[]
 ---@field new fun(hl?: hl_val): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
----@field add_filename fun(self: Builder): Builder
+---@field add_filename fun(self: Builder, hl?: hl_val): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
 ---@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?: hl_val): Builder
@@ -115,11 +116,12 @@ function Builder:add_conditional(fn, predicate)
 	return self
 end
 
+---@param hl hl_val
 ---@return Builder
-function Builder:add_filename()
+function Builder:add_filename(hl)
 	self:add(function()
 		return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-	end)
+	end, hl)
 	return self
 end
 
@@ -173,64 +175,7 @@ end
 ---@param hl? string
 ---@return Builder
 function Builder:add_mode(hl)
-	local mode_names = { -- change the strings if you like it vvvvverbose!
-		n = "N",
-		no = "N?",
-		nov = "N?",
-		noV = "N?",
-		["no\22"] = "N?",
-		niI = "Ni",
-		niR = "Nr",
-		niV = "Nv",
-		nt = "Nt",
-		v = "V",
-		vs = "Vs",
-		V = "V_",
-		Vs = "Vs",
-		["\22"] = "^V",
-		["\22s"] = "^V",
-		s = "S",
-		S = "S_",
-		["\19"] = "^S",
-		i = "I",
-		ic = "Ic",
-		ix = "Ix",
-		R = "R",
-		Rc = "Rc",
-		Rx = "Rx",
-		Rv = "Rv",
-		Rvc = "Rv",
-		Rvx = "Rv",
-		c = "C",
-		cv = "Ex",
-		r = "...",
-		rm = "M",
-		["r?"] = "?",
-		["!"] = "!",
-		t = "T",
-	}
-
-	local mode_colors = {
-		n = "Error",
-		i = "String",
-		v = "Special",
-		V = "Special",
-		["\22"] = "Special",
-		c = "Constant",
-		s = "Statement",
-		S = "Statement",
-		["\19"] = "Statement",
-		R = "Constant",
-		r = "Constant",
-		["!"] = "Error",
-		t = "Error",
-	}
-
-	self:add(function()
-		return "%(" .. mode_names[vim.fn.mode(1)] .. "%)"
-	end, function()
-		return { fg = highlight.get_highlight(mode_colors[vim.fn.mode(1)]).fg }
-	end)
+	vimode.add_mode(self)
 	return self
 end
 
