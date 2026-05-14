@@ -6,8 +6,8 @@ return {
 			statusline = function(builder)
 				builder
 					:add_block(function(bld)
-						bld:add_surround("", "", function(inner)
-							inner:add_mode()
+						bld:add_surround("", "", function(bld)
+							bld:add_mode()
 						end, { fg = highlight.get_highlight("Folded").bg })
 							:add_space()
 							:add_hl_start("Special")

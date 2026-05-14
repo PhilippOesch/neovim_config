@@ -24,7 +24,7 @@ Builder.__index = Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
----@alias eval_fun_builder fun(self: Builder)
+---@alias eval_fun_builder fun(bld: Builder)
 ---@alias condition_fun fun():boolean
 ---@alias hl_val string|table|function
 
@@ -65,6 +65,7 @@ local function resolve_dynamic_hl(hl)
 	return hl
 end
 
+---@param hl? hl_val
 ---@return Builder
 function Builder:add_hl_start(hl)
 	local hl_fn = function()
@@ -96,16 +97,19 @@ function Builder:add_hl_start(hl)
 	end)
 	return self
 end
+
+---@return Builder
 function Builder:add_hl_end()
 	if #self.hl_stack > 0 then
 		table.remove(self.hl_stack, #self.hl_stack)
 	end
 	table.insert(self.statusline, "%*")
+	return self
 end
 
 ---add new eval function
 ---@param fn eval_fun|string
----@param hl? string
+---@param hl? hl_val
 ---@return Builder
 function Builder:add(fn, hl)
 	if hl then
@@ -120,7 +124,7 @@ end
 
 ---add new eval function
 ---@param fn eval_fun_builder
----@param hl? string
+---@param hl? hl_val
 ---@return Builder
 function Builder:add_block(fn, hl)
 	if #self.statusline > 0 then
