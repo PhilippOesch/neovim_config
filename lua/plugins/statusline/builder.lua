@@ -1,5 +1,6 @@
 local highlight = require("plugins.statusline.highlight")
 local vimode = require("plugins.statusline.vimode")
+local ruler = require("plugins.statusline.ruler")
 
 local Builder = {}
 Builder.__index = Builder
@@ -12,6 +13,8 @@ Builder.__index = Builder
 ---@field add_filename fun(self: Builder, hl?: hl_val): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
+---@field add_scrollbar fun(self: Builder, hl?: hl_val): Builder
+---@field add_ruler fun(self: Builder, hl?: hl_val): Builder
 ---@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?: hl_val): Builder
 ---@field add_conditional fun(self: Builder, fn: eval_fun_builder, predicate: condition_fun): Builder
 ---@field add_mode fun(self: Builder, hl?: hl_val): Builder
@@ -122,6 +125,20 @@ function Builder:add_filename(hl)
 	self:add(function()
 		return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
 	end, hl)
+	return self
+end
+
+---@param hl hl_val
+---@return Builder
+function Builder:add_scrollbar(hl)
+	ruler.add_scrollbar(self, hl)
+	return self
+end
+
+---@param hl hl_val
+---@return Builder
+function Builder:add_ruler(hl)
+	ruler.add_ruler(self, hl)
 	return self
 end
 
