@@ -4,7 +4,7 @@ local Builder = {}
 Builder.__index = Builder
 
 ---@class Builder
----@field statusline eval_fun[]
+---@field statusline (eval_fun)[]
 ---@field hl_stack (string|table)[]
 ---@field new fun(): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: string): Builder
@@ -20,13 +20,17 @@ Builder.__index = Builder
 ---@alias eval_fun_builder fun(self: Builder)
 ---@alias condition_fun fun():boolean
 
+---@param hl? string|table
 ---@return Builder
-function Builder.new()
+function Builder.new(hl)
 	local self = setmetatable({}, Builder)
 
 	---@type eval_fun[]
 	self.statusline = {}
 	self.hl_stack = {}
+	if hl then
+		self.hl_stack = { hl }
+	end
 
 	return self
 end
@@ -97,9 +101,15 @@ end
 ---@param predicate condition_fun
 ---@return Builder
 function Builder:add_conditional(fn, predicate)
-	if predicate() then
-		fn(self)
-	end
+	local conditional_builder = Builder.new((#self.hl_stack > 0 and self.hl_stack[#self.hl_stack]) or nil)
+	fn(conditional_builder)
+	self:add(function()
+		if predicate() then
+			return conditional_builder:build()
+		end
+		return ""
+	end)
+	return self
 end
 
 ---@return Builder

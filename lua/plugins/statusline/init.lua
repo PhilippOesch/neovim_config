@@ -10,11 +10,11 @@ end
 local statusline_builder = builder.new()
 statusline_builder
 	:add_surround("", "", function(bld)
-		return bld:add_mode()
+		bld:add_mode()
 	end, { fg = highlight.get_highlight("Folded").bg })
 	:add_space()
 	:add_conditional(function(bld)
-		return bld:add_filename()
+		bld:add_filename()
 	end, function()
 		return vim.fn.mode(1) == "n"
 	end)
