@@ -10,9 +10,9 @@ return {
 							bld:add_mode()
 						end, { fg = highlight.get_highlight("Folded").bg })
 							:add_space()
-							:add_hl_start("Special")
-							:add_filename()
-							:add_hl_end()
+							:add_file_icon()
+							:add_space()
+							:add_filename({fg = highlight.get_highlight("Special").fg})
 					end)
 					:add_block(function(bld)
 						bld:add_ruler():add_space():add_scrollbar({

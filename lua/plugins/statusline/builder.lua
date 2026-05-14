@@ -183,9 +183,7 @@ end
 function Builder:add_filename(hl)
 	self:add(function()
 		return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-	end, function()
-		return hl
-	end)
+	end, hl)
 	return self
 end
 
