@@ -59,7 +59,6 @@ local function deepcopy(orig)
 end
 
 local function resolve_dynamic_hl(hl)
-	local hl = hl
 	while type(hl) == "function" do
 		hl = hl()
 	end
