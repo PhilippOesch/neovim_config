@@ -5,24 +5,25 @@ Builder.__index = Builder
 
 ---@class Builder
 ---@field statusline eval_fun[]
----@field hl_stack (string|table|function)[]
----@field new fun(hl?: string|table): Builder
----@field add fun(self: Builder, fn: eval_fun, hl?: string|function|table): Builder
+---@field hl_stack hl_val[]
+---@field new fun(hl?: hl_val): Builder
+---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
 ---@field add_filename fun(self: Builder): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
----@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?: string|table): Builder
+---@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?: hl_val): Builder
 ---@field add_conditional fun(self: Builder, fn: eval_fun_builder, predicate: condition_fun): Builder
----@field add_mode fun(self: Builder, hl?: string|function|table): Builder
----@field add_hl_start fun(self: Builder, hl: string|table|function): Builder
+---@field add_mode fun(self: Builder, hl?: hl_val): Builder
+---@field add_hl_start fun(self: Builder, hl: hl_val): Builder
 ---@field add_hl_end fun(self: Builder): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
 ---@alias eval_fun_builder fun(self: Builder)
 ---@alias condition_fun fun():boolean
+---@alias hl_val string|table|function
 
----@param hl? string|table
+---@param hl? hl_val
 ---@return Builder
 function Builder.new(hl)
 	local self = setmetatable({}, Builder)
