@@ -29,3 +29,17 @@ This repo represents a neovim config.
 - Install [Neovim 0.12.0](https://neovim.io/) or newer.
 - Start Neovim. Plugins will be installed automatically on first launch using vim.pack.
 
+## Running Tests
+
+Unit tests for custom Lua modules (e.g. the statusline framework) are written with `mini.test` and run in isolated headless Neovim child processes.
+
+```bash
+# Run the full test suite
+make test
+
+# Run a single test file
+make test_file FILE=tests/plugins/statusline/test_highlight.lua
+```
+
+The first run will automatically clone `mini.nvim` into `deps/`. Test files live under `tests/` and mirror the source structure in `lua/`.
+
