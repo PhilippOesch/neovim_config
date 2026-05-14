@@ -120,8 +120,9 @@ end
 function Builder:add(fn, hl)
 	hl = hl or (#self.hl_stack > 0 and self.hl_stack[#self.hl_stack])
 	local hl_fn = function()
-		if type(hl) == "table" then
-			return highlight.eval_hl(hl)
+		local resolve_hl = resolve_dynamic_hl(hl)
+		if type(resolve_hl) == "table" then
+			return highlight.eval_hl(resolve_hl)
 		end
 		return hl()
 	end

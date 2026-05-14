@@ -135,12 +135,25 @@ T["builder"]["add_hl_end - should remove highlight from stack"] = function()
 	MiniTest.expect.equality(result, 0)
 end
 
-T["builder"]["add - highlight should be processed as expected"] = function()
+T["builder"]["add - highlight table should be processed as expected"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add(function()
 			return "abc"
 		end, {fg= "#00FF00"})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#MockHl#abc%*")
+end
+
+T["builder"]["add - highlight function should be processed as expected"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add(function()
+			return "abc"
+		end, function ()
+			return {fg= "#00FF00"}
+		end)
 		return b:build()
 	]])
 	MiniTest.expect.equality(result, "%#MockHl#abc%*")
