@@ -281,7 +281,7 @@ T["builder"]["add_block - two blocks are separated with aling characters"] = fun
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add_block(function(bld)
-				bld:add("abc")
+			bld:add("abc")
 		end)
 		:add_block(function(bld)
 			bld:add("def")
@@ -290,6 +290,35 @@ T["builder"]["add_block - two blocks are separated with aling characters"] = fun
 		return b:build()
 	]])
 	MiniTest.expect.equality(result, "abc%=def")
+end
+
+
+T["builder"]["add_conditional - string not added when condition not fulfilled"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_conditional(function(bld)
+			bld:add("abc")
+		end, function()
+			return false
+		end)
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "")
+end
+
+T["builder"]["add_conditional - string added when condition fulfilled"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_conditional(function(bld)
+			bld:add("abc")
+		end, function()
+			return true
+		end)
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "abc")
 end
 
 return T
