@@ -337,21 +337,21 @@ T["builder"]["add_conditional - information about highights are keeped and build
 	MiniTest.expect.equality(result, "%#noBg_fg#%#bg_fg#abc%*%*")
 end
 
--- T["builder"]["add_file_icon - gets icon from web_icons"] = function()
--- 	local result = child.lua([[
--- 		package.loaded['nvim-web-devicons'] = {
--- 			get_icon_color = function(name)
--- 				return 'icon', 'icon_color'
--- 			end,
--- 		}
---
--- 		local builder = require('plugins.statusline.builder')
--- 		local b = builder.new()
--- 		:add_file_icon()
---
--- 		return b:build()
--- 	]])
--- 	MiniTest.expect.equality(result, "icon")
--- end
+T["builder"]["add_file_icon - icons and colors are processed as expected"] = function()
+	local result = child.lua([[
+		package.loaded['nvim-web-devicons'] = {
+			get_icon_color = function(name)
+				return 'icon', 'iconcolor'
+			end,
+		}
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new()
+		:add_file_icon()
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_iconcolor#icon%*")
+end
 
 return T
