@@ -267,4 +267,29 @@ T["builder"]["add_mode - surrounding keeps background color"] = function()
 	MiniTest.expect.equality(result, "%#noBg_MockHl#(%*%#MockHl_noFg#%(N%)%*%#noBg_MockHl#)%*")
 end
 
+T["builder"]["add_align - add expected charcters"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_align()
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%=")
+end
+
+T["builder"]["add_block - two blocks are separated with aling characters"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_block(function(bld)
+				bld:add("abc")
+		end)
+		:add_block(function(bld)
+			bld:add("def")
+		end)
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "abc%=def")
+end
+
 return T
