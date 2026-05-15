@@ -354,4 +354,15 @@ T["builder"]["add_file_icon - icons and colors are processed as expected"] = fun
 	MiniTest.expect.equality(result, "%#noBg_iconcolor#icon%*")
 end
 
+T["builder"]["add_file_icon - should not be processed when web_icons not available"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new()
+		:add_file_icon()
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "")
+end
+
 return T
