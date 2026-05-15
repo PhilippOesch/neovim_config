@@ -292,7 +292,6 @@ T["builder"]["add_block - two blocks are separated with aling characters"] = fun
 	MiniTest.expect.equality(result, "abc%=def")
 end
 
-
 T["builder"]["add_conditional - string not added when condition not fulfilled"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
@@ -319,6 +318,51 @@ T["builder"]["add_conditional - string added when condition fulfilled"] = functi
 		return b:build()
 	]])
 	MiniTest.expect.equality(result, "abc")
+end
+
+T["builder"]["add_conditional - information about highights are keeped"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new()
+		:add_hl_start({fg='mockHl'})
+		:add_conditional(function(bld)
+			bld:add("abc")
+		end, function()
+			return true
+		end)
+		:add_hl_end()
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#MockHl#%#MockHl#abc%*%*")
+end
+
+T["builder"]["add_conditional - information about highights are keeped and build on"] = function()
+	local result = child.lua([[
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			load_colors = function() end,                                  
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				return {fg = split[2], bg=split[1]}
+			end,                  
+		}                                                                  
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new()
+		:add_hl_start({fg='fg'})
+		:add_conditional(function(bld)
+			bld:add("abc", {bg = 'bg'})
+		end, function()
+			return true
+		end)
+		:add_hl_end()
+
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_fg#%#bg_fg#abc%*%*")
 end
 
 return T
