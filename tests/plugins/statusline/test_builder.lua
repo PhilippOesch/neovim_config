@@ -365,4 +365,30 @@ T["builder"]["add_file_icon - should not be processed when web_icons not availab
 	MiniTest.expect.equality(result, "")
 end
 
+T["builder"]["add_filename - expected vim api functions are called expected times"] = function()
+	local result = child.lua([[
+		local res = {
+			nvim_buf_get_name_called = 0,
+			fnamemodify = 0
+		}
+		vim.fn.fnamemodify = function()
+			res.fnamemodify = res.fnamemodify + 1
+			return ''
+		end
+		vim.api.nvim_buf_get_name = function()
+			res.nvim_buf_get_name_called = res.nvim_buf_get_name_called + 1
+			return ''
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new()
+		:add_filename()
+		b:build()
+
+		return res
+	]])
+	MiniTest.expect.equality(result.nvim_buf_get_name_called, 1)
+	MiniTest.expect.equality(result.fnamemodify, 1)
+end
+
 return T
