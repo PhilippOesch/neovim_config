@@ -482,4 +482,40 @@ T["builder"]["add_ruler - highlight is applied correctly"] = function()
 	MiniTest.expect.equality(result, "%#noBg_#00FF00#%7(%l/%3L%):%2c %P%*")
 end
 
+T["builder"]["add_git_branch - gets branch from gitsigns"] = function()
+	local result = child.lua([[
+		vim.b.gitsigns_status_dict = {
+			head = 'branch'
+		}
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_git_branch()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, " branch")
+end
+
+T["builder"]["add_git_branch - do not add git branch when gitsigns not available"] = function()
+	local result = child.lua([[
+		vim.b.gitsigns_status_dict = nil
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_git_branch()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "")
+end
+
+T["builder"]["add_git_branch - hl is processed"] = function()
+	local result = child.lua([[
+		vim.b.gitsigns_status_dict = {
+			head = 'branch'
+		}
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_git_branch({fg= 'fg'})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_fg# branch%*")
+end
+
 return T

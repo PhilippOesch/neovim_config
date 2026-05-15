@@ -22,6 +22,7 @@ Builder.__index = Builder
 ---@field add_mode fun(self: Builder, hl?: hl_val): Builder
 ---@field add_hl_start fun(self: Builder, hl: hl_val): Builder
 ---@field add_hl_end fun(self: Builder): Builder
+---@field add_git_branch fun(self: Builder, hl: hl_val): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
@@ -107,6 +108,19 @@ function Builder:add_hl_end()
 	if #self.hl_stack > 0 then
 		table.remove(self.hl_stack, #self.hl_stack)
 	end
+	return self
+end
+
+---@param hl hl_val
+---@return Builder
+function Builder:add_git_branch(hl)
+	self:add_conditional(function(bld)
+		bld:add(function()
+			return " " .. vim.b.gitsigns_status_dict.head
+		end, hl)
+	end, function()
+		return vim.b.gitsigns_head or vim.b.gitsigns_status_dict
+	end)
 	return self
 end
 
