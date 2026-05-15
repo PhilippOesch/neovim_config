@@ -129,9 +129,6 @@ end
 ---@param hl? hl_val
 ---@return Builder
 function Builder:add(fn, hl)
-	-- if type(hl) == "table" and type((#self.hl_stack > 0 and self.hl_stack[#self.hl_stack])) == "table" then
-	-- 	hl = vim.tbl_extend("force", self.hl_stack[#self.hl_stack], hl)
-	-- end
 	local stack_hl = nil
 	if #self.hl_stack then
 		stack_hl = self.hl_stack[#self.hl_stack]
