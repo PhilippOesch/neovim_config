@@ -391,4 +391,95 @@ T["builder"]["add_filename - expected vim api functions are called expected time
 	MiniTest.expect.equality(result.fnamemodify, 1)
 end
 
+T["builder"]["add_scrollbar - at first line returns space characters"] = function()
+	local result = child.lua([[
+		vim.api.nvim_win_get_cursor = function() return {1} end
+		vim.api.nvim_buf_line_count = function() return 9 end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_scrollbar()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "  ")
+end
+
+T["builder"]["add_scrollbar - at last line returns full block"] = function()
+	local result = child.lua([[
+		vim.api.nvim_win_get_cursor = function() return {9} end
+		vim.api.nvim_buf_line_count = function() return 9 end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_scrollbar()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "██")
+end
+
+T["builder"]["add_scrollbar - at middle line returns correct partial block"] = function()
+	local result = child.lua([[
+		vim.api.nvim_win_get_cursor = function() return {5} end
+		vim.api.nvim_buf_line_count = function() return 8 end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_scrollbar()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "▄▄")
+end
+
+T["builder"]["add_scrollbar - highlight is applied correctly"] = function()
+	local result = child.lua([[
+		vim.api.nvim_win_get_cursor = function() return {9} end
+		vim.api.nvim_buf_line_count = function() return 9 end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_scrollbar({fg = "#00FF00"})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_#00FF00#██%*")
+end
+
+T["builder"]["add_scrollbar - vim api functions are called expected times"] = function()
+	local result = child.lua([[
+		local res = {
+			nvim_win_get_cursor_called = 0,
+			nvim_buf_line_count_called = 0,
+		}
+		vim.api.nvim_win_get_cursor = function()
+			res.nvim_win_get_cursor_called = res.nvim_win_get_cursor_called + 1
+			return {1}
+		end
+		vim.api.nvim_buf_line_count = function()
+			res.nvim_buf_line_count_called = res.nvim_buf_line_count_called + 1
+			return 9
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_scrollbar()
+		b:build()
+
+		return res
+	]])
+	MiniTest.expect.equality(result.nvim_win_get_cursor_called, 1)
+	MiniTest.expect.equality(result.nvim_buf_line_count_called, 1)
+end
+
+T["builder"]["add_ruler - returns correct format string"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_ruler()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%7(%l/%3L%):%2c %P")
+end
+
+T["builder"]["add_ruler - highlight is applied correctly"] = function()
+	local result = child.lua([[
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_ruler({fg = "#00FF00"})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_#00FF00#%7(%l/%3L%):%2c %P%*")
+end
+
 return T
