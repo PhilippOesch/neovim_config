@@ -53,7 +53,11 @@ local mode_colors = {
 	t = "Error",
 }
 
-local function add_mode(bld)
+local M = {}
+
+---@param bld Builder
+---@param hl? hl_val
+function M.add(bld)
 	bld:add(function()
 		return "%(" .. mode_names[vim.fn.mode(1)] .. "%)"
 	end, function()
@@ -61,4 +65,4 @@ local function add_mode(bld)
 	end)
 end
 
-return { add_mode = add_mode }
+return M

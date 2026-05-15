@@ -1,6 +1,4 @@
 local highlight = require("plugins.statusline.highlight")
-local vimode = require("plugins.statusline.vimode")
-local ruler = require("plugins.statusline.ruler")
 
 local Builder = {}
 Builder.__index = Builder
@@ -10,20 +8,13 @@ Builder.__index = Builder
 ---@field hl_stack hl_val[]
 ---@field new fun(hl?: hl_val): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
----@field add_filename fun(self: Builder, hl?: hl_val): Builder
----@field add_file_icon fun(self: Builder): Builder
 ---@field add_block fun(self: Builder, hl?: hl_val): Builder
 ---@field add_align fun(self: Builder): Builder
 ---@field add_space fun(self: Builder, chars?: string, len?: integer): Builder
----@field add_scrollbar fun(self: Builder, hl?: hl_val): Builder
----@field add_ruler fun(self: Builder, hl?: hl_val): Builder
 ---@field add_surround fun(self: Builder, left: string, right: string, fn: eval_fun_builder, hl?: hl_val): Builder
 ---@field add_conditional fun(self: Builder, fn: eval_fun_builder, predicate: condition_fun): Builder
----@field add_mode fun(self: Builder, hl?: hl_val): Builder
 ---@field add_hl_start fun(self: Builder, hl: hl_val): Builder
 ---@field add_hl_end fun(self: Builder): Builder
----@field add_git_branch fun(self: Builder, hl?: hl_val): Builder
----@field add_lsp_attached_info fun(self: Builder, hl?: hl_val): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
@@ -112,36 +103,6 @@ function Builder:add_hl_end()
 	return self
 end
 
----@param hl hl_val
----@return Builder
-function Builder:add_git_branch(hl)
-	self:add_conditional(function(bld)
-		bld:add(function()
-			return " " .. vim.b.gitsigns_status_dict.head
-		end, hl)
-	end, function()
-		return vim.b.gitsigns_head or vim.b.gitsigns_status_dict
-	end)
-	return self
-end
----
----@param hl hl_val
----@return Builder
-function Builder:add_lsp_attached_info(hl)
-	self:add_conditional(function(bld)
-		bld:add(function()
-			local names = {}
-			for _, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-				table.insert(names, server.name)
-			end
-			return "󰣖 " .. table.concat(names, ",") .. ""
-		end, hl)
-	end, function()
-		return next(vim.lsp.get_clients({ bufnr = 0 })) ~= nil
-	end)
-	return self
-end
-
 ---add new eval function
 ---@param fn eval_fun|string
 ---@param hl? hl_val
@@ -212,51 +173,6 @@ function Builder:add_conditional(fn, predicate)
 	return self
 end
 
-local web_icons_available, web_icons = pcall(require, "nvim-web-devicons")
-
----@return Builder
-function Builder:add_file_icon()
-	self:add_conditional(function(bld)
-		bld:add(function()
-			local filename = vim.api.nvim_buf_get_name(0)
-			local extension = vim.fn.fnamemodify(filename, ":e")
-			local icon, _ = web_icons.get_icon_color(filename, extension, { default = true })
-			return icon
-		end, function()
-			local filename = vim.api.nvim_buf_get_name(0)
-			local extension = vim.fn.fnamemodify(filename, ":e")
-			local _, icon_color = web_icons.get_icon_color(filename, extension, { default = true })
-			return { fg = icon_color }
-		end)
-	end, function()
-		return web_icons_available
-	end)
-	return self
-end
-
----@param hl hl_val
----@return Builder
-function Builder:add_filename(hl)
-	self:add(function()
-		return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-	end, hl)
-	return self
-end
-
----@param hl hl_val
----@return Builder
-function Builder:add_scrollbar(hl)
-	ruler.add_scrollbar(self, hl)
-	return self
-end
-
----@param hl hl_val
----@return Builder
-function Builder:add_ruler(hl)
-	ruler.add_ruler(self, hl)
-	return self
-end
-
 ---@return Builder
 function Builder:add_align()
 	self:add("%=")
@@ -297,12 +213,6 @@ function Builder:add_surround(left, right, fn, hl)
 			return right
 		end)
 	end
-	return self
-end
-
----@return Builder
-function Builder:add_mode()
-	vimode.add_mode(self)
 	return self
 end
 
