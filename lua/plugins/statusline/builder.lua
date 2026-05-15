@@ -23,6 +23,7 @@ Builder.__index = Builder
 ---@field add_hl_start fun(self: Builder, hl: hl_val): Builder
 ---@field add_hl_end fun(self: Builder): Builder
 ---@field add_git_branch fun(self: Builder, hl: hl_val): Builder
+---@field add_lsp_attached_info fun(self: Builder, hl: hl_val): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
@@ -120,6 +121,23 @@ function Builder:add_git_branch(hl)
 		end, hl)
 	end, function()
 		return vim.b.gitsigns_head or vim.b.gitsigns_status_dict
+	end)
+	return self
+end
+---
+---@param hl hl_val
+---@return Builder
+function Builder:add_lsp_attached_info(hl)
+	self:add_conditional(function(bld)
+		bld:add(function()
+			local names = {}
+			for _, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+				table.insert(names, server.name)
+			end
+			return "󰣖 " .. table.concat(names, ",") .. ""
+		end, hl)
+	end, function()
+		return next(vim.lsp.get_clients({ bufnr = 0 })) ~= nil
 	end)
 	return self
 end

@@ -518,4 +518,56 @@ T["builder"]["add_git_branch - hl is processed"] = function()
 	MiniTest.expect.equality(result, "%#noBg_fg# branch%*")
 end
 
+T["builder"]["add_lsp_attached_info - doesn't show anything if no lsp attached"] = function()
+	local result = child.lua([[
+		vim.lsp.get_clients = function()
+			return {}
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_lsp_attached_info()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "")
+end
+
+T["builder"]["add_lsp_attached_info - does show lsp when attached"] = function()
+	local result = child.lua([[
+		vim.lsp.get_clients = function()
+			return {{name='lsp'}}
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_lsp_attached_info()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "󰣖 lsp")
+end
+
+T["builder"]["add_lsp_attached_info - concatenates all attached lsps"] = function()
+	local result = child.lua([[
+		vim.lsp.get_clients = function()
+			return {{name='lsp1'}, {name='lsp2'}}
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_lsp_attached_info()
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "󰣖 lsp1,lsp2")
+end
+
+T["builder"]["add_lsp_attached_info - hl is processed"] = function()
+	local result = child.lua([[
+		vim.lsp.get_clients = function()
+			return {{name='lsp'}}
+		end
+
+		local builder = require('plugins.statusline.builder')
+		local b = builder.new():add_lsp_attached_info({fg = 'fg'})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_fg#󰣖 lsp%*")
+end
+
 return T
