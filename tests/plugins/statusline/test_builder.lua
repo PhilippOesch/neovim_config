@@ -7,11 +7,16 @@ local child = MiniTest.new_child_neovim()
 
 local function mock_highlight()
 	child.lua([[                                                           
-             package.loaded['plugins.statusline.highlight'] = {                 
-                 eval_hl = function(hl) return 'MockHl' end,                    
-                 load_colors = function() end,                                  
-                 get_highlight = function(name) return {} end,                  
-             }                                                                  
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			load_colors = function() end,                                  
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				return {fg = split[2], bg=split[1]}
+			end,                  
+		}                                                                  
          ]])
 end
 
@@ -143,7 +148,7 @@ T["builder"]["add - highlight table should be processed as expected"] = function
 		end, {fg= "#00FF00"})
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl#abc%*")
+	MiniTest.expect.equality(result, "%#noBg_#00FF00#abc%*")
 end
 
 T["builder"]["add - highlight function should be processed as expected"] = function()
@@ -156,7 +161,7 @@ T["builder"]["add - highlight function should be processed as expected"] = funct
 		end)
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl#abc%*")
+	MiniTest.expect.equality(result, "%#noBg_#00FF00#abc%*")
 end
 
 T["builder"]["stacking higlight groups works as expected"] = function()
@@ -208,17 +213,6 @@ end
 
 T["builder"]["add_surround - surrounds text with surrounding characters and inverts highlight group properly"] = function()
 	local result = child.lua([[
-		package.loaded['plugins.statusline.highlight'] = {                 
-			eval_hl = function(hl)  
-				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
-			end,                    
-			load_colors = function() end,                                  
-			get_highlight = function(name)
-				local split = vim.split(name, '_')
-				return {fg = split[2], bg=split[1]}
-			end,                  
-		}                                                                  
-
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add_surround('(',')',function(bld)
 			bld:add('abc')
@@ -238,7 +232,7 @@ T["builder"]["add_mode - gets vim mode"] = function()
 		local b = builder.new():add_mode()
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl#%(N%)%*")
+	MiniTest.expect.equality(result, "%#noBg_noFg#%(N%)%*")
 end
 
 T["builder"]["add_mode - surrounding keeps background color"] = function()
@@ -246,17 +240,6 @@ T["builder"]["add_mode - surrounding keeps background color"] = function()
 		vim.fn.mode = function()
 			return 'n'
 		end
-
-		package.loaded['plugins.statusline.highlight'] = {                 
-			eval_hl = function(hl)  
-				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
-			end,                    
-			load_colors = function() end,                                  
-			get_highlight = function(name)
-				local split = vim.split(name, '_')
-				return {fg = split[2], bg=split[1]}
-			end,                  
-		}                                                                  
 
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new():add_surround('(',')',function(bld)
@@ -334,22 +317,11 @@ T["builder"]["add_conditional - information about highights are keeped"] = funct
 
 		return b:build()
 	]])
-	MiniTest.expect.equality(result, "%#MockHl#%#MockHl#abc%*%*")
+	MiniTest.expect.equality(result, "%#noBg_mockHl#%#noBg_mockHl#abc%*%*")
 end
 
 T["builder"]["add_conditional - information about highights are keeped and build on"] = function()
 	local result = child.lua([[
-		package.loaded['plugins.statusline.highlight'] = {                 
-			eval_hl = function(hl)  
-				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
-			end,                    
-			load_colors = function() end,                                  
-			get_highlight = function(name)
-				local split = vim.split(name, '_')
-				return {fg = split[2], bg=split[1]}
-			end,                  
-		}                                                                  
-
 		local builder = require('plugins.statusline.builder')
 		local b = builder.new()
 		:add_hl_start({fg='fg'})
@@ -364,5 +336,22 @@ T["builder"]["add_conditional - information about highights are keeped and build
 	]])
 	MiniTest.expect.equality(result, "%#noBg_fg#%#bg_fg#abc%*%*")
 end
+
+-- T["builder"]["add_file_icon - gets icon from web_icons"] = function()
+-- 	local result = child.lua([[
+-- 		package.loaded['nvim-web-devicons'] = {
+-- 			get_icon_color = function(name)
+-- 				return 'icon', 'icon_color'
+-- 			end,
+-- 		}
+--
+-- 		local builder = require('plugins.statusline.builder')
+-- 		local b = builder.new()
+-- 		:add_file_icon()
+--
+-- 		return b:build()
+-- 	]])
+-- 	MiniTest.expect.equality(result, "icon")
+-- end
 
 return T
