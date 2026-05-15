@@ -22,8 +22,8 @@ Builder.__index = Builder
 ---@field add_mode fun(self: Builder, hl?: hl_val): Builder
 ---@field add_hl_start fun(self: Builder, hl: hl_val): Builder
 ---@field add_hl_end fun(self: Builder): Builder
----@field add_git_branch fun(self: Builder, hl: hl_val): Builder
----@field add_lsp_attached_info fun(self: Builder, hl: hl_val): Builder
+---@field add_git_branch fun(self: Builder, hl?: hl_val): Builder
+---@field add_lsp_attached_info fun(self: Builder, hl?: hl_val): Builder
 ---@field build fun(self: Builder): string
 
 ---@alias eval_fun fun():string
