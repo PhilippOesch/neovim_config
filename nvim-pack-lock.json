@@ -74,7 +74,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lineforge.nvim": {
-      "rev": "8d2685c18dde327aedc027ceacf5dfe78fc072d1",
+      "rev": "78d9a36a27a378d297d70bd04cec340ff01f5e38",
       "src": "https://github.com/PhilippOesch/lineforge.nvim"
     },
     "markdown-preview.nvim": {

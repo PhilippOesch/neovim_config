@@ -2,28 +2,28 @@
 return {
 	deps = { "https://github.com/PhilippOesch/lineforge.nvim" },
 	init = function()
-		local segments = require("lineforge.segments")
+		local lineforge = require("lineforge")
+		local segments = lineforge.segments
 
-		require("lineforge").setup({
+		lineforge.setup({
+			---@param builder lineforge.Builder
 			statusline = function(builder)
 				builder
+					---@param bld lineforge.Builder
+					:section(function(bld)
+						bld:wrap("", "", function(bld)
+							segments.mode.add(bld)
+						end, { fg = bld.ctx:get_highlight("Folded").bg })
+						bld:add_space(" ", 2)
+						segments.file_icon.add(bld)
+						bld:add_space()
+						segments.filename.add(bld, { fg = bld.ctx:get_highlight("Special").fg })
+						bld:add_space(" ", 2)
+						segments.git_branch.add(bld, { fg = bld.ctx:get_highlight("String").fg, bold = true })
+						segments.git_status.add(bld)
+					end)
 					:section(
-						---@param bld Builder
-						function(bld)
-							bld:wrap("", "", function(bld)
-								segments.mode.add(bld)
-							end, { fg = bld.ctx:get_highlight("Folded").bg })
-							bld:add_space(" ", 2)
-							segments.file_icon.add(bld)
-							bld:add_space()
-							segments.filename.add(bld, { fg = bld.ctx:get_highlight("Special").fg })
-							bld:add_space(" ", 2)
-							segments.git_branch.add(bld, { fg = bld.ctx:get_highlight("String").fg, bold = true })
-							segments.git_status.add(bld)
-						end
-					)
-					:section(
-						---@param bld Builder
+						---@param bld lineforge.Builder
 						function(bld)
 							segments.lsp_attached_info.add(
 								bld,
