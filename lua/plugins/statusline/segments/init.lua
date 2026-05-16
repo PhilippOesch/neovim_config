@@ -1,5 +1,7 @@
 return {
+	git_status      = require("plugins.statusline.segments.git_status"),
 	git_branch      = require("plugins.statusline.segments.git_branch"),
+	fileformat      = require("plugins.statusline.segments.fileformat"),
 	lsp_attached_info = require("plugins.statusline.segments.lsp_attached_info"),
 	file_icon       = require("plugins.statusline.segments.file_icon"),
 	filename        = require("plugins.statusline.segments.filename"),

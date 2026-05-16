@@ -17,13 +17,18 @@ return {
 							bld:add_space(" ", 2)
 							segments.filename.add(bld, { fg = highlight.get_highlight("Special").fg })
 							bld:add_space(" ", 2)
-							segments.git_branch.add(bld, { fg = highlight.get_highlight("String").fg })
+							segments.git_branch.add(bld, { fg = highlight.get_highlight("String").fg, bold = true })
 						end
 					)
 					:add_block(
 						---@param bld Builder
 						function(bld)
-							segments.lsp_attached_info.add(bld, { fg = highlight.get_highlight("String").fg })
+							segments.lsp_attached_info.add(
+								bld,
+								{ fg = highlight.get_highlight("String").fg, bold = true }
+							)
+							bld:add_space(" ", 2)
+							segments.fileformat.add(bld, { fg = highlight.get_highlight("Normal").fg })
 							bld:add_space(" ", 2)
 							segments.ruler.add(bld)
 							bld:add_space(" ", 2)
