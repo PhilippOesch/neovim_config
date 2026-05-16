@@ -351,4 +351,160 @@ T["segments"]["fileformat - displays file format and adds highlight"] = function
 	MiniTest.expect.equality(result, "%#noBg_fg# unix%*")
 end
 
+T["segments"]["git_status - displays nothing when no status available"] = function()
+	local result = child.lua([[
+		vim.b.gitsigns_status_dict = nil
+		
+		local builder = require('plugins.statusline.builder')
+		local git_status = require('plugins.statusline.segments.git_status')
+		local b = builder.new()
+		git_status.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "")
+end
+
+T["segments"]["git_status - displays nothing when no changes available"] = function()
+	local result = child.lua([[
+		vim.b.gitsigns_status_dict = {
+			added = 0,
+			removed = 0,
+			changed = 0
+		}
+		
+		local builder = require('plugins.statusline.builder')
+		local git_status = require('plugins.statusline.segments.git_status')
+		local b = builder.new()
+		git_status.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "")
+end
+
+T["segments"]["git_status - displays number of added files"] = function()
+	local result = child.lua([[
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				if #split == 1 then
+					return {fg = split[1]}
+				end
+				return {fg = split[2], bg=split[1]}
+			end,                  
+		}                                                                  
+
+		vim.b.gitsigns_status_dict = {
+			added = 1
+		}
+		
+		local builder = require('plugins.statusline.builder')
+		local git_status = require('plugins.statusline.segments.git_status')
+		local b = builder.new()
+		git_status.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(
+		result,
+		"%#noBg_Constant#(%*%#noBg_Constant#%#noBg_Added#+1%*%*%#noBg_Constant#%*%#noBg_Constant#%*%#noBg_Constant#)%*"
+	)
+end
+
+T["segments"]["git_status - displays number of removed files"] = function()
+	local result = child.lua([[
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				if #split == 1 then
+					return {fg = split[1]}
+				end
+				return {fg = split[2], bg=split[1]}
+			end,                  
+		}                                                                  
+
+		vim.b.gitsigns_status_dict = {
+			removed = 1
+		}
+		
+		local builder = require('plugins.statusline.builder')
+		local git_status = require('plugins.statusline.segments.git_status')
+		local b = builder.new()
+		git_status.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(
+		result,
+		"%#noBg_Constant#(%*%#noBg_Constant#%*%#noBg_Constant#%#noBg_Removed#-1%*%*%#noBg_Constant#%*%#noBg_Constant#)%*"
+	)
+end
+
+T["segments"]["git_status - displays number of changed files"] = function()
+	local result = child.lua([[
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				if #split == 1 then
+					return {fg = split[1]}
+				end
+				return {fg = split[2], bg=split[1]}
+			end,                  
+		}                                                                  
+
+		vim.b.gitsigns_status_dict = {
+			changed = 1
+		}
+		
+		local builder = require('plugins.statusline.builder')
+		local git_status = require('plugins.statusline.segments.git_status')
+		local b = builder.new()
+		git_status.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(
+		result,
+		"%#noBg_Constant#(%*%#noBg_Constant#%*%#noBg_Constant#%*%#noBg_Constant#%#noBg_Changed#~1%*%*%#noBg_Constant#)%*"
+	)
+end
+
+T["segments"]["git_status - displays all changes correctly"] = function()
+	local result = child.lua([[
+		package.loaded['plugins.statusline.highlight'] = {                 
+			eval_hl = function(hl)  
+				return (hl.bg or 'noBg') .. '_' .. (hl.fg or 'noFg')
+			end,                    
+			get_highlight = function(name)
+				local split = vim.split(name, '_')
+				if #split == 1 then
+					return {fg = split[1]}
+				end
+				return {fg = split[2], bg=split[1]}
+			end,                  
+		}                                                                  
+
+		vim.b.gitsigns_status_dict = {
+			added = 1,
+			removed = 2,
+			changed = 3,
+		}
+		
+		local builder = require('plugins.statusline.builder')
+		local git_status = require('plugins.statusline.segments.git_status')
+		local b = builder.new()
+		git_status.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(
+		result,
+		"%#noBg_Constant#(%*%#noBg_Constant#%#noBg_Added#+1%*%*%#noBg_Constant#%#noBg_Removed#-2%*%*%#noBg_Constant#%#noBg_Changed#~3%*%*%#noBg_Constant#)%*"
+	)
+end
+
 return T

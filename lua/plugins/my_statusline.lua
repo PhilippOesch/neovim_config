@@ -14,10 +14,11 @@ return {
 							end, { fg = highlight.get_highlight("Folded").bg })
 							bld:add_space(" ", 2)
 							segments.file_icon.add(bld)
-							bld:add_space(" ", 2)
+							bld:add_space()
 							segments.filename.add(bld, { fg = highlight.get_highlight("Special").fg })
 							bld:add_space(" ", 2)
 							segments.git_branch.add(bld, { fg = highlight.get_highlight("String").fg, bold = true })
+							segments.git_status.add(bld)
 						end
 					)
 					:add_block(
