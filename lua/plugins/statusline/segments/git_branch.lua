@@ -5,10 +5,10 @@ local M = {}
 function M.add(bld, hl)
 	bld:add_conditional(function(bld)
 		bld:add(function()
-			return " " .. vim.b.gitsigns_status_dict.head
+			return " " .. bld.ctx:get_git_branch()
 		end, hl)
 	end, function()
-		return vim.b.gitsigns_head or vim.b.gitsigns_status_dict
+		return bld.ctx:get_git_branch() ~= nil
 	end)
 end
 

@@ -32,11 +32,11 @@ T["builder"] = MiniTest.new_set({
 T["builder"]["setup correctly after creation"] = function()
 	local result = child.lua([[
 		local builder = require('plugins.statusline.builder')
-
-		return builder.new() 
+		local b = builder.new()
+		return {#b.statusline, #b.hl_stack}
 	]])
-	MiniTest.expect.equality(#result.statusline, 0)
-	MiniTest.expect.equality(#result.hl_stack, 0)
+	MiniTest.expect.equality(result[1], 0)
+	MiniTest.expect.equality(result[2], 0)
 end
 
 T["builder"]["new builder returns empty string"] = function()

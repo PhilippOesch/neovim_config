@@ -1,5 +1,3 @@
-local highlight = require("plugins.statusline.highlight")
-
 local mode_names = { -- change the strings if you like it vvvvverbose!
 	n = "N",
 	no = "N?",
@@ -59,9 +57,9 @@ local M = {}
 ---@param hl? hl_val
 function M.add(bld)
 	bld:add(function()
-		return "%(" .. mode_names[vim.fn.mode(1)] .. "%)"
+		return "%(" .. mode_names[bld.ctx:get_mode()] .. "%)"
 	end, function()
-		return { fg = highlight.get_highlight(mode_colors[vim.fn.mode(1)]).fg }
+		return { fg = bld.ctx:get_highlight(mode_colors[bld.ctx:get_mode()]).fg }
 	end)
 end
 

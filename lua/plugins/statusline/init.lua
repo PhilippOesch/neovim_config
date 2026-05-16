@@ -1,5 +1,5 @@
 local builder = require("plugins.statusline.builder")
-local highlight = require("plugins.statusline.highlight")
+local context = require("plugins.statusline.context")
 
 ---@class my_statusline.config
 ---@field statusline? fun(builder: Builder)
@@ -11,7 +11,8 @@ local statusline_builder
 ---@param opts my_statusline.config
 M.setup = function(opts)
 	if opts.statusline then
-		statusline_builder = builder.new()
+		local ctx = context.default()
+		statusline_builder = builder.new(nil, ctx)
 		opts.statusline(statusline_builder)
 		vim.o.statusline = "%{%v:lua.require'plugins.statusline.init'.eval_statusline()%}"
 	else

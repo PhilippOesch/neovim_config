@@ -1,4 +1,5 @@
 local highlight = require("plugins.statusline.highlight")
+local context = require("plugins.statusline.context")
 
 local Builder = {}
 Builder.__index = Builder
@@ -6,7 +7,8 @@ Builder.__index = Builder
 ---@class Builder
 ---@field statusline (eval_fun|string)[]
 ---@field hl_stack hl_val[]
----@field new fun(hl?: hl_val): Builder
+---@field ctx EditorContext
+---@field new fun(hl?: hl_val, ctx?: EditorContext): Builder
 ---@field add fun(self: Builder, fn: eval_fun, hl?: hl_val): Builder
 ---@field add_block fun(self: Builder, hl?: hl_val): Builder
 ---@field add_align fun(self: Builder): Builder
@@ -23,8 +25,9 @@ Builder.__index = Builder
 ---@alias hl_val table|function
 
 ---@param hl? hl_val
+---@param ctx? EditorContext
 ---@return Builder
-function Builder.new(hl)
+function Builder.new(hl, ctx)
 	local self = setmetatable({}, Builder)
 
 	---@type eval_fun[]
@@ -33,6 +36,7 @@ function Builder.new(hl)
 	if hl then
 		self.hl_stack = { hl }
 	end
+	self.ctx = ctx or context.default()
 
 	return self
 end
@@ -70,9 +74,9 @@ function Builder:add_hl_start(hl)
 		local parent_hl = self.hl_stack[#self.hl_stack]
 		hl_fn = function()
 			local from_stack = resolve_dynamic_hl(parent_hl)
-			if type(from_stack) == "string" then
-				from_stack = highlight.get_highlight(from_stack)
-			end
+		if type(from_stack) == "string" then
+			from_stack = self.ctx:get_highlight(from_stack)
+		end
 			return highlight.eval_hl(vim.tbl_extend("force", from_stack, hl))
 		end
 	end
@@ -83,9 +87,9 @@ function Builder:add_hl_start(hl)
 			local evaluated_hl = resolve_dynamic_hl(hl)
 			if type(evaluated_hl) == "table" and #current_stack > 0 then
 				local from_stack = resolve_dynamic_hl(current_stack[#current_stack])
-				if type(from_stack) == "string" then
-					from_stack = highlight.get_highlight(from_stack)
-				end
+			if type(from_stack) == "string" then
+				from_stack = self.ctx:get_highlight(from_stack)
+			end
 				evaluated_hl = vim.tbl_extend("force", from_stack, evaluated_hl)
 			end
 			return highlight.eval_hl(evaluated_hl)
@@ -116,8 +120,8 @@ function Builder:add(fn, hl)
 	local hl_fn = function()
 		local resolve_hl = resolve_dynamic_hl(hl)
 		local resolve_stack_hl = resolve_dynamic_hl(stack_hl)
-		if resolve_stack_hl then
-			resolve_stack_hl = highlight.get_highlight(resolve_stack_hl)
+		if type(resolve_stack_hl) == "string" then
+			resolve_stack_hl = self.ctx:get_highlight(resolve_stack_hl)
 		end
 		if type(resolve_hl) == "table" and type(resolve_stack_hl) == "table" then
 			local res = vim.tbl_extend("force", resolve_stack_hl, resolve_hl)
@@ -162,7 +166,7 @@ end
 ---@param predicate condition_fun
 ---@return Builder
 function Builder:add_conditional(fn, predicate)
-	local conditional_builder = Builder.new((#self.hl_stack > 0 and self.hl_stack[#self.hl_stack]) or nil)
+	local conditional_builder = Builder.new((#self.hl_stack > 0 and self.hl_stack[#self.hl_stack]) or nil, self.ctx)
 	fn(conditional_builder)
 	self:add(function()
 		if predicate() then
