@@ -325,4 +325,30 @@ T["segments"]["lsp_attached_info - hl is processed"] = function()
 	MiniTest.expect.equality(result, "%#noBg_fg#󰣖 lsp%*")
 end
 
+T["segments"]["fileformat - displays file format"] = function()
+	local result = child.lua([[
+		vim.bo.fileformat = 'unix'
+
+		local builder = require('plugins.statusline.builder')
+		local fileformat = require('plugins.statusline.segments.fileformat')
+		local b = builder.new()
+		fileformat.add(b)
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, " unix")
+end
+
+T["segments"]["fileformat - displays file format and adds highlight"] = function()
+	local result = child.lua([[
+		vim.bo.fileformat = 'unix'
+
+		local builder = require('plugins.statusline.builder')
+		local fileformat = require('plugins.statusline.segments.fileformat')
+		local b = builder.new()
+		fileformat.add(b, {fg = 'fg'})
+		return b:build()
+	]])
+	MiniTest.expect.equality(result, "%#noBg_fg# unix%*")
+end
+
 return T
