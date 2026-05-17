@@ -1,11 +1,11 @@
 ---@class JestAdapter: Adapter
-local JestAdapter = {
+local M = {
 	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
 	formatter = require('plugins.test-runner.formatter'),
-	parser = require('plugins.test-runner.adapters.parser')
+	parser = require('plugins.test-runner.adapters.jest.parser')
 }
 
-JestAdapter.get_config = function(path)
+M.get_config = function(path)
 	local dir = path
 	local root = "/"
 	local home = os.getenv("HOME") or ""
@@ -39,8 +39,8 @@ JestAdapter.get_config = function(path)
 	return nil
 end
 
-JestAdapter.get_cwd = function(path)
-	local config = JestAdapter.get_config(path)
+M.get_cwd = function(path)
+	local config = M.get_config(path)
 
 	if config and config.cwd then
 		return config.cwd
@@ -51,7 +51,7 @@ end
 
 ---@param config table
 ---@param opts? {filepath: string}
-JestAdapter.get_cmd = function(config, opts)
+M.get_cmd = function(config, opts)
 	local cmd_parts = { "npx", "jest", "--json" }
 
 	if config and config.config_path then
@@ -63,4 +63,4 @@ JestAdapter.get_cmd = function(config, opts)
 	return cmd_parts
 end
 
-return JestAdapter
+return M

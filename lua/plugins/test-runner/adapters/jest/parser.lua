@@ -37,22 +37,22 @@ function M.parse(json_string)
 	end
 
 	-- jest may print non-json lines before/after the json (e.g. warnings)
-	local start_idx = json_string:find("{%s*\"numTotalTests")
-	local end_idx = json_string:find("}%s*$")
-	if not start_idx then
-		start_idx = json_string:find("{")
-	end
-	if not end_idx then
-		local rev_end = json_string:reverse():find("}")
-		if rev_end then
-			end_idx = #json_string - rev_end + 1
-		end
-	end
-
+	-- local start_idx = json_string:find("{%s*\"numTotalTests")
+	-- local end_idx = json_string:find("}%s*$")
+	-- if not start_idx then
+	-- 	start_idx = json_string:find("{")
+	-- end
+	-- if not end_idx then
+	-- 	local rev_end = json_string:reverse():find("}")
+	-- 	if rev_end then
+	-- 		end_idx = #json_string - rev_end + 1
+	-- 	end
+	-- end
+	--
 	local to_decode = json_string
-	if start_idx and end_idx then
-		to_decode = json_string:sub(start_idx, end_idx)
-	end
+	-- if start_idx and end_idx then
+	-- 	to_decode = json_string:sub(start_idx, end_idx)
+	-- end
 
 	local ok, data = pcall(vim.json.decode, to_decode)
 	if not ok or type(data) ~= "table" then

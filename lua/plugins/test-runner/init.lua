@@ -19,13 +19,13 @@ local ResultCache = require("plugins.test-runner.result_cache")
 ---@field formatter ResultParser
 
 ---@class JestAdapter: Adapter
-local JestAdapter = require("plugins.test-runner.adapters.jest-adapter")
+local JestAdapter = require("plugins.test-runner.adapters.jest.adapter")
 
----@class JestConfig
+---@class Config
 local config = {
 	---@type Adapter[]
 	adapters = {
-		require("plugins.test-runner.adapters.jest-adapter"),
+		require("plugins.test-runner.adapters.jest.adapter"),
 	},
 	icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
 	sidebar_width = 45,
