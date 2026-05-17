@@ -43,11 +43,12 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.markdown_preview"),
 	require("plugins.markdown_render"),
 	require("plugins.dap.init"),
-	require("plugins.neotest"),
+	-- require("plugins.neotest"),
 	require("plugins.persisted_nvim"),
 	require("plugins.nvimcolorizer"),
 	require("plugins.sidekick"),
-	require("plugins.lineforge")
+	require("plugins.lineforge"),
+	require("plugins.jest"),
 })
 
 require("config.general")

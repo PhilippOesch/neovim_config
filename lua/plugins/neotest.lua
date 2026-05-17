@@ -4,7 +4,7 @@ return {
 		"https://github.com/nvim-neotest/neotest",
 		"https://github.com/nvim-neotest/nvim-nio",
 		"https://github.com/antoinemadec/FixCursorHold.nvim",
-		"https://github.com/haydenmeade/neotest-jest",
+		{ src = "https://github.com/haydenmeade/neotest-jest", version = "1a54cf910571b9ae5216b8570367bcb0310d9f54" },
 		"https://github.com/Nsidorenco/neotest-vstest",
 		"https://github.com/rcasia/neotest-java",
 		"https://github.com/nvim-neotest/neotest-go",
@@ -13,6 +13,9 @@ return {
 	init = function()
 		require("neotest").setup({
 			loglevel = 1,
+			discovery = {
+				enabled = false,
+			},
 			adapters = {
 				-- require("neotest-dotnet")({
 				-- 	discovery_root = "solution",
@@ -33,6 +36,7 @@ return {
 				-- }),
 				require("neotest-go"),
 				require("neotest-jest")({
+					jest_test_discovery = true,
 					jestCommand = "npm test --",
 					env = { CI = true },
 					cwd = function(_)

@@ -114,8 +114,9 @@
       "src": "https://github.com/rcasia/neotest-java"
     },
     "neotest-jest": {
-      "rev": "0e7979d51301dfae5ef839d771bd28cf593fde3f",
-      "src": "https://github.com/haydenmeade/neotest-jest"
+      "rev": "1a54cf910571b9ae5216b8570367bcb0310d9f54",
+      "src": "https://github.com/haydenmeade/neotest-jest",
+      "version": "'1a54cf910571b9ae5216b8570367bcb0310d9f54'"
     },
     "neotest-vitest": {
       "rev": "f01addc6f07b79ef1be5f4297eafbee9e0959018",
