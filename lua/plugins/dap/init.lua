@@ -2,6 +2,7 @@
 return {
 	deps = {
 		"https://github.com/mfussenegger/nvim-dap",
+		"https://github.com/nvim-neotest/nvim-nio",
 		"https://github.com/rcarriga/nvim-dap-ui",
 		"https://github.com/leoluz/nvim-dap-go",
 		"https://github.com/jay-babu/mason-nvim-dap.nvim",

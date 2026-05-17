@@ -14,7 +14,7 @@ T["parser"] = MiniTest.new_set({
 
 T["parser"]["parse empty string returns error"] = function()
 	local result = child.lua([[
-		local parser = require('plugins.test-runner.parser')
+		local parser = require('plugins.test-runner.adapters.parser')
 		return { parser.parse("") }
 	]])
 	MiniTest.expect.equality(result[1], vim.NIL)
@@ -23,7 +23,7 @@ end
 
 T["parser"]["parse invalid json returns error"] = function()
 	local result = child.lua([[
-		local parser = require('plugins.test-runner.parser')
+		local parser = require('plugins.test-runner.adapters.parser')
 		return { parser.parse("not json") }
 	]])
 	MiniTest.expect.equality(result[1], vim.NIL)
@@ -32,7 +32,7 @@ end
 
 T["parser"]["parse valid jest json returns summary"] = function()
 	local result = child.lua([[
-		local parser = require('plugins.test-runner.parser')
+		local parser = require('plugins.test-runner.adapters.parser')
 		local json = vim.json.encode({
 			numTotalTests = 3,
 			numPassedTests = 2,
@@ -68,7 +68,7 @@ end
 
 T["parser"]["parse builds nested tree"] = function()
 	local result = child.lua([[
-		local parser = require('plugins.test-runner.parser')
+		local parser = require('plugins.test-runner.adapters.parser')
 		local json = vim.json.encode({
 			numTotalTests = 2,
 			numPassedTests = 1,
@@ -112,7 +112,7 @@ end
 
 T["parser"]["parse handles multiple test result entries"] = function()
 	local result = child.lua([[
-		local parser = require('plugins.test-runner.parser')
+		local parser = require('plugins.test-runner.adapters.parser')
 		local json = vim.json.encode({
 			numTotalTests = 2,
 			numPassedTests = 1,
