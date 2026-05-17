@@ -2,6 +2,7 @@ local M = {}
 
 local parser = require("plugins.jest.parser")
 local formatter = require("plugins.jest.formatter")
+local JestSidebar = require("plugins.jest.sidebar")
 
 ---@class JestConfig
 local config = {
@@ -17,7 +18,7 @@ local config = {
 
 ---@class JestState
 local state = {
-	sidebar = { buf = nil, win = nil },
+	sidebar = nil,
 	running_jobs = {},
 }
 
@@ -102,75 +103,6 @@ local function cleanup_old_results()
 	end
 end
 
----Ensure the sidebar buffer exists.
----@return integer buf
-local function ensure_sidebar_buf()
-	if state.sidebar.buf and vim.api.nvim_buf_is_valid(state.sidebar.buf) then
-		return state.sidebar.buf
-	end
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.bo[buf].buftype = "nofile"
-	vim.bo[buf].swapfile = false
-	vim.bo[buf].modifiable = false
-	vim.bo[buf].filetype = "jestresults"
-	vim.bo[buf].syntax = "markdown"
-
-	if vim.treesitter and vim.treesitter.language then
-		pcall(vim.treesitter.language.register, "markdown", "jestresults")
-	end
-
-	state.sidebar.buf = buf
-	return buf
-end
-
----Set the sidebar buffer content.
----@param content string
-local function set_sidebar_content(content)
-	local buf = ensure_sidebar_buf()
-	vim.bo[buf].modifiable = true
-	local lines = vim.split(content, "\n")
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.bo[buf].modifiable = false
-end
-
----Open the sidebar window on the right.
-local function open_sidebar()
-	if state.sidebar.win and vim.api.nvim_win_is_valid(state.sidebar.win) then
-		return
-	end
-	local current_win = vim.api.nvim_get_current_win()
-	local buf = ensure_sidebar_buf()
-	vim.cmd("botright vsplit")
-	local win = vim.api.nvim_get_current_win()
-	vim.api.nvim_win_set_buf(win, buf)
-	vim.api.nvim_win_set_width(win, config.sidebar_width)
-	vim.wo[win].winfixwidth = true
-	vim.wo[win].wrap = true
-	vim.wo[win].foldmethod = "marker"
-	vim.wo[win].foldlevel = 0
-	vim.wo[win].conceallevel = 2
-	vim.wo[win].concealcursor = "nvic"
-	state.sidebar.win = win
-
-	-- Return focus to original window
-	if vim.api.nvim_win_is_valid(current_win) then
-		vim.api.nvim_set_current_win(current_win)
-	end
-
-	-- Close on q
-	vim.keymap.set("n", "q", function()
-		M.toggle_sidebar()
-	end, { buffer = buf, noremap = true, silent = true })
-end
-
----Close the sidebar window.
-local function close_sidebar()
-	if state.sidebar.win and vim.api.nvim_win_is_valid(state.sidebar.win) then
-		vim.api.nvim_win_close(state.sidebar.win, true)
-		state.sidebar.win = nil
-	end
-end
-
 ---Update sidebar content based on the current buffer.
 local function update_sidebar_for_current_buf()
 	local filepath = vim.api.nvim_buf_get_name(0)
@@ -180,21 +112,21 @@ local function update_sidebar_for_current_buf()
 		local content = "# Test Results: "
 			.. basename
 			.. "\n\n## Not a test file\n\nSwitch to a test file to see results."
-		set_sidebar_content(content)
+		state.sidebar:set_content(content)
 		return
 	end
 
 	local cache_path = get_cache_path(filepath)
 	if vim.fn.filereadable(cache_path) == 1 then
 		local lines = vim.fn.readfile(cache_path)
-		set_sidebar_content(table.concat(lines, "\n"))
+		state.sidebar:set_content(table.concat(lines, "\n"))
 	else
 		local content = "# Test Results: "
 			.. basename
 			.. "\n\nNo results yet.\n\nRun tests with "
 			.. config.keybinding_run
 			.. "."
-		set_sidebar_content(content)
+		state.sidebar:set_content(content)
 	end
 end
 
@@ -233,18 +165,18 @@ local function handle_jest_result(filepath, obj)
 
 	-- Update sidebar if currently focused on this file
 	if vim.api.nvim_buf_get_name(0) == filepath then
-		if state.sidebar.win and vim.api.nvim_win_is_valid(state.sidebar.win) then
-			set_sidebar_content(content)
+		if state.sidebar:is_open() then
+			state.sidebar:set_content(content)
 		end
 	end
 end
 
 ---Toggle the sidebar visibility.
 function M.toggle_sidebar()
-	if state.sidebar.win and vim.api.nvim_win_is_valid(state.sidebar.win) then
-		close_sidebar()
+	if state.sidebar:is_open() then
+		state.sidebar:close()
 	else
-		open_sidebar()
+		state.sidebar:open()
 		update_sidebar_for_current_buf()
 	end
 end
@@ -253,7 +185,7 @@ end
 function M.run_file()
 	local filepath = vim.api.nvim_buf_get_name(0)
 	if not is_test_file(filepath) then
-		open_sidebar()
+		state.sidebar:open()
 		update_sidebar_for_current_buf()
 		return
 	end
@@ -267,10 +199,10 @@ function M.run_file()
 		state.running_jobs[filepath] = nil
 	end
 
-	open_sidebar()
+	state.sidebar:open()
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 	local content = "# Test Results: " .. basename .. "\n\n## Running tests..."
-	set_sidebar_content(content)
+	state.sidebar:set_content(content)
 
 	-- Determine jest cwd and config
 	local jest_info = find_jest_config(vim.fn.fnamemodify(filepath, ":h"))
@@ -306,6 +238,9 @@ function M.setup(opts)
 	-- Cleanup old results
 	cleanup_old_results()
 
+	-- Create sidebar instance
+	state.sidebar = JestSidebar.new({ width = config.sidebar_width })
+
 	-- Keymaps
 	if config.keybinding_run then
 		vim.keymap.set("n", config.keybinding_run, M.run_file, {
@@ -328,21 +263,12 @@ function M.setup(opts)
 	vim.api.nvim_create_autocmd("BufEnter", {
 		group = augroup,
 		callback = function()
-			if state.sidebar.win and vim.api.nvim_win_is_valid(state.sidebar.win) then
+			if state.sidebar:is_open() then
 				-- Don't update if we're entering the sidebar buffer itself
-				if vim.api.nvim_get_current_buf() == state.sidebar.buf then
+				if vim.api.nvim_get_current_buf() == state.sidebar:get_buf() then
 					return
 				end
 				update_sidebar_for_current_buf()
-			end
-		end,
-	})
-
-	vim.api.nvim_create_autocmd("WinClosed", {
-		group = augroup,
-		callback = function(ev)
-			if tonumber(ev.match) == state.sidebar.win then
-				state.sidebar.win = nil
 			end
 		end,
 	})
