@@ -9,7 +9,7 @@ local opts = {
 		width = "block",
 		right_pad = 1,
 	},
-	file_types = { "markdown", "codecompanion" },
+	file_types = { "markdown", "codecompanion", "todo", "jestresults" },
 }
 
 ---@type Config.Plugin

@@ -114,6 +114,11 @@ local function ensure_sidebar_buf()
 	vim.bo[buf].modifiable = false
 	vim.bo[buf].filetype = "jestresults"
 	vim.bo[buf].syntax = "markdown"
+
+	if vim.treesitter and vim.treesitter.language then
+		pcall(vim.treesitter.language.register, "markdown", "jestresults")
+	end
+
 	state.sidebar.buf = buf
 	return buf
 end
@@ -202,11 +207,7 @@ local function handle_jest_result(filepath, obj)
 
 	if obj.code ~= 0 and (not obj.stdout or obj.stdout == "") then
 		local err = obj.stderr or "Unknown error running jest"
-		content = "# Test Results: "
-			.. basename
-			.. "\n\n## Error running tests\n\n```\n"
-			.. err
-			.. "\n```"
+		content = "# Test Results: " .. basename .. "\n\n## Error running tests\n\n```\n" .. err .. "\n```"
 	else
 		local result, parse_err = parser.parse(obj.stdout or "")
 		if not result then

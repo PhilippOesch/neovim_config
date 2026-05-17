@@ -20,6 +20,7 @@ return {
 	},
 	init = function()
 		local ensureInstalled = {
+			'markdown',
 			"c",
 			"toml",
 			"cpp",
