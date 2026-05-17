@@ -14,7 +14,7 @@ T["formatter"] = MiniTest.new_set({
 
 T["formatter"]["format running state"] = function()
 	local result = child.lua([[
-		local formatter = require('plugins.jest.formatter')
+		local formatter = require('plugins.test-runner.formatter')
 		local lines = vim.split(formatter.format("foo.spec.ts", nil, { icons = { pass = "P", fail = "F", pending = "S", suite = "SU" } }), "\n")
 		return { lines[1], lines[3] }
 	]])
@@ -24,7 +24,7 @@ end
 
 T["formatter"]["format empty tree"] = function()
 	local result = child.lua([[
-		local formatter = require('plugins.jest.formatter')
+		local formatter = require('plugins.test-runner.formatter')
 		local md = formatter.format("foo.spec.ts", { summary = { passed = 0, failed = 0, pending = 0 }, tree = {} }, { icons = { pass = "P", fail = "F", pending = "S", suite = "SU" } })
 		local lines = vim.split(md, "\n")
 		return { lines[3], lines[5] }
@@ -35,7 +35,7 @@ end
 
 T["formatter"]["format renders tree with icons and suite icon"] = function()
 	local result = child.lua([[
-		local formatter = require('plugins.jest.formatter')
+		local formatter = require('plugins.test-runner.formatter')
 		local md = formatter.format("foo.spec.ts", {
 			summary = { passed = 1, failed = 1, pending = 0 },
 			tree = {
@@ -71,7 +71,7 @@ end
 
 T["formatter"]["format renders console for failed tests"] = function()
 	local result = child.lua([[
-		local formatter = require('plugins.jest.formatter')
+		local formatter = require('plugins.test-runner.formatter')
 		local md = formatter.format("foo.spec.ts", {
 			summary = { passed = 0, failed = 1, pending = 0 },
 			tree = {
@@ -102,7 +102,7 @@ end
 
 T["formatter"]["format truncates long console output"] = function()
 	local result = child.lua([[
-		local formatter = require('plugins.jest.formatter')
+		local formatter = require('plugins.test-runner.formatter')
 		local long_msg = {}
 		for i = 1, 25 do
 			table.insert(long_msg, "line " .. i)
@@ -134,7 +134,7 @@ end
 
 T["formatter"]["format uses custom icons"] = function()
 	local result = child.lua([[
-		local formatter = require('plugins.jest.formatter')
+		local formatter = require('plugins.test-runner.formatter')
 		local md = formatter.format("foo.spec.ts", {
 			summary = { passed = 1, failed = 0, pending = 0 },
 			tree = {

@@ -1,14 +1,26 @@
 local M = {}
 
-local parser = require("plugins.jest.parser")
-local formatter = require("plugins.jest.formatter")
-local JestSidebar = require("plugins.jest.sidebar")
-local JestJobRunner = require("plugins.jest.job_runner")
-local JestResultCache = require("plugins.jest.result_cache")
+local parser = require("plugins.test-runner.parser")
+local formatter = require("plugins.test-runner.formatter")
+local JestSidebar = require("plugins.test-runner.sidebar")
+local JestJobRunner = require("plugins.test-runner.job_runner")
+local JestResultCache = require("plugins.test-runner.result_cache")
+
+---@class Adapter
+---@field patterns string[]
+
+---@class JestAdapter: Adapter
+local JestAdapter = {
+	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
+}
 
 ---@class JestConfig
 local config = {
-	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
+	---@type Adapter[]
+	adapters = {
+		JestAdapter,
+	},
+	-- patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
 	jest_command = "npx jest --json",
 	jest_config = nil,
 	icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
@@ -25,18 +37,36 @@ local state = {
 	result_cache = nil,
 }
 
----Check if a file matches any test pattern.
+--- get the test adapter
+---
 ---@param filepath string
----@return boolean
-local function is_test_file(filepath)
+---@return Adapter|nil
+local function get_test_adapter(filepath)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
-	for _, pattern in ipairs(config.patterns) do
-		if string.find(basename, pattern) then
-			return true
+
+	for _, adapter in ipairs(config.adapters) do
+		for _, pattern in ipairs(adapter.patterns) do
+			if string.find(basename, pattern) then
+				return adapter
+			end
 		end
 	end
-	return false
+
+	return nil
 end
+
+-- ---Check if a file matches any test pattern.
+-- ---@param filepath string
+-- ---@return boolean
+-- local function is_test_file(filepath)
+-- 	local basename = vim.fn.fnamemodify(filepath, ":t")
+-- 	for _, pattern in ipairs(config.patterns) do
+-- 		if string.find(basename, pattern) then
+-- 			return true
+-- 		end
+-- 	end
+-- 	return false
+-- end
 
 ---Walk up directory tree to find jest config or package.json.
 ---@param start_dir string
@@ -80,7 +110,7 @@ local function update_sidebar_for_current_buf()
 	local filepath = vim.api.nvim_buf_get_name(0)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 
-	if not is_test_file(filepath) then
+	if not get_test_adapter(filepath) then
 		local content = "# Test Results: "
 			.. basename
 			.. "\n\n## Not a test file\n\nSwitch to a test file to see results."
@@ -150,7 +180,10 @@ end
 ---Run jest tests for the current file.
 function M.run_file()
 	local filepath = vim.api.nvim_buf_get_name(0)
-	if not is_test_file(filepath) then
+
+	local adapter = get_test_adapter(filepath)
+
+	if not adapter then
 		state.sidebar:open()
 		update_sidebar_for_current_buf()
 		return
@@ -195,7 +228,7 @@ function M.setup(opts)
 		vim.keymap.set("n", config.keybinding_run, M.run_file, {
 			noremap = true,
 			silent = true,
-			desc = "Run jest tests for current file",
+			desc = "Run tests for current file",
 		})
 	end
 	if config.keybinding_toggle then
