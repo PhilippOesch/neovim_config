@@ -8,11 +8,12 @@ local JestResultCache = require("plugins.test-runner.result_cache")
 
 ---@class Adapter
 ---@field patterns string[]
+---@field get_cwd fun(path: string): string|nil
+---@field get_cmd fun(config: table, opts:{filepath: string}): table
+---@field get_config fun(path: string): table
 
 ---@class JestAdapter: Adapter
-local JestAdapter = {
-	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
-}
+local JestAdapter = require('plugins.test-runner.adapters.jest-adapter')
 
 ---@class JestConfig
 local config = {
@@ -25,7 +26,7 @@ local config = {
 	jest_config = nil,
 	icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
 	sidebar_width = 45,
-	results_dir = vim.fn.stdpath("cache") .. "/jest-results/",
+	results_dir = vim.fn.stdpath("cache") .. "/test-results/",
 	keybinding_run = "<leader>tef",
 	keybinding_toggle = "<leader>tet",
 }
@@ -50,56 +51,6 @@ local function get_test_adapter(filepath)
 				return adapter
 			end
 		end
-	end
-
-	return nil
-end
-
--- ---Check if a file matches any test pattern.
--- ---@param filepath string
--- ---@return boolean
--- local function is_test_file(filepath)
--- 	local basename = vim.fn.fnamemodify(filepath, ":t")
--- 	for _, pattern in ipairs(config.patterns) do
--- 		if string.find(basename, pattern) then
--- 			return true
--- 		end
--- 	end
--- 	return false
--- end
-
----Walk up directory tree to find jest config or package.json.
----@param start_dir string
----@return {cwd: string, config_path: string|nil}|nil
-local function find_jest_config(start_dir)
-	local dir = start_dir
-	local root = "/"
-	local home = os.getenv("HOME") or ""
-
-	while dir and dir ~= "" and dir ~= root and dir ~= home do
-		local configs = {
-			"jest.config.js",
-			"jest.config.ts",
-			"jest.config.mjs",
-			"jest.config.cjs",
-			"jest.config.json",
-		}
-		for _, name in ipairs(configs) do
-			local path = dir .. "/" .. name
-			if vim.fn.filereadable(path) == 1 then
-				return { cwd = dir, config_path = path }
-			end
-		end
-
-		if vim.fn.filereadable(dir .. "/package.json") == 1 then
-			return { cwd = dir, config_path = nil }
-		end
-
-		local parent = vim.fn.fnamemodify(dir, ":h")
-		if parent == dir then
-			break
-		end
-		dir = parent
 	end
 
 	return nil
@@ -194,17 +145,9 @@ function M.run_file()
 	local content = "# Test Results: " .. basename .. "\n\n## Running tests..."
 	state.sidebar:set_content(content)
 
-	-- Determine jest cwd and config
-	local jest_info = find_jest_config(vim.fn.fnamemodify(filepath, ":h"))
-	local cwd = jest_info and jest_info.cwd or vim.fn.getcwd()
-	local cmd_parts = vim.split(config.jest_command, " ")
-
-	if jest_info and jest_info.config_path then
-		table.insert(cmd_parts, "--config")
-		table.insert(cmd_parts, jest_info.config_path)
-	end
-
-	table.insert(cmd_parts, filepath)
+	local adapter_config = adapter.get_config(vim.fn.fnamemodify(filepath, ":h"))
+	local cwd = adapter.get_cwd(vim.fn.fnamemodify(filepath, ":h")) or vim.fn.getcwd()
+	local cmd_parts = adapter.get_cmd(adapter_config, {filepath = filepath})
 
 	state.job_runner:run(filepath, cmd_parts, { cwd = cwd, text = true }, function(obj)
 		handle_jest_result(filepath, obj)
