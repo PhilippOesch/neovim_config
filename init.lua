@@ -48,7 +48,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.nvimcolorizer"),
 	require("plugins.sidekick"),
 	require("plugins.lineforge"),
-	require("plugins.jest"),
+	require("plugins.test-runner"),
 })
 
 require("config.general")
