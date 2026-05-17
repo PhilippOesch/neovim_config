@@ -5,6 +5,33 @@ return {
 		local lineforge = require("lineforge")
 		local segments = lineforge.segments
 
+		local oil_available, oilnvim = pcall(require, "oil")
+
+		local oilSegment = {
+			---@param bld lineforge.Builder
+			add = function(bld)
+				bld:when(function()
+					return oil_available and vim.bo.filetype == "oil"
+				end, function(bld)
+					bld:add(function()
+						local pathFormat = ":p:~:."
+						local dir = oilnvim.get_current_dir()
+						local bufName
+						if dir then
+							bufName = vim.fn.fnamemodify(dir, pathFormat)
+						else
+							bufName = vim.api.nvim_buf_get_name(0)
+						end
+
+						if bufName == "" then
+							return " ./"
+						end
+						return " " .. bufName
+					end, { fg = bld.ctx:get_highlight("Directory").fg })
+				end)
+			end,
+		}
+
 		lineforge.setup({
 			---@param builder lineforge.Builder
 			statusline = function(builder)
@@ -15,9 +42,13 @@ return {
 							segments.mode.add(bld)
 						end, { fg = bld.ctx:get_highlight("Folded").bg })
 						bld:add_space(" ", 2)
-						segments.file_icon.add(bld)
+						oilSegment.add(bld)
+						segments.file_icon.add(bld, { ignore_filetypes = { "oil" } })
 						bld:add_space()
-						segments.filename.add(bld, { fg = bld.ctx:get_highlight("Special").fg })
+						segments.filename.add(
+							bld,
+							{ hl = { fg = bld.ctx:get_highlight("Special").fg }, ignore_filetypes = { "oil" } }
+						)
 						bld:add_space(" ", 2)
 						segments.git_branch.add(bld, { fg = bld.ctx:get_highlight("String").fg, bold = true })
 						segments.git_status.add(bld)
