@@ -45,16 +45,14 @@ return {
 
 		local group = vim.api.nvim_create_augroup("PersitedHooks", {})
 
+		local ignored_file_types = { "codecompanion", "sidekick_terminal", "jestresults" }
+
 		vim.api.nvim_create_autocmd({ "User" }, {
 			pattern = "PersistedSavePre",
 			group = group,
 			callback = function()
 				for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-					if vim.bo[buf].filetype == "codecompanion" then
-						vim.api.nvim_buf_delete(buf, { force = true })
-					end
-
-					if vim.bo[buf].filetype == "sidekick_terminal" then
+					if vim.bo[buf].filetype and vim.tbl_contains(ignored_file_types, vim.bo[buf].filetype) then
 						vim.api.nvim_buf_delete(buf, { force = true })
 					end
 				end
