@@ -1,17 +1,17 @@
 local M = {}
 
----@class JestJobRunner
+---@class test_runner.JobRunner
 ---@field _jobs table<string, vim.SystemObj>
 
 ---Create a new job runner instance.
----@return JestJobRunner
+---@return test_runner.JobRunner
 function M.new()
 	return setmetatable({ _jobs = {} }, { __index = M })
 end
 
 ---Run a command, cancelling any existing job with the same key.
 ---The on_complete callback is guaranteed to run in a vim-safe context.
----@param self JestJobRunner
+---@param self test_runner.JobRunner
 ---@param key string
 ---@param cmd string[]
 ---@param opts table
@@ -32,7 +32,7 @@ function M.run(self, key, cmd, opts, on_complete)
 end
 
 ---Cancel a running job by key.
----@param self JestJobRunner
+---@param self test_runner.JobRunner
 ---@param key string
 function M.cancel(self, key)
 	local job = self._jobs[key]
@@ -45,7 +45,7 @@ function M.cancel(self, key)
 end
 
 ---Check if a job is currently running for the given key.
----@param self JestJobRunner
+---@param self test_runner.JobRunner
 ---@param key string
 ---@return boolean
 function M.is_running(self, key)

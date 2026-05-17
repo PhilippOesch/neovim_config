@@ -1,16 +1,16 @@
 local M = {}
 
----@class SidebarState
+---@class test_runner.SidebarState
 ---@field buf integer|nil
 ---@field win integer|nil
 ---@field config { width: number, filetype: string, syntax: string }
 
----@class Sidebar
----@field _state SidebarState
+---@class test_runner.Sidebar
+---@field _state test_runner.SidebarState
 
 ---Create a new sidebar instance.
 ---@param opts { width?: number, filetype?: string, syntax?: string }
----@return Sidebar
+---@return test_runner.Sidebar
 function M.new(opts)
 	opts = opts or {}
 	local instance = {
@@ -29,7 +29,7 @@ function M.new(opts)
 end
 
 ---Ensure the sidebar buffer exists.
----@param self Sidebar
+---@param self test_runner.Sidebar
 ---@return integer buf
 local function ensure_buf(self)
 	if self._state.buf and vim.api.nvim_buf_is_valid(self._state.buf) then
@@ -51,7 +51,7 @@ local function ensure_buf(self)
 end
 
 ---Set the sidebar buffer content.
----@param self Sidebar
+---@param self test_runner.Sidebar
 ---@param content string
 function M.set_content(self, content)
 	local buf = ensure_buf(self)
@@ -62,7 +62,7 @@ function M.set_content(self, content)
 end
 
 ---Open the sidebar window on the right.
----@param self Sidebar
+---@param self test_runner.Sidebar
 function M.open(self)
 	if self._state.win and vim.api.nvim_win_is_valid(self._state.win) then
 		return
@@ -93,7 +93,7 @@ function M.open(self)
 end
 
 ---Close the sidebar window.
----@param self Sidebar
+---@param self test_runner.Sidebar
 function M.close(self)
 	if self._state.win and vim.api.nvim_win_is_valid(self._state.win) then
 		vim.api.nvim_win_close(self._state.win, true)
@@ -102,7 +102,7 @@ function M.close(self)
 end
 
 ---Toggle the sidebar visibility.
----@param self Sidebar
+---@param self test_runner.Sidebar
 function M.toggle(self)
 	if self._state.win and vim.api.nvim_win_is_valid(self._state.win) then
 		self:close()
@@ -112,14 +112,14 @@ function M.toggle(self)
 end
 
 ---Check if the sidebar window is currently open.
----@param self Sidebar
+---@param self test_runner.Sidebar
 ---@return boolean
 function M.is_open(self)
 	return self._state.win ~= nil and vim.api.nvim_win_is_valid(self._state.win)
 end
 
 ---Get the sidebar buffer number.
----@param self Sidebar
+---@param self test_runner.Sidebar
 ---@return integer|nil
 function M.get_buf(self)
 	if self._state.buf and vim.api.nvim_buf_is_valid(self._state.buf) then

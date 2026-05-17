@@ -4,37 +4,44 @@ local Sidebar = require("plugins.test-runner.sidebar")
 local JobRunner = require("plugins.test-runner.job_runner")
 local ResultCache = require("plugins.test-runner.result_cache")
 
----@class ResultParser
----@field parse fun(raw: string): ParsedResult
----
----@class ResultFormatter
----@field format fun(filename: string, result: ParsedResult, opts: FormatterConfig): string
+local adapters = require("plugins.test-runner.adapters")
 
----@class Adapter
----@field patterns string[]
----@field get_cwd fun(path: string): string|nil
----@field get_cmd fun(config: table, opts:{filepath: string}): table
----@field get_config fun(path: string): table
----@field parser ResultParser
----@field formatter ResultParser
+---@class test_runner.config.keybindings
+---@field run? string
+---@field toggle? string
 
----@class JestAdapter: Adapter
-local JestAdapter = require("plugins.test-runner.adapters.jest.adapter")
+---@class test_runner.config
+---@field adapters test_runner.Adapter[]
+---@field icons table
+---@field sidebar_width integer
+---@field results_dir string
+---@field keybindings test_runner.config.keybindings
 
----@class Config
-local config = {
-	---@type Adapter[]
-	adapters = {
-		require("plugins.test-runner.adapters.jest.adapter"),
-	},
-	icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
-	sidebar_width = 45,
-	results_dir = vim.fn.stdpath("cache") .. "/test-results/",
-	keybinding_run = "<leader>tef",
-	keybinding_toggle = "<leader>tet",
-}
 
----@class JestState
+---comment
+---@return test_runner.config
+local get_default_config = function()
+	return {
+		adapters = {
+			adapters.jest,
+		},
+		icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
+		sidebar_width = 45,
+		results_dir = vim.fn.stdpath("cache") .. "/test-results/",
+		keybindings = {
+			run = "<leader>tef",
+			toggle = "<leader>tet"
+		}
+	}
+end
+
+---@type test_runner.config
+local config = {}
+
+---@class test_runner.State
+---@field sidebar test_runner.Sidebar|nil
+---@field job_runner test_runner.JobRunner|nil
+---@field result_cache test_runner.ResultCache|nil
 local state = {
 	sidebar = nil,
 	job_runner = nil,
@@ -44,7 +51,7 @@ local state = {
 --- get the test adapter
 ---
 ---@param filepath string
----@return Adapter|nil
+---@return test_runner.Adapter|nil
 local function get_test_adapter(filepath)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 
@@ -88,7 +95,7 @@ end
 ---Handle jest job completion.
 ---@param filepath string
 ---@param obj vim.SystemCompleted
----@param adapter Adapter
+---@param adapter test_runner.Adapter
 local function handle_result(filepath, obj, adapter)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 	local content
@@ -162,7 +169,7 @@ end
 ---@param opts? table
 function M.setup(opts)
 	opts = opts or {}
-	config = vim.tbl_deep_extend("force", config, opts)
+	config = vim.tbl_deep_extend("force", get_default_config(), opts)
 
 	-- Create sidebar, job runner, and result cache instances
 	state.sidebar = Sidebar.new({ width = config.sidebar_width })
@@ -171,15 +178,15 @@ function M.setup(opts)
 	state.result_cache:cleanup()
 
 	-- Keymaps
-	if config.keybinding_run then
-		vim.keymap.set("n", config.keybinding_run, M.run_file, {
+	if config.keybindings.run then
+		vim.keymap.set("n", config.keybindings.run, M.run_file, {
 			noremap = true,
 			silent = true,
 			desc = "Run tests for current file",
 		})
 	end
-	if config.keybinding_toggle then
-		vim.keymap.set("n", config.keybinding_toggle, M.toggle_sidebar, {
+	if config.keybindings.toggle then
+		vim.keymap.set("n", config.keybindings.toggle, M.toggle_sidebar, {
 			noremap = true,
 			silent = true,
 			desc = "Toggle jest results sidebar",

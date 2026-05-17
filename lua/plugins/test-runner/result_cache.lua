@@ -1,6 +1,6 @@
 local M = {}
 
----@class ResultCache
+---@class test_runner.ResultCache
 ---@field _results_dir string
 ---@field _max_age_seconds number
 

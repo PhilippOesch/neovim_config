@@ -1,4 +1,4 @@
----@class JestAdapter: Adapter
+---@class JestAdapter: test_runner.Adapter
 local M = {
 	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
 	formatter = require('plugins.test-runner.formatter'),
