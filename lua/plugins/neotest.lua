@@ -17,20 +17,20 @@ return {
 				-- require("neotest-dotnet")({
 				-- 	discovery_root = "solution",
 				-- }),
-				require("neotest-vstest")({
-					-- Path to dotnet sdk path.
-					-- Used in cases where the sdk path cannot be auto discovered.
-					-- sdk_path = "/usr/local/dotnet/sdk/9.0.101/",
-					-- table is passed directly to DAP when debugging tests.
-					dap_settings = {
-						type = "netcoredbg",
-					},
-					-- If multiple solutions exists the adapter will ask you to choose one.
-					-- If you have a different heuristic for choosing a solution you can provide a function here.
-					solution_selector = function(solutions)
-						return nil -- return the solution you want to use or nil to let the adapter choose.
-					end,
-				}),
+				-- require("neotest-vstest")({
+				-- 	-- Path to dotnet sdk path.
+				-- 	-- Used in cases where the sdk path cannot be auto discovered.
+				-- 	-- sdk_path = "/usr/local/dotnet/sdk/9.0.101/",
+				-- 	-- table is passed directly to DAP when debugging tests.
+				-- 	dap_settings = {
+				-- 		type = "netcoredbg",
+				-- 	},
+				-- 	-- If multiple solutions exists the adapter will ask you to choose one.
+				-- 	-- If you have a different heuristic for choosing a solution you can provide a function here.
+				-- 	solution_selector = function(solutions)
+				-- 		return nil -- return the solution you want to use or nil to let the adapter choose.
+				-- 	end,
+				-- }),
 				require("neotest-go"),
 				require("neotest-jest")({
 					jestCommand = "npm test --",
@@ -40,9 +40,10 @@ return {
 					end,
 				}),
 				require("neotest-vitest"),
-				require("neotest-java")({
-					ignore_wrapper = false,
-				}),
+				-- require("neotest-java")({
+				-- 	ignore_wrapper = false,
+				-- 	test_classname_patterns = { "^.*Tests?$", "^.*IT$", "^.*Spec$" },
+				-- }),
 			},
 		})
 

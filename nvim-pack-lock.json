@@ -74,7 +74,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lineforge.nvim": {
-      "rev": "8b9eaf42ece4d43feb929cdea604bc7cfdc127cd",
+      "rev": "caeeef749663009efafbf52f1309b8c90c2fe2da",
       "src": "https://github.com/PhilippOesch/lineforge.nvim"
     },
     "markdown-preview.nvim": {
@@ -102,7 +102,7 @@
       "src": "https://github.com/echasnovski/mini.surround"
     },
     "neotest": {
-      "rev": "fd0b7986dd0ae04e38ec7dc0c78a432e3820839c",
+      "rev": "ad991822b7076b1d940b33a9d6d0d30416d5df81",
       "src": "https://github.com/nvim-neotest/neotest"
     },
     "neotest-go": {
