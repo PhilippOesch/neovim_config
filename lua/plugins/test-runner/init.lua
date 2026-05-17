@@ -1,8 +1,8 @@
 local M = {}
 
-local JestSidebar = require("plugins.test-runner.sidebar")
-local JestJobRunner = require("plugins.test-runner.job_runner")
-local JestResultCache = require("plugins.test-runner.result_cache")
+local Sidebar = require("plugins.test-runner.sidebar")
+local JobRunner = require("plugins.test-runner.job_runner")
+local ResultCache = require("plugins.test-runner.result_cache")
 
 ---@class ResultParser
 ---@field parse fun(raw: string): ParsedResult
@@ -27,9 +27,6 @@ local config = {
 	adapters = {
 		require("plugins.test-runner.adapters.jest-adapter"),
 	},
-	-- patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
-	jest_command = "npx jest --json",
-	jest_config = nil,
 	icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
 	sidebar_width = 45,
 	results_dir = vim.fn.stdpath("cache") .. "/test-results/",
@@ -168,9 +165,9 @@ function M.setup(opts)
 	config = vim.tbl_deep_extend("force", config, opts)
 
 	-- Create sidebar, job runner, and result cache instances
-	state.sidebar = JestSidebar.new({ width = config.sidebar_width })
-	state.job_runner = JestJobRunner.new()
-	state.result_cache = JestResultCache.new({ results_dir = config.results_dir })
+	state.sidebar = Sidebar.new({ width = config.sidebar_width })
+	state.job_runner = JobRunner.new()
+	state.result_cache = ResultCache.new({ results_dir = config.results_dir })
 	state.result_cache:cleanup()
 
 	-- Keymaps

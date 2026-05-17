@@ -1,12 +1,12 @@
 local M = {}
 
----@class JestResultCache
+---@class ResultCache
 ---@field _results_dir string
 ---@field _max_age_seconds number
 
 ---Create a new result cache instance.
 ---@param opts { results_dir: string, max_age_seconds?: number }
----@return JestResultCache
+---@return ResultCache
 function M.new(opts)
 	return setmetatable({
 		_results_dir = opts.results_dir,
@@ -15,7 +15,7 @@ function M.new(opts)
 end
 
 ---Get cache file path for a test file.
----@param self JestResultCache
+---@param self ResultCache
 ---@param filepath string
 ---@return string
 local function get_cache_path(self, filepath)
@@ -24,7 +24,7 @@ local function get_cache_path(self, filepath)
 end
 
 ---Load cached content for a test file.
----@param self JestResultCache
+---@param self ResultCache
 ---@param filepath string
 ---@return string|nil
 function M.load(self, filepath)
@@ -37,7 +37,7 @@ function M.load(self, filepath)
 end
 
 ---Save content to cache for a test file.
----@param self JestResultCache
+---@param self ResultCache
 ---@param filepath string
 ---@param content string
 function M.save(self, filepath, content)
@@ -50,7 +50,7 @@ function M.save(self, filepath, content)
 end
 
 ---Clean up cached result files older than max_age_seconds.
----@param self JestResultCache
+---@param self ResultCache
 function M.cleanup(self)
 	local uv = vim.uv or vim.loop
 	if vim.fn.isdirectory(self._results_dir) ~= 1 then

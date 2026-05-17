@@ -2,7 +2,7 @@
 local JestAdapter = {
 	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
 	formatter = require('plugins.test-runner.formatter'),
-	parser = require('plugins.test-runner.parser')
+	parser = require('plugins.test-runner.adapters.parser')
 }
 
 JestAdapter.get_config = function(path)
