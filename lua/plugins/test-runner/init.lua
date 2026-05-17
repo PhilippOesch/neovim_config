@@ -1,25 +1,31 @@
 local M = {}
 
-local parser = require("plugins.test-runner.parser")
-local formatter = require("plugins.test-runner.formatter")
 local JestSidebar = require("plugins.test-runner.sidebar")
 local JestJobRunner = require("plugins.test-runner.job_runner")
 local JestResultCache = require("plugins.test-runner.result_cache")
+
+---@class ResultParser
+---@field parse fun(raw: string): ParsedResult
+---
+---@class ResultFormatter
+---@field format fun(filename: string, result: ParsedResult, opts: FormatterConfig): string
 
 ---@class Adapter
 ---@field patterns string[]
 ---@field get_cwd fun(path: string): string|nil
 ---@field get_cmd fun(config: table, opts:{filepath: string}): table
 ---@field get_config fun(path: string): table
+---@field parser ResultParser
+---@field formatter ResultParser
 
 ---@class JestAdapter: Adapter
-local JestAdapter = require('plugins.test-runner.adapters.jest-adapter')
+local JestAdapter = require("plugins.test-runner.adapters.jest-adapter")
 
 ---@class JestConfig
 local config = {
 	---@type Adapter[]
 	adapters = {
-		JestAdapter,
+		require("plugins.test-runner.adapters.jest-adapter"),
 	},
 	-- patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
 	jest_command = "npx jest --json",
@@ -85,7 +91,8 @@ end
 ---Handle jest job completion.
 ---@param filepath string
 ---@param obj vim.SystemCompleted
-local function handle_jest_result(filepath, obj)
+---@param adapter Adapter
+local function handle_result(filepath, obj, adapter)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 	local content
 
@@ -93,7 +100,7 @@ local function handle_jest_result(filepath, obj)
 		local err = obj.stderr or "Unknown error running jest"
 		content = "# Test Results: " .. basename .. "\n\n## Error running tests\n\n```\n" .. err .. "\n```"
 	else
-		local result, parse_err = parser.parse(obj.stdout or "")
+		local result, parse_err = adapter.parser.parse(obj.stdout or "")
 		if not result then
 			content = "# Test Results: "
 				.. basename
@@ -103,7 +110,7 @@ local function handle_jest_result(filepath, obj)
 				.. (obj.stdout or "")
 				.. "\n```"
 		else
-			content = formatter.format(basename, result, { icons = config.icons, max_console_lines = 20 })
+			content = adapter.formatter.format(basename, result, { icons = config.icons, max_console_lines = 20 })
 		end
 	end
 
@@ -147,10 +154,10 @@ function M.run_file()
 
 	local adapter_config = adapter.get_config(vim.fn.fnamemodify(filepath, ":h"))
 	local cwd = adapter.get_cwd(vim.fn.fnamemodify(filepath, ":h")) or vim.fn.getcwd()
-	local cmd_parts = adapter.get_cmd(adapter_config, {filepath = filepath})
+	local cmd_parts = adapter.get_cmd(adapter_config, { filepath = filepath })
 
 	state.job_runner:run(filepath, cmd_parts, { cwd = cwd, text = true }, function(obj)
-		handle_jest_result(filepath, obj)
+		handle_result(filepath, obj, adapter)
 	end)
 end
 

@@ -26,10 +26,6 @@ local M = {}
 ---@field failureMessages string[]|nil
 ---@field console {message: string, type: string}[]|nil
 
----@class ParsedResult
----@field summary {passed: number, failed: number, pending: number}
----@field tree ParsedTestNode[]
-
 ---Parse raw jest --json stdout into a structured tree.
 ---Returns nil and an error message if parsing fails.
 ---@param json_string string
