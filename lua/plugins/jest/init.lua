@@ -8,7 +8,7 @@ local config = {
 	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
 	jest_command = "npx jest --json",
 	jest_config = nil,
-	icons = { pass = "✅", fail = "❌", pending = "⏳" },
+	icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
 	sidebar_width = 45,
 	results_dir = vim.fn.stdpath("cache") .. "/jest-results/",
 	keybinding_run = "<leader>tef",
@@ -140,6 +140,10 @@ local function open_sidebar()
 	vim.api.nvim_win_set_width(win, config.sidebar_width)
 	vim.wo[win].winfixwidth = true
 	vim.wo[win].wrap = true
+	vim.wo[win].foldmethod = "marker"
+	vim.wo[win].foldlevel = 0
+	vim.wo[win].conceallevel = 2
+	vim.wo[win].concealcursor = "nvic"
 	state.sidebar.win = win
 
 	-- Return focus to original window
@@ -213,7 +217,7 @@ local function handle_jest_result(filepath, obj)
 				.. (obj.stdout or "")
 				.. "\n```"
 		else
-			content = formatter.format(basename, result, { icons = config.icons })
+			content = formatter.format(basename, result, { icons = config.icons, max_console_lines = 20 })
 		end
 	end
 

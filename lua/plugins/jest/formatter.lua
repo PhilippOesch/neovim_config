@@ -1,7 +1,8 @@
 local M = {}
 
 ---@class FormatterConfig
----@field icons {pass: string, fail: string, pending: string}
+---@field icons {pass: string, fail: string, pending: string, suite: string}
+---@field max_console_lines number|nil
 
 ---@class ParsedTestNode
 ---@field name string
@@ -22,6 +23,7 @@ local M = {}
 function M.format(filename, result, opts)
 	local lines = {}
 	local icons = opts.icons
+	local max_lines = opts.max_console_lines or 20
 
 	table.insert(lines, "# Test Results: " .. filename)
 	table.insert(lines, "")
@@ -42,6 +44,45 @@ function M.format(filename, result, opts)
 		return table.concat(lines, "\n")
 	end
 
+	---Collect output lines for a failed test, truncating to max_lines.
+	---@param node ParsedTestNode
+	---@param indent number
+	---@return string[]
+	local function collect_output_lines(node, indent)
+		local out = {}
+		local prefix = string.rep("  ", indent + 1)
+
+		if node.failureMessages then
+			for _, msg in ipairs(node.failureMessages) do
+				for _, msg_line in ipairs(vim.split(msg, "\n")) do
+					table.insert(out, prefix .. msg_line)
+				end
+			end
+		end
+
+		if node.console and #node.console > 0 then
+			if node.failureMessages and #node.failureMessages > 0 then
+				table.insert(out, prefix .. "---")
+			end
+			for _, entry in ipairs(node.console) do
+				for _, c_line in ipairs(vim.split(entry.message, "\n")) do
+					table.insert(out, prefix .. "[" .. entry.type .. "] " .. c_line)
+				end
+			end
+		end
+
+		if #out > max_lines then
+			local truncated = {}
+			for i = 1, max_lines do
+				table.insert(truncated, out[i])
+			end
+			table.insert(truncated, prefix .. "... (" .. (#out - max_lines) .. " more lines)")
+			return truncated
+		end
+
+		return out
+	end
+
 	local function format_node(node, indent)
 		local icon = icons.pass
 		if node.status == "failed" then
@@ -50,7 +91,10 @@ function M.format(filename, result, opts)
 			icon = icons.pending
 		end
 
-		local line = string.rep("  ", indent) .. "- " .. icon .. " " .. node.name
+		local is_suite = node.children ~= nil
+		local suite_icon = is_suite and (icons.suite .. " ") or ""
+
+		local line = string.rep("  ", indent) .. "- " .. suite_icon .. icon .. " " .. node.name
 		table.insert(lines, line)
 
 		if node.children then
@@ -61,28 +105,16 @@ function M.format(filename, result, opts)
 
 		-- Show failure messages and console output for failed tests
 		if node.status == "failed" then
-			local has_output = (node.failureMessages and #node.failureMessages > 0)
-				or (node.console and #node.console > 0)
-			if has_output then
-				table.insert(lines, string.rep("  ", indent + 1) .. "```")
-				if node.failureMessages then
-					for _, msg in ipairs(node.failureMessages) do
-						for _, msg_line in ipairs(vim.split(msg, "\n")) do
-							table.insert(lines, string.rep("  ", indent + 1) .. msg_line)
-						end
-					end
+			local output = collect_output_lines(node, indent)
+			if #output > 0 then
+				local prefix = string.rep("  ", indent + 1)
+				table.insert(lines, prefix .. "<!-- {{{1 -->")
+				table.insert(lines, prefix .. "```")
+				for _, out_line in ipairs(output) do
+					table.insert(lines, out_line)
 				end
-				if node.console and #node.console > 0 then
-					if node.failureMessages and #node.failureMessages > 0 then
-						table.insert(lines, string.rep("  ", indent + 1) .. "---")
-					end
-					for _, entry in ipairs(node.console) do
-						for _, c_line in ipairs(vim.split(entry.message, "\n")) do
-							table.insert(lines, string.rep("  ", indent + 1) .. "[" .. entry.type .. "] " .. c_line)
-						end
-					end
-				end
-				table.insert(lines, string.rep("  ", indent + 1) .. "```")
+				table.insert(lines, prefix .. "```")
+				table.insert(lines, prefix .. "<!-- }}}1 -->")
 			end
 		end
 	end
