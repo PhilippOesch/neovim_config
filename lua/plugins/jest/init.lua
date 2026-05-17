@@ -3,6 +3,8 @@ local M = {}
 local parser = require("plugins.jest.parser")
 local formatter = require("plugins.jest.formatter")
 local JestSidebar = require("plugins.jest.sidebar")
+local JestJobRunner = require("plugins.jest.job_runner")
+local JestResultCache = require("plugins.jest.result_cache")
 
 ---@class JestConfig
 local config = {
@@ -19,10 +21,9 @@ local config = {
 ---@class JestState
 local state = {
 	sidebar = nil,
-	running_jobs = {},
+	job_runner = nil,
+	result_cache = nil,
 }
-
-local uv = vim.uv or vim.loop
 
 ---Check if a file matches any test pattern.
 ---@param filepath string
@@ -74,35 +75,6 @@ local function find_jest_config(start_dir)
 	return nil
 end
 
----Get cache file path for a test file.
----@param filepath string
----@return string
-local function get_cache_path(filepath)
-	local sanitized = filepath:gsub("[/\\:]", "_")
-	return config.results_dir .. sanitized .. ".md"
-end
-
----Clean up cached result files older than 7 days.
-local function cleanup_old_results()
-	local dir = config.results_dir
-	if vim.fn.isdirectory(dir) ~= 1 then
-		return
-	end
-	local files = vim.fn.readdir(dir)
-	local now = os.time()
-	local max_age = 7 * 24 * 60 * 60 -- 7 days in seconds
-	for _, file in ipairs(files) do
-		local path = dir .. "/" .. file
-		local stat = uv.fs_stat(path)
-		if stat and stat.mtime then
-			local age = now - stat.mtime.sec
-			if age > max_age then
-				vim.fn.delete(path)
-			end
-		end
-	end
-end
-
 ---Update sidebar content based on the current buffer.
 local function update_sidebar_for_current_buf()
 	local filepath = vim.api.nvim_buf_get_name(0)
@@ -116,10 +88,9 @@ local function update_sidebar_for_current_buf()
 		return
 	end
 
-	local cache_path = get_cache_path(filepath)
-	if vim.fn.filereadable(cache_path) == 1 then
-		local lines = vim.fn.readfile(cache_path)
-		state.sidebar:set_content(table.concat(lines, "\n"))
+	local cached = state.result_cache:load(filepath)
+	if cached then
+		state.sidebar:set_content(cached)
 	else
 		local content = "# Test Results: "
 			.. basename
@@ -156,12 +127,7 @@ local function handle_jest_result(filepath, obj)
 	end
 
 	-- Save to cache
-	vim.fn.mkdir(config.results_dir, "p")
-	local file = io.open(get_cache_path(filepath), "w")
-	if file then
-		file:write(content)
-		file:close()
-	end
+	state.result_cache:save(filepath, content)
 
 	-- Update sidebar if currently focused on this file
 	if vim.api.nvim_buf_get_name(0) == filepath then
@@ -190,15 +156,6 @@ function M.run_file()
 		return
 	end
 
-	-- Cancel existing job for this file
-	if state.running_jobs[filepath] then
-		local job = state.running_jobs[filepath]
-		pcall(function()
-			job:kill(9)
-		end)
-		state.running_jobs[filepath] = nil
-	end
-
 	state.sidebar:open()
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 	local content = "# Test Results: " .. basename .. "\n\n## Running tests..."
@@ -216,14 +173,9 @@ function M.run_file()
 
 	table.insert(cmd_parts, filepath)
 
-	local job = vim.system(cmd_parts, { cwd = cwd, text = true }, function(obj)
-		vim.schedule(function()
-			state.running_jobs[filepath] = nil
-			handle_jest_result(filepath, obj)
-		end)
+	state.job_runner:run(filepath, cmd_parts, { cwd = cwd, text = true }, function(obj)
+		handle_jest_result(filepath, obj)
 	end)
-
-	state.running_jobs[filepath] = job
 end
 
 ---Setup the jest plugin.
@@ -232,14 +184,11 @@ function M.setup(opts)
 	opts = opts or {}
 	config = vim.tbl_deep_extend("force", config, opts)
 
-	-- Ensure results dir exists
-	vim.fn.mkdir(config.results_dir, "p")
-
-	-- Cleanup old results
-	cleanup_old_results()
-
-	-- Create sidebar instance
+	-- Create sidebar, job runner, and result cache instances
 	state.sidebar = JestSidebar.new({ width = config.sidebar_width })
+	state.job_runner = JestJobRunner.new()
+	state.result_cache = JestResultCache.new({ results_dir = config.results_dir })
+	state.result_cache:cleanup()
 
 	-- Keymaps
 	if config.keybinding_run then
