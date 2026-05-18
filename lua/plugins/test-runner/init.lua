@@ -17,7 +17,6 @@ local adapters = require("plugins.test-runner.adapters")
 ---@field results_dir string
 ---@field keybindings test_runner.config.keybindings
 
-
 ---comment
 ---@return test_runner.config
 local get_default_config = function()
@@ -30,8 +29,8 @@ local get_default_config = function()
 		results_dir = vim.fn.stdpath("cache") .. "/test-results/",
 		keybindings = {
 			run = "<leader>tef",
-			toggle = "<leader>tet"
-		}
+			toggle = "<leader>tet",
+		},
 	}
 end
 
@@ -86,7 +85,7 @@ local function update_sidebar_for_current_buf()
 		local content = "# Test Results: "
 			.. basename
 			.. "\n\nNo results yet.\n\nRun tests with "
-			.. config.keybinding_run
+			.. config.keybindings.run
 			.. "."
 		state.sidebar:set_content(content)
 	end
