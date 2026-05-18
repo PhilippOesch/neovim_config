@@ -12,6 +12,8 @@ local M = {}
 ---@field filetype? string
 ---@field syntax? string
 
+--- Represent the sidebar of the test runner.
+---
 ---@class test_runner.Sidebar
 ---@field _state test_runner.SidebarState
 ---@field new fun(opts: test_runner.Sidebar.new.opts): test_runner.Sidebar
