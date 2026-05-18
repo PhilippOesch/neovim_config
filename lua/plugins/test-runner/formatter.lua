@@ -7,7 +7,7 @@ local M = {}
 ---@class ParsedTestNode
 ---@field name string
 ---@field status string
----@field children table[]|nil
+---@field children ParsedTestNode[]|nil
 ---@field failureMessages string[]|nil
 ---@field console {message: string, type: string}[]|nil
 

@@ -18,6 +18,7 @@
 ---@type table<string, test_runner.Adapter>
 local M = {
 	jest = require("plugins.test-runner.adapters.jest.adapter"),
+	dotnet = require("plugins.test-runner.adapters.dotnet.adapter"),
 }
 
 return M
