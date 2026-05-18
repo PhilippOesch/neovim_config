@@ -6,10 +6,12 @@ local ResultCache = require("plugins.test-runner.result_cache")
 
 local adapters = require("plugins.test-runner.adapters")
 
+--- available keybindings
 ---@class test_runner.config.keybindings
 ---@field run? string
 ---@field toggle? string
 
+--- The plugin configuration.
 ---@class test_runner.config
 ---@field adapters test_runner.Adapter[]
 ---@field icons table
@@ -17,7 +19,8 @@ local adapters = require("plugins.test-runner.adapters")
 ---@field results_dir string
 ---@field keybindings test_runner.config.keybindings
 
----comment
+--- Returns the default config for this plugin
+---
 ---@return test_runner.config
 local get_default_config = function()
 	return {
