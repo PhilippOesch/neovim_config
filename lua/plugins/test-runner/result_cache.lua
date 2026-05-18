@@ -1,4 +1,4 @@
-local M = {}
+local ResultCache = {}
 
 ---@class test_runner.ResultCache
 ---@field _results_dir string
@@ -10,11 +10,11 @@ local M = {}
 ---Create a new result cache instance.
 ---@param opts { results_dir: string, max_age_seconds?: number }
 ---@return test_runner.ResultCache
-function M.new(opts)
+function ResultCache.new(opts)
 	return setmetatable({
 		_results_dir = opts.results_dir,
 		_max_age_seconds = opts.max_age_seconds or 7 * 24 * 60 * 60,
-	}, { __index = M })
+	}, { __index = ResultCache })
 end
 
 ---Get cache file path for a test file.
@@ -29,7 +29,7 @@ end
 ---Load cached content for a test file.
 ---@param filepath string
 ---@return string|nil
-function M:load(filepath)
+function ResultCache:load(filepath)
 	local cache_path = get_cache_path(self, filepath)
 	if vim.fn.filereadable(cache_path) == 1 then
 		local lines = vim.fn.readfile(cache_path)
@@ -41,7 +41,7 @@ end
 ---Save content to cache for a test file.
 ---@param filepath string
 ---@param content string
-function M:save(filepath, content)
+function ResultCache:save(filepath, content)
 	vim.fn.mkdir(self._results_dir, "p")
 	local file = io.open(get_cache_path(self, filepath), "w")
 	if file then
@@ -51,7 +51,7 @@ function M:save(filepath, content)
 end
 
 ---Clean up cached result files older than max_age_seconds.
-function M:cleanup()
+function ResultCache:cleanup()
 	local uv = vim.uv or vim.loop
 	if vim.fn.isdirectory(self._results_dir) ~= 1 then
 		return
@@ -70,4 +70,4 @@ function M:cleanup()
 	end
 end
 
-return M
+return ResultCache

@@ -1,4 +1,4 @@
-local M = {}
+local Sidebar = {}
 
 --- The state of the sidebar
 ---
@@ -27,7 +27,7 @@ local M = {}
 ---Create a new sidebar instance.
 ---@param opts test_runner.Sidebar.new.opts
 ---@return test_runner.Sidebar
-function M.new(opts)
+function Sidebar.new(opts)
 	opts = opts or {}
 	local instance = {
 		_state = {
@@ -40,7 +40,7 @@ function M.new(opts)
 			},
 		},
 	}
-	setmetatable(instance, { __index = M })
+	setmetatable(instance, { __index = Sidebar })
 	return instance
 end
 
@@ -68,7 +68,7 @@ end
 
 ---Set the sidebar buffer content.
 ---@param content string
-function M:set_content(content)
+function Sidebar:set_content(content)
 	local buf = ensure_buf(self)
 	vim.bo[buf].modifiable = true
 	local lines = vim.split(content, "\n")
@@ -77,7 +77,7 @@ function M:set_content(content)
 end
 
 ---Open the sidebar window on the right.
-function M:open()
+function Sidebar:open()
 	if self._state.win and vim.api.nvim_win_is_valid(self._state.win) then
 		return
 	end
@@ -107,7 +107,7 @@ function M:open()
 end
 
 ---Close the sidebar window.
-function M:close()
+function Sidebar:close()
 	if self._state.win and vim.api.nvim_win_is_valid(self._state.win) then
 		vim.api.nvim_win_close(self._state.win, true)
 		self._state.win = nil
@@ -115,7 +115,7 @@ function M:close()
 end
 
 ---Toggle the sidebar visibility.
-function M:toggle()
+function Sidebar:toggle()
 	if self._state.win and vim.api.nvim_win_is_valid(self._state.win) then
 		self:close()
 	else
@@ -125,17 +125,17 @@ end
 
 ---Check if the sidebar window is currently open.
 ---@return boolean
-function M:is_open()
+function Sidebar:is_open()
 	return self._state.win ~= nil and vim.api.nvim_win_is_valid(self._state.win)
 end
 
 ---Get the sidebar buffer number.
 ---@return integer|nil
-function M:get_buf()
+function Sidebar:get_buf()
 	if self._state.buf and vim.api.nvim_buf_is_valid(self._state.buf) then
 		return self._state.buf
 	end
 	return nil
 end
 
-return M
+return Sidebar
