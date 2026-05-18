@@ -18,6 +18,7 @@ local plugins = require("utils.plugin_manager").new({
 	"https://github.com/j-hui/fidget.nvim",
 	"https://github.com/esmuellert/vscode-diff.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
+	"https://github.com/nvim-mini/mini.test",
 	require("plugins.whichkey"),
 	require("plugins.todo"),
 	require("plugins.webdev_icons"),

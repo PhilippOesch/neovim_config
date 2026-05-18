@@ -101,6 +101,10 @@
       "rev": "2715e04bea3ec9244f15b421dc5b18c0fe326210",
       "src": "https://github.com/echasnovski/mini.surround"
     },
+    "mini.test": {
+      "rev": "451c6ba2933418a4b8ed9f936f4bb14ef513b1d4",
+      "src": "https://github.com/nvim-mini/mini.test"
+    },
     "neotest": {
       "rev": "ad991822b7076b1d940b33a9d6d0d30416d5df81",
       "src": "https://github.com/nvim-neotest/neotest"
