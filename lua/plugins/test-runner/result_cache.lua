@@ -29,7 +29,7 @@ end
 ---Load cached content for a test file.
 ---@param filepath string
 ---@return string|nil
-function M:load(self, filepath)
+function M:load(filepath)
 	local cache_path = get_cache_path(self, filepath)
 	if vim.fn.filereadable(cache_path) == 1 then
 		local lines = vim.fn.readfile(cache_path)
@@ -41,7 +41,7 @@ end
 ---Save content to cache for a test file.
 ---@param filepath string
 ---@param content string
-function M:save(self, filepath, content)
+function M:save(filepath, content)
 	vim.fn.mkdir(self._results_dir, "p")
 	local file = io.open(get_cache_path(self, filepath), "w")
 	if file then
@@ -51,7 +51,7 @@ function M:save(self, filepath, content)
 end
 
 ---Clean up cached result files older than max_age_seconds.
-function M:cleanup(self)
+function M:cleanup()
 	local uv = vim.uv or vim.loop
 	if vim.fn.isdirectory(self._results_dir) ~= 1 then
 		return

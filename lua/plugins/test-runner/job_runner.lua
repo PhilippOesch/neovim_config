@@ -2,6 +2,9 @@ local M = {}
 
 ---@class test_runner.JobRunner
 ---@field _jobs table<string, vim.SystemObj>
+---@field run fun(self: test_runner.JobRunner, key: string, cmd: string[], opts: table, on_complete: fun(obj: vim.SystemCompleted))
+---@field cancel fun(self: test_runner.JobRunner, key: string)
+---@field is_running fun(self: test_runner.JobRunner, key: string): boolean
 
 ---Create a new job runner instance.
 ---@return test_runner.JobRunner
@@ -11,12 +14,11 @@ end
 
 ---Run a command, cancelling any existing job with the same key.
 ---The on_complete callback is guaranteed to run in a vim-safe context.
----@param self test_runner.JobRunner
 ---@param key string
 ---@param cmd string[]
 ---@param opts table
 ---@param on_complete fun(obj: vim.SystemCompleted)
-function M.run(self, key, cmd, opts, on_complete)
+function M:run(key, cmd, opts, on_complete)
 	self:cancel(key)
 
 	local job = vim.system(cmd, opts, function(obj)
@@ -32,9 +34,8 @@ function M.run(self, key, cmd, opts, on_complete)
 end
 
 ---Cancel a running job by key.
----@param self test_runner.JobRunner
 ---@param key string
-function M.cancel(self, key)
+function M:cancel(key)
 	local job = self._jobs[key]
 	if job then
 		pcall(function()
@@ -45,10 +46,9 @@ function M.cancel(self, key)
 end
 
 ---Check if a job is currently running for the given key.
----@param self test_runner.JobRunner
 ---@param key string
 ---@return boolean
-function M.is_running(self, key)
+function M:is_running(key)
 	return self._jobs[key] ~= nil
 end
 
