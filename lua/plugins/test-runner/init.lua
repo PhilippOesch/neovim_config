@@ -95,26 +95,37 @@ local function update_sidebar_for_current_buf()
 	end
 end
 
----Handle jest job completion.
+---Handle test job completion.
 ---@param filepath string
 ---@param obj vim.SystemCompleted
 ---@param adapter test_runner.Adapter
-local function handle_result(filepath, obj, adapter)
+---@param context table|nil
+local function handle_result(filepath, obj, adapter, context)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 	local content
 
-	if obj.code ~= 0 and (not obj.stdout or obj.stdout == "") then
-		local err = obj.stderr or "Unknown error running jest"
+	-- Apply post_process if available
+	local stdout = obj.stdout
+	local proc_err
+	if adapter.post_process then
+		stdout, proc_err = adapter.post_process(obj, context)
+	end
+
+	if not stdout then
+		local err = proc_err or "Unknown error processing results"
+		content = "# Test Results: " .. basename .. "\n\n## Error processing results\n\n```\n" .. err .. "\n```"
+	elseif obj.code ~= 0 and (stdout == "" or stdout == nil) then
+		local err = obj.stderr or "Unknown error running tests"
 		content = "# Test Results: " .. basename .. "\n\n## Error running tests\n\n```\n" .. err .. "\n```"
 	else
-		local result, parse_err = adapter.parser.parse(obj.stdout or "")
+		local result, parse_err = adapter.parser.parse(stdout or "")
 		if not result then
 			content = "# Test Results: "
 				.. basename
 				.. "\n\n## Error parsing results\n\n```\n"
 				.. (parse_err or "Unknown parse error")
 				.. "\n```\n\nRaw stdout:\n```\n"
-				.. (obj.stdout or "")
+				.. (stdout or "")
 				.. "\n```"
 		else
 			content = adapter.formatter.format(basename, result, { icons = config.icons, max_console_lines = 20 })
@@ -142,7 +153,7 @@ function M.toggle_sidebar()
 	end
 end
 
----Run jest tests for the current file.
+---Run tests for the current file.
 function M.run_file()
 	local filepath = vim.api.nvim_buf_get_name(0)
 
@@ -160,15 +171,35 @@ function M.run_file()
 	state.sidebar:set_content(content)
 
 	local adapter_config = adapter.get_config(vim.fn.fnamemodify(filepath, ":h"))
+	if not adapter_config then
+		state.sidebar:set_content("# Test Results: " .. basename .. "\n\n## Error: Could not find test configuration (e.g., solution file)")
+		return
+	end
+
 	local cwd = adapter.get_cwd(vim.fn.fnamemodify(filepath, ":h")) or vim.fn.getcwd()
-	local cmd_parts = adapter.get_cmd(adapter_config, { filepath = filepath })
+
+	-- Generate context if adapter supports it
+	local context
+	if adapter.get_context then
+		context = adapter.get_context(adapter_config, { filepath = filepath })
+		if not context then
+			-- Adapter returned nil (e.g., missing dependency)
+			return
+		end
+	end
+
+	local cmd_parts = adapter.get_cmd(adapter_config, { filepath = filepath }, context)
+	if not cmd_parts then
+		state.sidebar:set_content("# Test Results: " .. basename .. "\n\n## Error: Failed to build test command")
+		return
+	end
 
 	state.job_runner:run(filepath, cmd_parts, { cwd = cwd, text = true }, function(obj)
-		handle_result(filepath, obj, adapter)
+		handle_result(filepath, obj, adapter, context)
 	end)
 end
 
----Setup the jest plugin.
+---Setup the test runner plugin.
 ---@param opts? table
 function M.setup(opts)
 	opts = opts or {}
@@ -192,12 +223,12 @@ function M.setup(opts)
 		vim.keymap.set("n", config.keybindings.toggle, M.toggle_sidebar, {
 			noremap = true,
 			silent = true,
-			desc = "Toggle jest results sidebar",
+			desc = "Toggle test results sidebar",
 		})
 	end
 
 	-- Autocmds
-	local augroup = vim.api.nvim_create_augroup("JestSidebar", { clear = true })
+	local augroup = vim.api.nvim_create_augroup("TestRunnerSidebar", { clear = true })
 
 	vim.api.nvim_create_autocmd("BufEnter", {
 		group = augroup,
