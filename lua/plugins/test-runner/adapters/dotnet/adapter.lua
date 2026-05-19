@@ -60,7 +60,23 @@ M.get_cmd = function(config, opts)
 	local tree = parser:parse()[1]
 	local root = tree:root()
 
-	local query = vim.treesitter.query.parse(
+	-- Query for namespace declarations (both file-scoped and block-style)
+	local namespace_query = vim.treesitter.query.parse(
+		"c_sharp",
+		[[
+		(file_scoped_namespace_declaration name: (_) @namespace.name)
+		(namespace_declaration name: (_) @namespace.name)
+	]]
+	)
+
+	local namespaces = {}
+	for _, node in namespace_query:iter_captures(root, bufnr) do
+		local name = vim.treesitter.get_node_text(node, bufnr)
+		table.insert(namespaces, name)
+	end
+
+	-- Query for class declarations
+	local class_query = vim.treesitter.query.parse(
 		"c_sharp",
 		[[
 		(class_declaration name: (identifier) @class.name)
@@ -68,7 +84,7 @@ M.get_cmd = function(config, opts)
 	)
 
 	local class_names = {}
-	for _, node in query:iter_captures(root, bufnr) do
+	for _, node in class_query:iter_captures(root, bufnr) do
 		local name = vim.treesitter.get_node_text(node, bufnr)
 		table.insert(class_names, name)
 	end
@@ -78,9 +94,12 @@ M.get_cmd = function(config, opts)
 		return nil
 	end
 
+	-- Build filter with namespace prefix for fully qualified names
 	local filter_parts = {}
+	local namespace_prefix = namespaces[1] and (namespaces[1] .. ".") or ""
+
 	for _, name in ipairs(class_names) do
-		table.insert(filter_parts, string.format("FullyQualifiedName~%s", name))
+		table.insert(filter_parts, string.format("FullyQualifiedName~%s%s", namespace_prefix, name))
 	end
 
 	local filter = table.concat(filter_parts, "|")
