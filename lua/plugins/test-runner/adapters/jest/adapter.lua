@@ -1,8 +1,7 @@
 ---@class JestAdapter: test_runner.Adapter
 local M = {
 	patterns = { "%.test%.[tj]sx?$", "%.spec%.[tj]sx?$" },
-	formatter = require('plugins.test-runner.formatter'),
-	parser = require('plugins.test-runner.adapters.jest.parser')
+	parser = require('plugins.test-runner.adapters.jest.parser'),
 }
 
 M.get_config = function(path)

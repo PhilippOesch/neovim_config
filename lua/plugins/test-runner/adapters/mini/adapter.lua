@@ -1,7 +1,6 @@
 ---@class MiniTestAdapter: test_runner.Adapter
 local M = {
 	patterns = { "test_.*%.lua$" },
-	formatter = require("plugins.test-runner.formatter"),
 	parser = require("plugins.test-runner.adapters.mini.parser"),
 }
 

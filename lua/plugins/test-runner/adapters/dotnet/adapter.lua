@@ -1,7 +1,6 @@
 ---@class DotnetTestAdapter: test_runner.Adapter
 local M = {
 	patterns = { ".[Tt]est%.cs$" },
-	formatter = require("plugins.test-runner.formatter"),
 	parser = require("plugins.test-runner.adapters.dotnet.parser"),
 }
 

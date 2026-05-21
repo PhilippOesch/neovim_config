@@ -1,9 +1,6 @@
 ---@class ResultParser
 ---@field parse fun(raw: string): ParsedResult
 
----@class ResultFormatter
----@field format fun(filename: string, result: ParsedResult, opts: FormatterConfig): string
-
 --- Generic Adapter interface
 ---
 --- Implement this to create adapter for different testing framework.
@@ -15,7 +12,6 @@
 ---@field get_context fun(config: table, opts:{filepath: string}): table|nil Optional: generate context for test run
 ---@field post_process fun(obj: vim.SystemCompleted, context: table): string|nil, string|nil Optional: process output before parsing
 ---@field parser ResultParser
----@field formatter ResultFormatter
 
 return {
 	jest = "plugins.test-runner.adapters.jest.adapter",
