@@ -27,6 +27,7 @@ local get_default_config = function()
 		adapters = {
 			adapters.jest,
 			adapters.dotnet,
+			adapters.mini,
 		},
 		icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
 		sidebar_width = 45,

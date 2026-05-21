@@ -21,6 +21,7 @@
 local M = {
 	jest = require("plugins.test-runner.adapters.jest.adapter"),
 	dotnet = require("plugins.test-runner.adapters.dotnet.adapter"),
+	mini = require("plugins.test-runner.adapters.mini.adapter"),
 }
 
 return M
