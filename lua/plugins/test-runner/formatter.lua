@@ -15,6 +15,64 @@ local M = {}
 ---@field summary {passed: number, failed: number, pending: number}
 ---@field tree ParsedTestNode[]
 
+---@class test_runner.RunResult
+---@field type "success"|"error"
+---@field result? ParsedResult
+---@field stage? string
+---@field message? string
+---@field raw? string
+
+local STAGE_MESSAGES = {
+	config = "Could not find test configuration",
+	context = "Failed to prepare test context",
+	cmd = "Failed to build test command",
+	post_process = "Error processing results",
+	run = "Error running tests",
+	parse = "Error parsing results",
+}
+
+---Render a run result as markdown.
+---@param filename string basename of the test file
+---@param run_result test_runner.RunResult
+---@param opts FormatterConfig
+---@return string
+function M.render(filename, run_result, opts)
+	local lines = {}
+
+	table.insert(lines, "# Test Results: " .. filename)
+	table.insert(lines, "")
+
+	if run_result.type == "success" then
+		if not run_result.result then
+			table.insert(lines, "## Running tests...")
+			return table.concat(lines, "\n")
+		end
+		return M.format(filename, run_result.result, opts)
+	end
+
+	local msg = STAGE_MESSAGES[run_result.stage] or "Unknown error"
+	table.insert(lines, "## Error: " .. msg)
+	table.insert(lines, "")
+
+	if run_result.message and run_result.message ~= "" then
+		table.insert(lines, "```")
+		table.insert(lines, run_result.message)
+		table.insert(lines, "```")
+	end
+
+	if run_result.raw and run_result.raw ~= "" then
+		table.insert(lines, "")
+		table.insert(lines, "Raw output:")
+		table.insert(lines, "```")
+		for _, raw_line in ipairs(vim.split(run_result.raw, "\n")) do
+			table.insert(lines, raw_line)
+		end
+		table.insert(lines, "```")
+	end
+
+	return table.concat(lines, "\n")
+end
+
 ---Format parsed jest result as markdown string.
 ---@param filename string basename of the test file
 ---@param result ParsedResult|nil

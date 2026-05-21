@@ -5,6 +5,7 @@ local JobRunner = require("plugins.test-runner.job_runner")
 local ResultCache = require("plugins.test-runner.result_cache")
 local TestRun = require("plugins.test-runner.test_run")
 local AdapterRegistry = require("plugins.test-runner.adapter_registry")
+local Formatter = require("plugins.test-runner.formatter")
 
 --- available keybindings
 ---@class test_runner.config.keybindings
@@ -103,7 +104,8 @@ function M.run_file()
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 	state.sidebar:set_content("# Test Results: " .. basename .. "\n\n## Running tests...")
 
-	state.test_run:run(adapter, filepath, function(content)
+	state.test_run:run(adapter, filepath, function(run_result)
+		local content = Formatter.render(basename, run_result, { icons = config.icons, max_console_lines = 20 })
 		state.result_cache:save(filepath, content)
 		if vim.api.nvim_buf_get_name(0) == filepath then
 			if state.sidebar:is_open() then
@@ -129,7 +131,7 @@ function M.setup(opts)
 	state.job_runner = JobRunner.new()
 	state.result_cache = ResultCache.new({ results_dir = config.results_dir })
 	state.adapter_registry = AdapterRegistry.new(config.adapters)
-	state.test_run = TestRun.new({ job_runner = state.job_runner, icons = config.icons, max_console_lines = 20 })
+	state.test_run = TestRun.new({ job_runner = state.job_runner })
 	state.result_cache:cleanup()
 
 	-- Keymaps
