@@ -59,8 +59,8 @@ function M.parse(json_string)
 	local tree = {}
 
 	for _, test_result in ipairs(test_results) do
-		local test_name = test_result.testName
-		local outcome = test_result.outcome
+		local test_name = test_result["+@testName"]
+		local outcome = test_result["+@outcome"]
 
 		if not test_name then
 			goto continue
