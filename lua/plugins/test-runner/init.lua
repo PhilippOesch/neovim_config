@@ -3,6 +3,7 @@ local M = {}
 local Sidebar = require("plugins.test-runner.sidebar")
 local JobRunner = require("plugins.test-runner.job_runner")
 local ResultCache = require("plugins.test-runner.result_cache")
+local TestRun = require("plugins.test-runner.test_run")
 
 local adapters = require("plugins.test-runner.adapters")
 
@@ -46,10 +47,12 @@ local config = {}
 ---@field sidebar test_runner.Sidebar|nil
 ---@field job_runner test_runner.JobRunner|nil
 ---@field result_cache test_runner.ResultCache|nil
+---@field test_run test_runner.TestRun|nil
 local state = {
 	sidebar = nil,
 	job_runner = nil,
 	result_cache = nil,
+	test_run = nil,
 }
 
 --- get the test adapter
@@ -96,54 +99,6 @@ local function update_sidebar_for_current_buf()
 	end
 end
 
----Handle test job completion.
----@param filepath string
----@param obj vim.SystemCompleted
----@param adapter test_runner.Adapter
----@param context table|nil
-local function handle_result(filepath, obj, adapter, context)
-	local basename = vim.fn.fnamemodify(filepath, ":t")
-	local content
-
-	-- Apply post_process if available
-	local stdout = obj.stdout
-	local proc_err
-	if adapter.post_process then
-		stdout, proc_err = adapter.post_process(obj, context)
-	end
-
-	if not stdout then
-		local err = proc_err or "Unknown error processing results"
-		content = "# Test Results: " .. basename .. "\n\n## Error processing results\n\n```\n" .. err .. "\n```"
-	elseif obj.code ~= 0 and (stdout == "" or stdout == nil) then
-		local err = obj.stderr or "Unknown error running tests"
-		content = "# Test Results: " .. basename .. "\n\n## Error running tests\n\n```\n" .. err .. "\n```"
-	else
-		local result, parse_err = adapter.parser.parse(stdout or "")
-		if not result then
-			content = "# Test Results: "
-				.. basename
-				.. "\n\n## Error parsing results\n\n```\n"
-				.. (parse_err or "Unknown parse error")
-				.. "\n```\n\nRaw stdout:\n```\n"
-				.. (stdout or "")
-				.. "\n```"
-		else
-			content = adapter.formatter.format(basename, result, { icons = config.icons, max_console_lines = 20 })
-		end
-	end
-
-	-- Save to cache
-	state.result_cache:save(filepath, content)
-
-	-- Update sidebar if currently focused on this file
-	if vim.api.nvim_buf_get_name(0) == filepath then
-		if state.sidebar:is_open() then
-			state.sidebar:set_content(content)
-		end
-	end
-end
-
 ---Toggle the sidebar visibility.
 function M.toggle_sidebar()
 	if state.sidebar:is_open() then
@@ -157,7 +112,6 @@ end
 ---Run tests for the current file.
 function M.run_file()
 	local filepath = vim.api.nvim_buf_get_name(0)
-
 	local adapter = get_test_adapter(filepath)
 
 	if not adapter then
@@ -168,35 +122,15 @@ function M.run_file()
 
 	state.sidebar:open()
 	local basename = vim.fn.fnamemodify(filepath, ":t")
-	local content = "# Test Results: " .. basename .. "\n\n## Running tests..."
-	state.sidebar:set_content(content)
+	state.sidebar:set_content("# Test Results: " .. basename .. "\n\n## Running tests...")
 
-	local adapter_config = adapter.get_config(vim.fn.fnamemodify(filepath, ":h"))
-	if not adapter_config then
-		state.sidebar:set_content("# Test Results: " .. basename .. "\n\n## Error: Could not find test configuration (e.g., solution file)")
-		return
-	end
-
-	local cwd = adapter.get_cwd(vim.fn.fnamemodify(filepath, ":h")) or vim.fn.getcwd()
-
-	-- Generate context if adapter supports it
-	local context
-	if adapter.get_context then
-		context = adapter.get_context(adapter_config, { filepath = filepath })
-		if not context then
-			-- Adapter returned nil (e.g., missing dependency)
-			return
+	state.test_run:run(adapter, filepath, function(content)
+		state.result_cache:save(filepath, content)
+		if vim.api.nvim_buf_get_name(0) == filepath then
+			if state.sidebar:is_open() then
+				state.sidebar:set_content(content)
+			end
 		end
-	end
-
-	local cmd_parts = adapter.get_cmd(adapter_config, { filepath = filepath }, context)
-	if not cmd_parts then
-		state.sidebar:set_content("# Test Results: " .. basename .. "\n\n## Error: Failed to build test command")
-		return
-	end
-
-	state.job_runner:run(filepath, cmd_parts, { cwd = cwd, text = true }, function(obj)
-		handle_result(filepath, obj, adapter, context)
 	end)
 end
 
@@ -206,10 +140,11 @@ function M.setup(opts)
 	opts = opts or {}
 	config = vim.tbl_deep_extend("force", get_default_config(), opts)
 
-	-- Create sidebar, job runner, and result cache instances
+	-- Create sidebar, job runner, result cache, and test run instances
 	state.sidebar = Sidebar.new({ width = config.sidebar_width })
 	state.job_runner = JobRunner.new()
 	state.result_cache = ResultCache.new({ results_dir = config.results_dir })
+	state.test_run = TestRun.new({ job_runner = state.job_runner, icons = config.icons, max_console_lines = 20 })
 	state.result_cache:cleanup()
 
 	-- Keymaps
