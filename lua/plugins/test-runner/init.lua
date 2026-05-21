@@ -4,8 +4,7 @@ local Sidebar = require("plugins.test-runner.sidebar")
 local JobRunner = require("plugins.test-runner.job_runner")
 local ResultCache = require("plugins.test-runner.result_cache")
 local TestRun = require("plugins.test-runner.test_run")
-
-local adapters = require("plugins.test-runner.adapters")
+local AdapterRegistry = require("plugins.test-runner.adapter_registry")
 
 --- available keybindings
 ---@class test_runner.config.keybindings
@@ -25,11 +24,7 @@ local adapters = require("plugins.test-runner.adapters")
 ---@return test_runner.config
 local get_default_config = function()
 	return {
-		adapters = {
-			adapters.jest,
-			adapters.dotnet,
-			adapters.mini,
-		},
+		adapters = { "jest", "dotnet", "mini" },
 		icons = { pass = "✅", fail = "❌", pending = "⏳", suite = "📂" },
 		sidebar_width = 45,
 		results_dir = vim.fn.stdpath("cache") .. "/test-results/",
@@ -48,37 +43,21 @@ local config = {}
 ---@field job_runner test_runner.JobRunner|nil
 ---@field result_cache test_runner.ResultCache|nil
 ---@field test_run test_runner.TestRun|nil
+---@field adapter_registry test_runner.AdapterRegistry|nil
 local state = {
 	sidebar = nil,
 	job_runner = nil,
 	result_cache = nil,
 	test_run = nil,
+	adapter_registry = nil,
 }
-
---- get the test adapter
----
----@param filepath string
----@return test_runner.Adapter|nil
-local function get_test_adapter(filepath)
-	local basename = vim.fn.fnamemodify(filepath, ":t")
-
-	for _, adapter in ipairs(config.adapters) do
-		for _, pattern in ipairs(adapter.patterns) do
-			if string.find(basename, pattern) then
-				return adapter
-			end
-		end
-	end
-
-	return nil
-end
 
 ---Update sidebar content based on the current buffer.
 local function update_sidebar_for_current_buf()
 	local filepath = vim.api.nvim_buf_get_name(0)
 	local basename = vim.fn.fnamemodify(filepath, ":t")
 
-	if not get_test_adapter(filepath) then
+	if not state.adapter_registry:find(filepath) then
 		local content = "# Test Results: "
 			.. basename
 			.. "\n\n## Not a test file\n\nSwitch to a test file to see results."
@@ -112,7 +91,7 @@ end
 ---Run tests for the current file.
 function M.run_file()
 	local filepath = vim.api.nvim_buf_get_name(0)
-	local adapter = get_test_adapter(filepath)
+	local adapter = state.adapter_registry:find(filepath)
 
 	if not adapter then
 		state.sidebar:open()
@@ -138,12 +117,18 @@ end
 ---@param opts? table
 function M.setup(opts)
 	opts = opts or {}
-	config = vim.tbl_deep_extend("force", get_default_config(), opts)
+	local default_config = get_default_config()
+
+	-- Handle adapters separately to avoid tbl_deep_extend array-merge bug
+	local adapter_specs = opts.adapters or default_config.adapters
+	config = vim.tbl_deep_extend("force", default_config, opts)
+	config.adapters = adapter_specs
 
 	-- Create sidebar, job runner, result cache, and test run instances
 	state.sidebar = Sidebar.new({ width = config.sidebar_width })
 	state.job_runner = JobRunner.new()
 	state.result_cache = ResultCache.new({ results_dir = config.results_dir })
+	state.adapter_registry = AdapterRegistry.new(config.adapters)
 	state.test_run = TestRun.new({ job_runner = state.job_runner, icons = config.icons, max_console_lines = 20 })
 	state.result_cache:cleanup()
 

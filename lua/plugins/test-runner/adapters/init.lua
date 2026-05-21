@@ -16,12 +16,9 @@
 ---@field post_process fun(obj: vim.SystemCompleted, context: table): string|nil, string|nil Optional: process output before parsing
 ---@field parser ResultParser
 ---@field formatter ResultFormatter
----
----@type table<string, test_runner.Adapter>
-local M = {
-	jest = require("plugins.test-runner.adapters.jest.adapter"),
-	dotnet = require("plugins.test-runner.adapters.dotnet.adapter"),
-	mini = require("plugins.test-runner.adapters.mini.adapter"),
-}
 
-return M
+return {
+	jest = "plugins.test-runner.adapters.jest.adapter",
+	dotnet = "plugins.test-runner.adapters.dotnet.adapter",
+	mini = "plugins.test-runner.adapters.mini.adapter",
+}
