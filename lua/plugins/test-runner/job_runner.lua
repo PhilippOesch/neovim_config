@@ -7,9 +7,14 @@ local JobRunner = {}
 ---@field is_running fun(self: test_runner.JobRunner, key: string): boolean
 
 ---Create a new job runner instance.
+---@param opts? { system?: fun(cmd: string[], opts: table, callback: fun(obj: vim.SystemCompleted)): vim.SystemObj }
 ---@return test_runner.JobRunner
-function JobRunner.new()
-	return setmetatable({ _jobs = {} }, { __index = JobRunner })
+function JobRunner.new(opts)
+	opts = opts or {}
+	return setmetatable({
+		_jobs = {},
+		_system = opts.system or vim.system,
+	}, { __index = JobRunner })
 end
 
 ---Run a command, cancelling any existing job with the same key.
@@ -21,7 +26,7 @@ end
 function JobRunner:run(key, cmd, opts, on_complete)
 	self:cancel(key)
 
-	local job = vim.system(cmd, opts, function(obj)
+	local job = self._system(cmd, opts, function(obj)
 		vim.schedule(function()
 			if self._jobs[key] == job then
 				self._jobs[key] = nil

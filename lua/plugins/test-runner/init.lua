@@ -128,7 +128,7 @@ function M.setup(opts)
 
 	-- Create sidebar, job runner, result cache, and test run instances
 	state.sidebar = Sidebar.new({ width = config.sidebar_width })
-	state.job_runner = JobRunner.new()
+	state.job_runner = JobRunner.new({ system = vim.system })
 	state.result_cache = ResultCache.new({ results_dir = config.results_dir })
 	state.adapter_registry = AdapterRegistry.new(config.adapters)
 	state.test_run = TestRun.new({ job_runner = state.job_runner })
