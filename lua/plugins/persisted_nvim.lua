@@ -45,7 +45,7 @@ return {
 
 		local group = vim.api.nvim_create_augroup("PersitedHooks", {})
 
-		local ignored_file_types = { "codecompanion", "sidekick_terminal", "jestresults" }
+		local ignored_file_types = { "codecompanion", "sidekick_terminal", "jestresults", "dbui", "dbout" }
 
 		vim.api.nvim_create_autocmd({ "User" }, {
 			pattern = "PersistedSavePre",
