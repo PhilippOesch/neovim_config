@@ -9,6 +9,58 @@ local M = {}
 ---@class DotnetTestRun
 ---@field TestRun table Contains Results and other metadata
 
+---Extract a dotnet test filter from a C# buffer using treesitter.
+---@param bufnr integer
+---@return string|nil filter
+---@return string|nil error
+function M.extract_filter(bufnr)
+	local ok, parser = pcall(vim.treesitter.get_parser, bufnr, "c_sharp")
+	if not ok or not parser then
+		return nil, "c_sharp treesitter parser not available"
+	end
+
+	local tree = parser:parse()[1]
+	local root = tree:root()
+
+	local namespace_query = vim.treesitter.query.parse(
+		"c_sharp",
+		[[
+		(file_scoped_namespace_declaration name: (_) @namespace.name)
+		(namespace_declaration name: (_) @namespace.name)
+	]]
+	)
+
+	local namespaces = {}
+	for _, node in namespace_query:iter_captures(root, bufnr) do
+		table.insert(namespaces, vim.treesitter.get_node_text(node, bufnr))
+	end
+
+	local class_query = vim.treesitter.query.parse(
+		"c_sharp",
+		[[
+		(class_declaration name: (identifier) @class.name)
+	]]
+	)
+
+	local class_names = {}
+	for _, node in class_query:iter_captures(root, bufnr) do
+		table.insert(class_names, vim.treesitter.get_node_text(node, bufnr))
+	end
+
+	if #class_names == 0 then
+		return nil, "no classes found"
+	end
+
+	local filter_parts = {}
+	local namespace_prefix = namespaces[1] and (namespaces[1] .. ".") or ""
+
+	for _, name in ipairs(class_names) do
+		table.insert(filter_parts, string.format("FullyQualifiedName~%s%s", namespace_prefix, name))
+	end
+
+	return table.concat(filter_parts, "|"), nil
+end
+
 ---Parse raw TRX JSON (converted from XML by yq) into a structured tree.
 ---Returns nil and an error message if parsing fails.
 ---@param json_string string

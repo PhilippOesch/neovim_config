@@ -46,12 +46,7 @@ end
 
 M.get_cwd = function(path)
 	local config = M.get_config(path)
-
-	if config and config.cwd then
-		return config.cwd
-	end
-
-	return nil
+	return config and config.cwd or nil
 end
 
 ---Generate context for test run including temp directory for TRX
@@ -83,58 +78,12 @@ M.get_cmd = function(config, opts, context)
 		return nil
 	end
 
-	local ok, parser = pcall(vim.treesitter.get_parser, bufnr, "c_sharp")
-	if not ok or not parser then
-		vim.notify("Dotnet adapter: c_sharp treesitter parser not available", vim.log.levels.ERROR)
+	local filter, err = M.parser.extract_filter(bufnr)
+	if not filter then
+		local level = err == "no classes found" and vim.log.levels.WARN or vim.log.levels.ERROR
+		vim.notify("Dotnet adapter: " .. err .. " in " .. opts.filepath, level)
 		return nil
 	end
-
-	local tree = parser:parse()[1]
-	local root = tree:root()
-
-	-- Query for namespace declarations (both file-scoped and block-style)
-	local namespace_query = vim.treesitter.query.parse(
-		"c_sharp",
-		[[
-		(file_scoped_namespace_declaration name: (_) @namespace.name)
-		(namespace_declaration name: (_) @namespace.name)
-	]]
-	)
-
-	local namespaces = {}
-	for _, node in namespace_query:iter_captures(root, bufnr) do
-		local name = vim.treesitter.get_node_text(node, bufnr)
-		table.insert(namespaces, name)
-	end
-
-	-- Query for class declarations
-	local class_query = vim.treesitter.query.parse(
-		"c_sharp",
-		[[
-		(class_declaration name: (identifier) @class.name)
-	]]
-	)
-
-	local class_names = {}
-	for _, node in class_query:iter_captures(root, bufnr) do
-		local name = vim.treesitter.get_node_text(node, bufnr)
-		table.insert(class_names, name)
-	end
-
-	if #class_names == 0 then
-		vim.notify("Dotnet adapter: no classes found in " .. opts.filepath, vim.log.levels.WARN)
-		return nil
-	end
-
-	-- Build filter with namespace prefix for fully qualified names
-	local filter_parts = {}
-	local namespace_prefix = namespaces[1] and (namespaces[1] .. ".") or ""
-
-	for _, name in ipairs(class_names) do
-		table.insert(filter_parts, string.format("FullyQualifiedName~%s%s", namespace_prefix, name))
-	end
-
-	local filter = table.concat(filter_parts, "|")
 
 	local cmd = {
 		"dotnet",
@@ -144,12 +93,13 @@ M.get_cmd = function(config, opts, context)
 		filter,
 	}
 
-	-- Add TRX logger with results directory if context provided
 	if context and context.results_dir then
-		table.insert(cmd, "--results-directory")
-		table.insert(cmd, context.results_dir)
-		table.insert(cmd, "--logger")
-		table.insert(cmd, "trx")
+		vim.list_extend(cmd, {
+			"--results-directory",
+			context.results_dir,
+			"--logger",
+			"trx",
+		})
 	end
 
 	return cmd
@@ -159,23 +109,12 @@ end
 ---@param results_dir string
 ---@return string|nil
 local function find_trx_file(results_dir)
-	-- TRX files are typically in results_dir/TestResults/*.trx
-	local test_results_dir = results_dir .. "/TestResults"
-
-	-- Check if TestResults subdirectory exists
-	if vim.fn.isdirectory(test_results_dir) == 1 then
-		local trx_files = vim.fn.glob(test_results_dir .. "/*.trx", false, true)
+	for _, pattern in ipairs({ results_dir .. "/TestResults/*.trx", results_dir .. "/*.trx" }) do
+		local trx_files = vim.fn.glob(pattern, false, true)
 		if #trx_files > 0 then
 			return trx_files[1]
 		end
 	end
-
-	-- Try direct search in results_dir
-	local trx_files = vim.fn.glob(results_dir .. "/*.trx", false, true)
-	if #trx_files > 0 then
-		return trx_files[1]
-	end
-
 	return nil
 end
 
