@@ -1,6 +1,8 @@
 ---@type Config.Plugin
 return {
-	deps = { "https://github.com/PhilippOesch/lineforge.nvim" },
+	deps = {
+		{ src = "https://github.com/PhilippOesch/lineforge.nvim" },
+	},
 	init = function()
 		local lineforge = require("lineforge")
 		local segments = lineforge.segments
@@ -45,12 +47,16 @@ return {
 						oilSegment.add(bld)
 						segments.file_icon.add(bld, { ignore_filetypes = { "oil" } })
 						bld:add_space()
-						segments.filename.add(
-							bld,
-							{ hl = { fg = bld.ctx:get_highlight("Special").fg }, ignore_filetypes = { "oil" } }
-						)
+						segments.filename.add(bld, {
+							hl = { fg = bld.ctx:get_highlight("Special").fg },
+							ignore_filetypes = { "oil" },
+							max_width = 50,
+						})
 						bld:add_space(" ", 2)
-						segments.git_branch.add(bld, { fg = bld.ctx:get_highlight("String").fg, bold = true })
+						segments.git_branch.add(
+							bld,
+							{ hl = { fg = bld.ctx:get_highlight("String").fg, bold = true }, max_width = 50 }
+						)
 						segments.git_status.add(bld)
 					end)
 					:section(
