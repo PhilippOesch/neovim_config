@@ -1,18 +1,27 @@
 local M = {}
 
----Build trigger characters for completion autotrigger.
----Includes a-z, A-Z, and underscore.
+local luasnip = require("luasnip")
+
+local COMPLETION_KIND_SNIPPET = 15
+local INSERT_FORMAT_SNIPPET = 2
+
+-- Trigger characters for completion autotrigger (a-z, A-Z, _).
+local TRIGGER_CHARS = {
+	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+	"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+	"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+	"_",
+}
+
+---Normalize a snippet docstring to a table of lines.
+---@param doc string|string[]
 ---@return string[]
-local function build_trigger_chars()
-	local chars = {}
-	for i = string.byte("a"), string.byte("z") do
-		table.insert(chars, string.char(i))
+local function normalize_docstring(doc)
+	if type(doc) == "string" then
+		return { doc }
 	end
-	for i = string.byte("A"), string.byte("Z") do
-		table.insert(chars, string.char(i))
-	end
-	table.insert(chars, "_")
-	return chars
+	return doc
 end
 
 ---@param dispatchers vim.lsp.rpc.Dispatchers
@@ -20,8 +29,6 @@ end
 local function cmd_fn(dispatchers)
 	local closing = false
 	local request_id = 0
-
-	local trigger_chars = build_trigger_chars()
 
 	---@type vim.lsp.rpc.PublicClient
 	local srv = {}
@@ -31,7 +38,7 @@ local function cmd_fn(dispatchers)
 			callback(nil, {
 				capabilities = {
 					completionProvider = {
-						triggerCharacters = trigger_chars,
+						triggerCharacters = TRIGGER_CHARS,
 						resolveProvider = true,
 					},
 				},
@@ -39,8 +46,8 @@ local function cmd_fn(dispatchers)
 		elseif method == "shutdown" then
 			callback(nil, nil)
 		elseif method == "textDocument/completion" then
-			local typed_params = params ---@type lsp.CompletionParams
-			local file_path = typed_params.textDocument.uri:gsub("^file://", "")
+			---@cast params lsp.CompletionParams
+			local file_path = params.textDocument.uri:gsub("^file://", "")
 			local bufnr = vim.fn.bufnr(file_path)
 			if bufnr == -1 then
 				bufnr = 0
@@ -48,14 +55,13 @@ local function cmd_fn(dispatchers)
 
 			local line = vim.api.nvim_buf_get_lines(
 				bufnr,
-				typed_params.position.line,
-				typed_params.position.line + 1,
+				params.position.line,
+				params.position.line + 1,
 				false
 			)[1] or ""
-			local line_to_cursor = line:sub(1, typed_params.position.character)
+			local line_to_cursor = line:sub(1, params.position.character)
 			local prefix = line_to_cursor:match("[%w_]+$") or ""
 
-			local luasnip = require("luasnip")
 			local ok, luasnip_util = pcall(require, "luasnip.util.util")
 			local filetypes
 			if ok then
@@ -70,16 +76,14 @@ local function cmd_fn(dispatchers)
 			for _, ft in ipairs(filetypes) do
 				local snippets = luasnip.get_snippets(ft, { type = "snippets" }) or {}
 				for _, snip in pairs(snippets) do
-					if snip.hidden or snip.invalidated then
+					-- Skip hidden, invalidated, or already-seen snippets.
+					if snip.hidden or snip.invalidated or seen_ids[snip.id] then
 						goto next_snip
 					end
 
 					-- When a prefix is typed, only literal triggers that match it.
 					if prefix ~= "" then
-						if snip.regTrig then
-							goto next_snip
-						end
-						if snip.trigger:sub(1, #prefix) ~= prefix then
+						if snip.regTrig or snip.trigger:sub(1, #prefix) ~= prefix then
 							goto next_snip
 						end
 					end
@@ -88,35 +92,28 @@ local function cmd_fn(dispatchers)
 						goto next_snip
 					end
 
-					if seen_ids[snip.id] then
-						goto next_snip
-					end
 					seen_ids[snip.id] = true
 
-					local docstring = snip:get_docstring()
-					if type(docstring) == "string" then
-						docstring = { docstring }
-					end
-					local body = table.concat(docstring, "\n")
+					local body = table.concat(normalize_docstring(snip:get_docstring()), "\n")
 
 					local priority = snip.effective_priority or 1000
 					local sort_text = string.format("%04d", 10000 - priority) .. snip.trigger
 
-					local start_char = typed_params.position.character - #prefix
+					local start_char = params.position.character - #prefix
 					local item = {
 						label = snip.trigger,
-						kind = 15, -- Snippet
+						kind = COMPLETION_KIND_SNIPPET,
 						sortText = sort_text,
-						insertTextFormat = 2, -- Snippet
+						insertTextFormat = INSERT_FORMAT_SNIPPET,
 						textEdit = {
 							range = {
 								start = {
-									line = typed_params.position.line,
+									line = params.position.line,
 									character = start_char,
 								},
 								["end"] = {
-									line = typed_params.position.line,
-									character = typed_params.position.character,
+									line = params.position.line,
+									character = params.position.character,
 								},
 							},
 							newText = body,
@@ -138,18 +135,15 @@ local function cmd_fn(dispatchers)
 				isIncomplete = false,
 			})
 		elseif method == "completionItem/resolve" then
-			local item = params ---@type lsp.CompletionItem
+			---@cast params lsp.CompletionItem
+			local item = params
 			if item.data and item.data.snip_id then
-				local snip = require("luasnip").get_id_snippet(item.data.snip_id)
+				local snip = luasnip.get_id_snippet(item.data.snip_id)
 				if snip then
 					item.detail = snip.name
-					local docstring = snip:get_docstring()
-					if type(docstring) == "string" then
-						docstring = { docstring }
-					end
 					item.documentation = {
 						kind = "markdown",
-						value = "```" .. (item.data.filetype or "") .. "\n" .. table.concat(docstring, "\n") .. "\n```",
+						value = "```" .. (item.data.filetype or "") .. "\n" .. table.concat(normalize_docstring(snip:get_docstring()), "\n") .. "\n```",
 					}
 				end
 			end
@@ -178,8 +172,6 @@ local function cmd_fn(dispatchers)
 end
 
 function M.init()
-	local luasnip = require("luasnip")
-
 	luasnip.filetype_extend("javascriptreact", { "html" })
 	luasnip.filetype_extend("typescriptreact", { "html" })
 	luasnip.filetype_extend("htmlangular", { "html" })
