@@ -144,7 +144,7 @@ mason_lspconfig.setup({
 local config_servers = function()
 	for server_name, server in pairs(servers) do
 		if not vim.tbl_contains(excludedSetups, server_name) then
-			server.capabilities = vim.tbl_deep_extend("force", {}, lspHelpers.capabilities, server.capabilities or {})
+			-- server.capabilities = vim.tbl_deep_extend("force", {}, lspHelpers.capabilities, server.capabilities or {})
 			vim.lsp.config(server_name, server)
 			vim.lsp.enable(server_name)
 		end
