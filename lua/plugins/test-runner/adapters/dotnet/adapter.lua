@@ -26,15 +26,12 @@ M.get_config = function(path)
 	local home = os.getenv("HOME") or ""
 
 	while dir and dir ~= "" and dir ~= root and dir ~= home do
-		local has_git_dir = vim.fn.finddir(".git", dir .. "/") ~= ""
-		local has_git_file = vim.fn.filereadable(dir .. "/.git") == 1
-		if has_git_dir or has_git_file then
-			local solutions = vim.fn.glob(dir .. "/*.sln", false, true)
-			local solutionFile = solutions[1]
-			if not solutionFile or solutionFile == "" then
-				solutionFile = dir .. "/dirs.proj"
+		local csproj_files = vim.fn.glob(dir .. "/*.csproj", false, true)
+		for _, file in ipairs(csproj_files) do
+			local basename = vim.fn.fnamemodify(file, ":t:r")
+			if basename:match("^[Tt]ests?") or basename:match("[Tt]ests?$") then
+				return { cwd = dir, solutionFile = file }
 			end
-			return { cwd = dir, solutionFile = solutionFile }
 		end
 
 		local parent = vim.fn.fnamemodify(dir, ":h")
