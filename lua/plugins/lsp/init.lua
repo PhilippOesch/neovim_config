@@ -10,6 +10,9 @@ return {
 		"https://github.com/seblj/roslyn.nvim",
 		"https://github.com/mfussenegger/nvim-jdtls",
 		"https://github.com/folke/lazydev.nvim",
+		"https://github.com/L3MON4D3/LuaSnip",
+		"https://github.com/rafamadriz/friendly-snippets",
+		"https://github.com/kristijanhusak/vim-dadbod-completion"
 	},
 	init = function()
 		local lspHelpers = require("plugins.lsp.utils")

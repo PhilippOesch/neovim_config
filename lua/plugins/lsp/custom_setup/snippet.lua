@@ -46,7 +46,12 @@ local function cmd_fn(dispatchers)
 				bufnr = 0
 			end
 
-			local line = vim.api.nvim_buf_get_lines(bufnr, typed_params.position.line, typed_params.position.line + 1, false)[1] or ""
+			local line = vim.api.nvim_buf_get_lines(
+				bufnr,
+				typed_params.position.line,
+				typed_params.position.line + 1,
+				false
+			)[1] or ""
 			local line_to_cursor = line:sub(1, typed_params.position.character)
 			local prefix = line_to_cursor:match("[%w_]+$") or ""
 
@@ -144,9 +149,7 @@ local function cmd_fn(dispatchers)
 					end
 					item.documentation = {
 						kind = "markdown",
-						value = "```" .. (item.data.filetype or "") .. "\n"
-							.. table.concat(docstring, "\n")
-							.. "\n```",
+						value = "```" .. (item.data.filetype or "") .. "\n" .. table.concat(docstring, "\n") .. "\n```",
 					}
 				end
 			end
@@ -175,6 +178,18 @@ local function cmd_fn(dispatchers)
 end
 
 function M.init()
+	local luasnip = require("luasnip")
+
+	luasnip.filetype_extend("javascriptreact", { "html" })
+	luasnip.filetype_extend("typescriptreact", { "html" })
+	luasnip.filetype_extend("htmlangular", { "html" })
+	luasnip.filetype_extend("vue", { "html" })
+	luasnip.filetype_extend("todo", { "markdown" })
+
+	require("luasnip.loaders.from_vscode").lazy_load()
+	require("luasnip.loaders.from_vscode").load({ paths = { "./snippets" } })
+
+	luasnip.config.setup()
 	vim.lsp.config["luasnip-server"] = {
 		cmd = cmd_fn,
 		root_dir = function(bufnr, on_dir)
