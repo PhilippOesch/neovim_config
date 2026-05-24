@@ -2,9 +2,7 @@ local utils = require("utils")
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
-require("mason").setup({
-	registries = { "github:Crashdummyy/mason-registry", "github:mason-org/mason-registry" },
-})
+require("mason").setup()
 
 -- If you are using mason.nvim, you can get the ts_plugin_path like this
 -- For Mason v1,
@@ -98,7 +96,6 @@ local mason_tool_installer = require("mason-tool-installer")
 
 local ensure_tools_installed = {}
 local other_tools = {
-	"roslyn",
 	"java-test",
 	"golangci-lint",
 	"tree-sitter-cli",
@@ -133,7 +130,7 @@ mason_tool_installer.setup({
 
 local lspHelpers = require("plugins.lsp.utils")
 
-local excludedSetups = { "jdtls", "vue_ls", "roslyn", "angularls", "copilot" }
+local excludedSetups = { "jdtls", "vue_ls", "angularls", "copilot" }
 
 mason_lspconfig.setup({
 	ensure_installed = vim.tbl_keys(servers or {}),
