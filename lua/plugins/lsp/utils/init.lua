@@ -101,21 +101,6 @@ M.on_attach = function(event)
 	elseif client and M.is_client_active("obsidian-ls") and client.name == "marksman" then
 		client:stop(true)
 	end
-	-- event.data.ro
-	-- if disable_mapping[client.name] ~= nil and client.root_dir ~= nil then
-	-- 	local paths = vim.iter(disable_mapping[client.name])
-	-- 		:map(function(path)
-	-- 			vim.fs.normalize(vim.fn.expand(path))
-	-- 		end)
-	-- 		:totable()
-	--
-	-- 	vim.print(paths)
-	-- 	vim.print(client.root_dir)
-	-- 	if vim.tbl_contains(paths, client.root_dir) then
-	-- 		vim.lsp.enable(client.name, false)
-	-- 	end
-	-- 	return
-	-- end
 
 	if client and customHandlers[client.name] then
 		client.handlers = vim.tbl_deep_extend("force", client.handlers or {}, customHandlers[client.name])
