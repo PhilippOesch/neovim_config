@@ -32,7 +32,6 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.treesitter"),
 	require("plugins.gitsigns"),
 	require("plugins.harpoon"),
-	require("plugins.navic"),
 	require("plugins.oil"),
 	require("plugins.kulala"),
 	require("plugins.snacks"),
