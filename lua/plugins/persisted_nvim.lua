@@ -19,7 +19,7 @@ local opts = {
 	on_autoload_no_session = function() end,
 
 	allowed_dirs = {}, -- Table of dirs that the plugin will start and autoload from
-	ignored_dirs = { { "~/", exact = true } },
+	ignored_dirs = { { "~/db" } },
 
 	telescope = {
 		mappings = { -- Mappings for managing sessions in Telescope
