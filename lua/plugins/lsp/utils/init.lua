@@ -84,15 +84,15 @@ end
 M.on_attach = function(event)
 	local keymaps = require("plugins.lsp.setup.keymaps")
 
-	local ok, navic = pcall(require, "nvim-navic")
+	-- local ok, navic = pcall(require, "nvim-navic")
 
 	keymaps.init(event)
 
 	local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-	if ok and client.server_capabilities.documentSymbolProvider then
-		navic.attach(client, event.buf)
-	end
+	-- if ok and client.server_capabilities.documentSymbolProvider then
+	-- 	navic.attach(client, event.buf)
+	-- end
 
 	local marksman_active = M.is_client_active("marksman")
 	if client and obsidian_active and client.name == "obsidian-ls" then
