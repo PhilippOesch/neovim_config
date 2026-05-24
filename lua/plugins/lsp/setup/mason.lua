@@ -8,12 +8,10 @@ require("mason").setup()
 -- For Mason v1,
 -- local mason_registry = require('mason-registry')
 -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
--- For Mason v2,
 local vue_language_server_path = vim.fn.expand("$MASON/packages")
 	.. "/vue-language-server"
 	.. "/node_modules/@vue/language-server"
 -- or even
--- local vue_language_server_path = vim.fn.stdpath('data') .. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
 local vue_plugin = {
 	name = "@vue/typescript-plugin",
 	location = vue_language_server_path,
@@ -33,19 +31,31 @@ local servers = {
 	jdtls = {},
 	golangci_lint_ls = {},
 	vue_ls = {},
-	ts_ls = {
-		plugins = {
-			vue_plugin,
+	-- ts_ls = {
+	-- 	plugins = {
+	-- 		vue_plugin,
+	-- 	},
+	-- 	filetypes = {
+	-- 		"javascript",
+	-- 		"javascriptreact",
+	-- 		"javascript.jsx",
+	-- 		"typescript",
+	-- 		"typescriptreact",
+	-- 		"typescript.tsx",
+	-- 		"vue",
+	-- 	},
+	-- },
+	vtsls = {
+		settings = {
+			vtsls = {
+				tsserver = {
+					globalPlugins = {
+						vue_plugin,
+					},
+				},
+			},
 		},
-		filetypes = {
-			"javascript",
-			"javascriptreact",
-			"javascript.jsx",
-			"typescript",
-			"typescriptreact",
-			"typescript.tsx",
-			"vue",
-		},
+		filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
 	},
 	["eslint@4.8.0"] = {},
 	-- ["eslint"] = {
