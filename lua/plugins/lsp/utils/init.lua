@@ -7,7 +7,7 @@ local disable_mapping = {
 	},
 }
 
-local active_typescript_lsp = "ts_ls"
+local active_typescript_lsp = "vtsls"
 
 ---comment
 ---@param client_name string
