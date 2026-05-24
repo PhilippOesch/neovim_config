@@ -248,6 +248,10 @@
       "rev": "3a7e62c9048a318281328ad08d6269e50b884cd3",
       "src": "https://github.com/gruvw/strudel.nvim"
     },
+    "testreport.nvim": {
+      "rev": "bd742e2652ad65ab749b18f2f56fa9879e8ff850",
+      "src": "git@github.com:PhilippOesch/testreport.nvim.git"
+    },
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
       "src": "https://github.com/folke/todo-comments.nvim"
