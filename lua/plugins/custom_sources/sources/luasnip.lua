@@ -1,8 +1,8 @@
 local luasnip = require("luasnip")
 
-local M = {}
+local LuaSnipSource = {}
 
-M.name = "luasnip"
+LuaSnipSource.name = "luasnip"
 
 ---Normalize a snippet docstring to a table of lines.
 ---@param doc string|string[]
@@ -16,7 +16,7 @@ end
 
 ---@param item lsp.CompletionItem
 ---@return lsp.CompletionItem
-function M.resolve(item)
+function LuaSnipSource.resolve(item)
 	if item.data and item.data.snip_id then
 		local snip = luasnip.get_id_snippet(item.data.snip_id)
 		if snip then
@@ -35,7 +35,7 @@ end
 ---@param params lsp.CompletionParams
 ---@param context table
 ---@return lsp.CompletionItem[]
-function M.get_completions(params, context)
+function LuaSnipSource.get_completions(params, context)
 	local bufnr = context.bufnr
 
 	local prefix = context.line_to_cursor:match("[%w_]+$") or ""
@@ -111,4 +111,4 @@ function M.get_completions(params, context)
 	return items
 end
 
-return M
+return LuaSnipSource

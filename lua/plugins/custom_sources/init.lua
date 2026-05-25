@@ -23,7 +23,7 @@ end
 
 local function get_default_config()
 	return {
-		sources = { "luasnip" },
+		sources = { "luasnip", "dadbod" },
 		trigger_chars = build_trigger_chars(),
 	}
 end

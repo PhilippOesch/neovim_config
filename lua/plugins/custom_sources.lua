@@ -2,6 +2,7 @@ return {
 	deps = {
 		"https://github.com/L3MON4D3/LuaSnip",
 		"https://github.com/rafamadriz/friendly-snippets",
+		"https://github.com/kristijanhusak/vim-dadbod-completion",
 	},
 	init = function()
 		local luasnip = require("luasnip")
