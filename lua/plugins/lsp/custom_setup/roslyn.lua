@@ -1,3 +1,5 @@
+local lspHelpers = require("plugins.lsp.utils")
+
 local M = {}
 
 -- install roslyn: dotnet tool install --global roslyn-language-server --prerelease
@@ -24,6 +26,7 @@ local opts = {
 }
 
 function M.init()
+	opts.capabilities = vim.tbl_deep_extend("force", {}, lspHelpers.capabilities, opts.capabilities or {})
 	vim.lsp.config("roslyn_ls", opts)
 	vim.lsp.enable("roslyn_ls")
 end

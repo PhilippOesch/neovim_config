@@ -66,6 +66,8 @@ end
 
 local M = {}
 
+local lspHelpers = require("plugins.lsp.utils")
+
 function M.init()
 	local config = {
 		cmd = function(dispatchers, config)
@@ -99,6 +101,8 @@ function M.init()
 		filetypes = { "typescript", "html", "typescriptreact", "typescript.tsx", "htmlangular" },
 		root_markers = { "angular.json", "nx.json" },
 	}
+
+	config.capabilities = vim.tbl_deep_extend("force", {}, lspHelpers.capabilities, config.capabilities or {})
 
 	vim.lsp.config("angularls", config)
 	vim.lsp.enable("angularls")

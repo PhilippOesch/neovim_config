@@ -1,7 +1,13 @@
 local utils = require("utils")
 
+-- mason-lspconfig requires that these setup functions are called in this order
+-- before setting up the servers.
 require("mason").setup()
 
+-- If you are using mason.nvim, you can get the ts_plugin_path like this
+-- For Mason v1,
+-- local mason_registry = require('mason-registry')
+-- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 local vue_language_server_path = vim.fn.expand("$MASON/packages")
 	.. "/vue-language-server"
 	.. "/node_modules/@vue/language-server"
@@ -20,10 +26,25 @@ local servers = {
 	},
 	gopls = {},
 	angularls = {},
+	-- ["angularls@19.2.4"] = {},
 	sqlls = {},
 	jdtls = {},
 	golangci_lint_ls = {},
 	vue_ls = {},
+	-- ts_ls = {
+	-- 	plugins = {
+	-- 		vue_plugin,
+	-- 	},
+	-- 	filetypes = {
+	-- 		"javascript",
+	-- 		"javascriptreact",
+	-- 		"javascript.jsx",
+	-- 		"typescript",
+	-- 		"typescriptreact",
+	-- 		"typescript.tsx",
+	-- 		"vue",
+	-- 	},
+	-- },
 	vtsls = {
 		settings = {
 			vtsls = {
@@ -37,6 +58,18 @@ local servers = {
 		filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
 	},
 	["eslint@4.8.0"] = {},
+	-- ["eslint"] = {
+	-- 	-- settings = {
+	-- 	-- 	experimental = {
+	-- 	-- 		-- If you want to use flat config on >= 8.21, < 9.0
+	-- 	-- 		useFlatConfig = true,
+	-- 	-- 		-- Or if you want to use eslintrc on 9.*
+	-- 	-- 		-- useFlatConfig = false,
+	-- 	-- 	},
+	-- 	-- },
+	-- 	-- root_markers = { ".git", "package.json" },
+	-- 	workingDirectory = { mode = "location" },
+	-- },
 	tailwindcss = {
 		classAttributes = { "class", "className", "class:list", "classList", "ngClass", "placeholderClassName" },
 		filetypes = {
@@ -105,6 +138,8 @@ mason_tool_installer.setup({
 	ensure_installed = ensure_tools_installed,
 })
 
+local lspHelpers = require("plugins.lsp.utils")
+
 local excludedSetups = { "jdtls", "vue_ls", "angularls", "copilot" }
 
 mason_lspconfig.setup({
@@ -116,6 +151,7 @@ mason_lspconfig.setup({
 local config_servers = function()
 	for server_name, server in pairs(servers) do
 		if not vim.tbl_contains(excludedSetups, server_name) then
+			-- server.capabilities = vim.tbl_deep_extend("force", {}, lspHelpers.capabilities, server.capabilities or {})
 			vim.lsp.config(server_name, server)
 			vim.lsp.enable(server_name)
 		end
@@ -126,6 +162,6 @@ config_servers()
 
 local custom_setups = utils.requireAll("plugins.lsp.custom_setup")
 
-for _, s in pairs(custom_setups) do
+for ls, s in pairs(custom_setups) do
 	s.init()
 end
