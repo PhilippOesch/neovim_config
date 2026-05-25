@@ -22,7 +22,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.whichkey"),
 	require("plugins.todo"),
 	require("plugins.webdev_icons"),
-	require("plugins.blink_cmp"),
+	-- require("plugins.blink_cmp"),
 	require("config.theme"),
 	require("plugins.comment"),
 	require("plugins.autopairs"),
@@ -49,6 +49,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.sidekick"),
 	require("plugins.lineforge"),
 	require("plugins.testreport"),
+	require("plugins.custom_sources"),
 })
 
 require("config.general")
