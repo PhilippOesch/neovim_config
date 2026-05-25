@@ -1,173 +1,79 @@
-local CustomSourceLsp = {}
-
-local luasnip = require("luasnip")
-
-local COMPLETION_KIND_SNIPPET = 15
-local INSERT_FORMAT_SNIPPET = 2
-
-local function build_trigger_chars()
-	local chars = {}
-	for i = string.byte("a"), string.byte("z") do
-		table.insert(chars, string.char(i))
-	end
-	for i = string.byte("A"), string.byte("Z") do
-		table.insert(chars, string.char(i))
-	end
-	table.insert(chars, "_")
-	return chars
-end
-
----@alias custom_sources.Source.resolve_completion_callback fun(error?: lsp.ResponseError, result: lsp.CompletionItem)
----@alias custom_sources.Source.on_get_completion_items_callback fun(error?: lsp.ResponseError, result: vim.lsp.CompletionResult)
-
 ---@class custom_sources.Source
----@field resolve_completion? fun(params: lsp.CompletionItem, callback: custom_sources.Source.resolve_completion_callback)
----@field on_get_completion_items? fun(params: lsp.CompletionParams, callback: custom_sources.Source.on_get_completion_items_callback)
+---@field name string
+---@field get_completions fun(params: lsp.CompletionParams, context: table): lsp.CompletionItem[]
+---@field resolve? fun(item: lsp.CompletionItem): lsp.CompletionItem
 
--- Trigger characters for completion autotrigger (a-z, A-Z, _).
-local TRIGGER_CHARS = build_trigger_chars()
+local M = {}
 
----Normalize a snippet docstring to a table of lines.
----@param doc string|string[]
----@return string[]
-local function normalize_docstring(doc)
-	if type(doc) == "string" then
-		return { doc }
-	end
-	return doc
-end
-
----@class custom_sources.Source[]
-local active_sources = {}
-
----@type custom_sources.lsp_server.definition
-local custom_source_ls_lsp_def = {
-	onInitialize = function(self, callback)
-		vim.print(self)
-		callback(nil, {
-			---@type lsp.ClientCapabilities
-			capabilities = {
-				completionProvider = {
-					triggerCharacters = TRIGGER_CHARS,
-					resolveProvider = true,
+---@param active_sources custom_sources.Source[]
+---@param trigger_chars string[]
+---@return custom_sources.lsp_server.definition
+function M.create_server_def(active_sources, trigger_chars)
+	return {
+		onInitialize = function(_, callback)
+			callback(nil, {
+				capabilities = {
+					completionProvider = {
+						triggerCharacters = trigger_chars,
+						resolveProvider = true,
+					},
 				},
-			},
-		})
-	end,
-	shutdown = function(self, callback)
-		callback(nil, nil)
-	end,
-	onCompletionItemResolve = function(self, params, callback)
-		local item = params
-		if item.data and item.data.snip_id then
-			local snip = luasnip.get_id_snippet(item.data.snip_id)
-			if snip then
-				item.detail = snip.name
-				item.documentation = {
-					kind = "markdown",
-					value = "```" .. (item.data.filetype or "") .. "\n" .. table.concat(
-						normalize_docstring(snip:get_docstring()),
-						"\n"
-					) .. "\n```",
-				}
-			end
-		end
-		callback(nil, item)
-	end,
-	onTextDocumentCompletion = function(self, params, callback)
-		local file_path = params.textDocument.uri:gsub("^file://", "")
-		local bufnr = vim.fn.bufnr(file_path)
-		if bufnr == -1 then
-			bufnr = 0
-		end
-
-		local line = vim.api.nvim_buf_get_lines(bufnr, params.position.line, params.position.line + 1, false)[1] or ""
-		local line_to_cursor = line:sub(1, params.position.character)
-		local prefix = line_to_cursor:match("[%w_]+$") or ""
-
-		local ok, luasnip_util = pcall(require, "luasnip.util.util")
-		local filetypes
-		if ok then
-			filetypes = luasnip_util.get_snippet_filetypes()
-		else
-			filetypes = { vim.api.nvim_get_option_value("filetype", { buf = bufnr }), "all" }
-		end
-
-		local items = {}
-		local seen_ids = {}
-
-		for _, ft in ipairs(filetypes) do
-			local snippets = luasnip.get_snippets(ft, { type = "snippets" }) or {}
-			for _, snip in pairs(snippets) do
-				-- Skip hidden, invalidated, or already-seen snippets.
-				if snip.hidden or snip.invalidated or seen_ids[snip.id] then
-					goto next_snip
-				end
-
-				-- When a prefix is typed, only literal triggers that match it.
-				if prefix ~= "" then
-					if snip.regTrig or snip.trigger:sub(1, #prefix) ~= prefix then
-						goto next_snip
+			})
+		end,
+		shutdown = function(_, callback)
+			callback(nil, nil)
+		end,
+		onCompletionItemResolve = function(_, params, callback)
+			local item = params
+			if item.data and item.data._source_id then
+				for _, source in ipairs(active_sources) do
+					if source.name == item.data._source_id and source.resolve then
+						item = source.resolve(item)
+						break
 					end
 				end
-
-				if snip.show_condition and not snip.show_condition(line_to_cursor) then
-					goto next_snip
-				end
-
-				seen_ids[snip.id] = true
-
-				local body = table.concat(normalize_docstring(snip:get_docstring()), "\n")
-
-				local priority = snip.effective_priority or 1000
-				local sort_text = string.format("%04d", 10000 - priority) .. snip.trigger
-
-				local start_char = params.position.character - #prefix
-				local item = {
-					label = snip.trigger,
-					kind = COMPLETION_KIND_SNIPPET,
-					sortText = sort_text,
-					insertTextFormat = INSERT_FORMAT_SNIPPET,
-					textEdit = {
-						range = {
-							start = {
-								line = params.position.line,
-								character = start_char,
-							},
-							["end"] = {
-								line = params.position.line,
-								character = params.position.character,
-							},
-						},
-						newText = body,
-					},
-					data = {
-						snip_id = snip.id,
-						filetype = ft,
-					},
-				}
-
-				table.insert(items, item)
-
-				::next_snip::
 			end
-		end
+			callback(nil, item)
+		end,
+		onTextDocumentCompletion = function(_, params, callback)
+			local file_path = params.textDocument.uri:gsub("^file://", "")
+			local bufnr = vim.fn.bufnr(file_path)
+			if bufnr == -1 then
+				bufnr = 0
+			end
 
-		callback(nil, {
-			items = items,
-			isIncomplete = false,
-		})
-	end,
-}
+			local line = vim.api.nvim_buf_get_lines(bufnr, params.position.line, params.position.line + 1, false)[1] or ""
+			local line_to_cursor = line:sub(1, params.position.character)
+			local context = {
+				bufnr = bufnr,
+				line = line,
+				line_to_cursor = line_to_cursor,
+			}
 
----@param config custom_sources.config
-function CustomSourceLsp.setup(config)
-	vim.lsp.config["custom_source_ls"] = {
-		cmd = require("plugins.custom_sources.utils").create_lsp(custom_source_ls_lsp_def),
-		root_dir = function(_, on_dir)
-			on_dir(vim.fn.getcwd())
+			local all_items = {}
+
+			for _, source in ipairs(active_sources) do
+				local ok, items = pcall(source.get_completions, params, context)
+				if not ok then
+					vim.notify(
+						"[custom_sources] Source '" .. source.name .. "' failed: " .. tostring(items),
+						vim.log.levels.ERROR
+					)
+				else
+					for _, item in ipairs(items) do
+						item.data = item.data or {}
+						item.data._source_id = source.name
+						table.insert(all_items, item)
+					end
+				end
+			end
+
+			callback(nil, {
+				items = all_items,
+				isIncomplete = false,
+			})
 		end,
 	}
 end
 
-return CustomSourceLsp
+return M
