@@ -114,7 +114,7 @@ local function setup_autocompletion(client, bufnr)
 end
 
 ---get the path for a plugin
----@param name name of the plugin
+---@param name string of the plugin
 ---@return string
 function M.get_plugin_path(name)
 	local data = vim.fn.stdpath("data")
@@ -137,15 +137,9 @@ end
 M.on_attach = function(event)
 	local keymaps = require("plugins.lsp.setup.keymaps")
 
-	-- local ok, navic = pcall(require, "nvim-navic")
-
 	keymaps.init(event)
 
 	local client = vim.lsp.get_client_by_id(event.data.client_id)
-
-	-- if ok and client.server_capabilities.documentSymbolProvider then
-	-- 	navic.attach(client, event.buf)
-	-- end
 
 	local marksman_active = M.is_client_active("marksman")
 	if client and obsidian_active and client.name == "obsidian-ls" then
@@ -218,10 +212,8 @@ M.on_attach = function(event)
 	end
 end
 
--- local capabilities = vim.lsp.protocol.make_client_capabilities()
--- capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
--- local capabilities = require("blink-cmp").get_lsp_capabilities()
+local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-M.capabilities = {}
+M.capabilities = capabilities
 
 return M
