@@ -2,8 +2,6 @@ local CustomSourceLsp = {}
 
 local luasnip = require("luasnip")
 
-local builtin_sources = require("plugins.custom_sources.sources")
-
 local COMPLETION_KIND_SNIPPET = 15
 local INSERT_FORMAT_SNIPPET = 2
 
@@ -25,7 +23,6 @@ end
 ---@class custom_sources.Source
 ---@field resolve_completion? fun(params: lsp.CompletionItem, callback: custom_sources.Source.resolve_completion_callback)
 ---@field on_get_completion_items? fun(params: lsp.CompletionParams, callback: custom_sources.Source.on_get_completion_items_callback)
----@field trigger_characters: string[]
 
 -- Trigger characters for completion autotrigger (a-z, A-Z, _).
 local TRIGGER_CHARS = build_trigger_chars()
@@ -42,6 +39,17 @@ end
 
 ---@class custom_sources.Source[]
 local active_sources = {}
+
+---@class custom_sources.lsp_server: custom_sources.lsp_server.definition
+---@field dispatchers vim.lsp.rpc.Dispatchers
+---@field request_id integer
+---@field server vim.lsp.rpc.PublicClient
+
+---@class custom_sources.lsp_server.definition
+---@field onInitialize? fun(self:custom_sources.lsp_server)
+---@field onTextDocumentCompletion? fun(self:custom_sources.lsp_server, params: lsp.CompletionParams, callback: custom_sources.Source.on_get_completion_items_callback)
+
+local function create_lsp() end
 
 ---@param dispatchers vim.lsp.rpc.Dispatchers
 ---@return vim.lsp.rpc.PublicClient
@@ -190,24 +198,9 @@ local function cmd_fn(dispatchers)
 	return srv
 end
 
----comment
----@param sources (table|custom_sources.builtin.source)[]
-local function setup_sources(sources)
-	active_sources = {}
-
-	for _, value in ipairs(sources) do
-		if type(value) == "string" then
-			table.insert(active_sources, builtin_sources[value])
-		elseif type(value) == "table" then
-			table.insert(active_sources, value)
-		end
-	end
-end
 
 ---@param config custom_sources.config
 function CustomSourceLsp.setup(config)
-	setup_sources(config.sources)
-
 	vim.lsp.config["custom_source_ls"] = {
 		cmd = cmd_fn,
 		root_dir = function(_, on_dir)
