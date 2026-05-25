@@ -84,7 +84,12 @@ local function feedkeys(keys)
 end
 
 local function setup_autocompletion(client, bufnr)
-	vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
+	vim.lsp.completion.enable(true, client.id, bufnr, {
+		autotrigger = true,
+		convert = function(item)
+			return { abbr = item.label:gsub("%b()", "") }
+		end,
+	})
 	vim.keymap.set({ "i" }, "<C-Space>", function()
 		vim.lsp.completion.get()
 	end, { desc = "trigger autocompletion" })

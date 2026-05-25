@@ -34,7 +34,7 @@ vim.o.timeoutlen = 300
 vim.o.splitright = true
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = "menuone,noselect"
+vim.o.completeopt = "menuone,noinsert"
 
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
