@@ -1,18 +1,34 @@
-local M = {}
+local CustomSourceLsp = {}
 
 local luasnip = require("luasnip")
+
+local builtin_sources = require("plugins.custom_sources.sources")
 
 local COMPLETION_KIND_SNIPPET = 15
 local INSERT_FORMAT_SNIPPET = 2
 
+local function build_trigger_chars()
+	local chars = {}
+	for i = string.byte("a"), string.byte("z") do
+		table.insert(chars, string.char(i))
+	end
+	for i = string.byte("A"), string.byte("Z") do
+		table.insert(chars, string.char(i))
+	end
+	table.insert(chars, "_")
+	return chars
+end
+
+---@alias custom_sources.Source.resolve_completion_callback fun(error?: lsp.ResponseError, result: lsp.CompletionItem)
+---@alias custom_sources.Source.on_get_completion_items_callback fun(error?: lsp.ResponseError, result: vim.lsp.CompletionResult)
+
+---@class custom_sources.Source
+---@field resolve_completion? fun(params: lsp.CompletionItem, callback: custom_sources.Source.resolve_completion_callback)
+---@field on_get_completion_items? fun(params: lsp.CompletionParams, callback: custom_sources.Source.on_get_completion_items_callback)
+---@field trigger_characters: string[]
+
 -- Trigger characters for completion autotrigger (a-z, A-Z, _).
-local TRIGGER_CHARS = {
-	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
-	"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-	"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-	"_",
-}
+local TRIGGER_CHARS = build_trigger_chars()
 
 ---Normalize a snippet docstring to a table of lines.
 ---@param doc string|string[]
@@ -23,6 +39,9 @@ local function normalize_docstring(doc)
 	end
 	return doc
 end
+
+---@class custom_sources.Source[]
+local active_sources = {}
 
 ---@param dispatchers vim.lsp.rpc.Dispatchers
 ---@return vim.lsp.rpc.PublicClient
@@ -36,6 +55,7 @@ local function cmd_fn(dispatchers)
 	function srv.request(method, params, callback)
 		if method == "initialize" then
 			callback(nil, {
+				---@type lsp.ClientCapabilities
 				capabilities = {
 					completionProvider = {
 						triggerCharacters = TRIGGER_CHARS,
@@ -53,12 +73,8 @@ local function cmd_fn(dispatchers)
 				bufnr = 0
 			end
 
-			local line = vim.api.nvim_buf_get_lines(
-				bufnr,
-				params.position.line,
-				params.position.line + 1,
-				false
-			)[1] or ""
+			local line = vim.api.nvim_buf_get_lines(bufnr, params.position.line, params.position.line + 1, false)[1]
+				or ""
 			local line_to_cursor = line:sub(1, params.position.character)
 			local prefix = line_to_cursor:match("[%w_]+$") or ""
 
@@ -143,7 +159,10 @@ local function cmd_fn(dispatchers)
 					item.detail = snip.name
 					item.documentation = {
 						kind = "markdown",
-						value = "```" .. (item.data.filetype or "") .. "\n" .. table.concat(normalize_docstring(snip:get_docstring()), "\n") .. "\n```",
+						value = "```" .. (item.data.filetype or "") .. "\n" .. table.concat(
+							normalize_docstring(snip:get_docstring()),
+							"\n"
+						) .. "\n```",
 					}
 				end
 			end
@@ -171,24 +190,30 @@ local function cmd_fn(dispatchers)
 	return srv
 end
 
-function M.init()
-	luasnip.filetype_extend("javascriptreact", { "html" })
-	luasnip.filetype_extend("typescriptreact", { "html" })
-	luasnip.filetype_extend("htmlangular", { "html" })
-	luasnip.filetype_extend("vue", { "html" })
-	luasnip.filetype_extend("todo", { "markdown" })
+---comment
+---@param sources (table|custom_sources.builtin.source)[]
+local function setup_sources(sources)
+	active_sources = {}
 
-	require("luasnip.loaders.from_vscode").lazy_load()
-	require("luasnip.loaders.from_vscode").load({ paths = { "./snippets" } })
+	for _, value in ipairs(sources) do
+		if type(value) == "string" then
+			table.insert(active_sources, builtin_sources[value])
+		elseif type(value) == "table" then
+			table.insert(active_sources, value)
+		end
+	end
+end
 
-	luasnip.config.setup()
-	vim.lsp.config["luasnip-server"] = {
+---@param config custom_sources.config
+function CustomSourceLsp.setup(config)
+	setup_sources(config.sources)
+
+	vim.lsp.config["custom_source_ls"] = {
 		cmd = cmd_fn,
-		root_dir = function(bufnr, on_dir)
+		root_dir = function(_, on_dir)
 			on_dir(vim.fn.getcwd())
 		end,
 	}
-	vim.lsp.enable("luasnip-server")
 end
 
-return M
+return CustomSourceLsp
