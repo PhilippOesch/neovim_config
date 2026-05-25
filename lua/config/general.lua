@@ -35,6 +35,7 @@ vim.o.splitright = true
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,popup,noinsert,fuzzy"
+vim.o.pumheight = 10
 
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
