@@ -3,7 +3,7 @@ local builtins = require("plugins.custom_sources.sources")
 
 local M = {}
 
----@alias custom_sources.builtin.source 'luasnip'
+---@alias custom_sources.builtin.source 'luasnip'|'dadbod'
 
 ---@class custom_sources.config
 ---@field sources? (table|custom_sources.builtin.source)[]
