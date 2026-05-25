@@ -32,7 +32,6 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.treesitter"),
 	require("plugins.gitsigns"),
 	require("plugins.harpoon"),
-	require("plugins.navic"),
 	require("plugins.oil"),
 	require("plugins.kulala"),
 	require("plugins.snacks"),
@@ -49,7 +48,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.nvimcolorizer"),
 	require("plugins.sidekick"),
 	require("plugins.lineforge"),
-	require("plugins.jest"),
+	require("plugins.testreport"),
 })
 
 require("config.general")

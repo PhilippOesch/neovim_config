@@ -7,7 +7,6 @@ return {
 		"https://github.com/williamboman/mason-lspconfig.nvim",
 		"https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim",
 		"https://github.com/ionide/Ionide-vim",
-		"https://github.com/seblj/roslyn.nvim",
 		"https://github.com/mfussenegger/nvim-jdtls",
 		"https://github.com/folke/lazydev.nvim",
 		"https://github.com/L3MON4D3/LuaSnip",
@@ -26,6 +25,9 @@ return {
 				lspHelpers.on_attach(event)
 			end,
 		})
+
+		local lsp_log_path = vim.fn.stdpath("state") .. "/lsp.log"
+		vim.api.nvim_create_user_command("LspLog", "tabe " .. lsp_log_path, { desc = "open lsp logs" })
 
 		require("plugins.lsp.setup.mason")
 	end,

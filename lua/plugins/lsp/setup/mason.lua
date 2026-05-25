@@ -2,20 +2,16 @@ local utils = require("utils")
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
-require("mason").setup({
-	registries = { "github:Crashdummyy/mason-registry", "github:mason-org/mason-registry" },
-})
+require("mason").setup()
 
 -- If you are using mason.nvim, you can get the ts_plugin_path like this
 -- For Mason v1,
 -- local mason_registry = require('mason-registry')
 -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
--- For Mason v2,
 local vue_language_server_path = vim.fn.expand("$MASON/packages")
 	.. "/vue-language-server"
 	.. "/node_modules/@vue/language-server"
 -- or even
--- local vue_language_server_path = vim.fn.stdpath('data') .. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
 local vue_plugin = {
 	name = "@vue/typescript-plugin",
 	location = vue_language_server_path,
@@ -35,19 +31,31 @@ local servers = {
 	jdtls = {},
 	golangci_lint_ls = {},
 	vue_ls = {},
-	ts_ls = {
-		plugins = {
-			vue_plugin,
+	-- ts_ls = {
+	-- 	plugins = {
+	-- 		vue_plugin,
+	-- 	},
+	-- 	filetypes = {
+	-- 		"javascript",
+	-- 		"javascriptreact",
+	-- 		"javascript.jsx",
+	-- 		"typescript",
+	-- 		"typescriptreact",
+	-- 		"typescript.tsx",
+	-- 		"vue",
+	-- 	},
+	-- },
+	vtsls = {
+		settings = {
+			vtsls = {
+				tsserver = {
+					globalPlugins = {
+						vue_plugin,
+					},
+				},
+			},
 		},
-		filetypes = {
-			"javascript",
-			"javascriptreact",
-			"javascript.jsx",
-			"typescript",
-			"typescriptreact",
-			"typescript.tsx",
-			"vue",
-		},
+		filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
 	},
 	["eslint@4.8.0"] = {},
 	-- ["eslint"] = {
@@ -98,7 +106,6 @@ local mason_tool_installer = require("mason-tool-installer")
 
 local ensure_tools_installed = {}
 local other_tools = {
-	"roslyn",
 	"java-test",
 	"golangci-lint",
 	"tree-sitter-cli",
@@ -133,7 +140,7 @@ mason_tool_installer.setup({
 
 local lspHelpers = require("plugins.lsp.utils")
 
-local excludedSetups = { "jdtls", "vue_ls", "roslyn", "angularls", "copilot" }
+local excludedSetups = { "jdtls", "vue_ls", "angularls", "copilot" }
 
 mason_lspconfig.setup({
 	ensure_installed = vim.tbl_keys(servers or {}),

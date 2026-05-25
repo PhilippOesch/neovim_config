@@ -74,7 +74,7 @@
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "lineforge.nvim": {
-      "rev": "caeeef749663009efafbf52f1309b8c90c2fe2da",
+      "rev": "6f874f36284bb6b9c152aa6e3ec0ec34aa5784c9",
       "src": "https://github.com/PhilippOesch/lineforge.nvim"
     },
     "markdown-preview.nvim": {
@@ -247,6 +247,10 @@
     "strudel.nvim": {
       "rev": "3a7e62c9048a318281328ad08d6269e50b884cd3",
       "src": "https://github.com/gruvw/strudel.nvim"
+    },
+    "testreport.nvim": {
+      "rev": "bd742e2652ad65ab749b18f2f56fa9879e8ff850",
+      "src": "git@github.com:PhilippOesch/testreport.nvim.git"
     },
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
