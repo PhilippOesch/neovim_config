@@ -9,6 +9,7 @@ return {
 		"https://github.com/ionide/Ionide-vim",
 		"https://github.com/mfussenegger/nvim-jdtls",
 		"https://github.com/folke/lazydev.nvim",
+		"https://github.com/seblj/roslyn.nvim",
 	},
 	init = function()
 		local lspHelpers = require("plugins.lsp.utils")

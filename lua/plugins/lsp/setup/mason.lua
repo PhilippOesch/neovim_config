@@ -2,7 +2,9 @@ local utils = require("utils")
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
-require("mason").setup()
+require("mason").setup({
+	registries = { "github:Crashdummyy/mason-registry", "github:mason-org/mason-registry" },
+})
 
 -- If you are using mason.nvim, you can get the ts_plugin_path like this
 -- For Mason v1,
@@ -31,20 +33,6 @@ local servers = {
 	jdtls = {},
 	golangci_lint_ls = {},
 	vue_ls = {},
-	-- ts_ls = {
-	-- 	plugins = {
-	-- 		vue_plugin,
-	-- 	},
-	-- 	filetypes = {
-	-- 		"javascript",
-	-- 		"javascriptreact",
-	-- 		"javascript.jsx",
-	-- 		"typescript",
-	-- 		"typescriptreact",
-	-- 		"typescript.tsx",
-	-- 		"vue",
-	-- 	},
-	-- },
 	vtsls = {
 		settings = {
 			vtsls = {
@@ -58,18 +46,6 @@ local servers = {
 		filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
 	},
 	["eslint@4.8.0"] = {},
-	-- ["eslint"] = {
-	-- 	-- settings = {
-	-- 	-- 	experimental = {
-	-- 	-- 		-- If you want to use flat config on >= 8.21, < 9.0
-	-- 	-- 		useFlatConfig = true,
-	-- 	-- 		-- Or if you want to use eslintrc on 9.*
-	-- 	-- 		-- useFlatConfig = false,
-	-- 	-- 	},
-	-- 	-- },
-	-- 	-- root_markers = { ".git", "package.json" },
-	-- 	workingDirectory = { mode = "location" },
-	-- },
 	tailwindcss = {
 		classAttributes = { "class", "className", "class:list", "classList", "ngClass", "placeholderClassName" },
 		filetypes = {
@@ -106,6 +82,7 @@ local mason_tool_installer = require("mason-tool-installer")
 
 local ensure_tools_installed = {}
 local other_tools = {
+	"roslyn",
 	"java-test",
 	"golangci-lint",
 	"tree-sitter-cli",
@@ -140,7 +117,7 @@ mason_tool_installer.setup({
 
 local lspHelpers = require("plugins.lsp.utils")
 
-local excludedSetups = { "jdtls", "vue_ls", "angularls", "copilot" }
+local excludedSetups = { "jdtls", "vue_ls", "angularls", "copilot", "roslyn" }
 
 mason_lspconfig.setup({
 	ensure_installed = vim.tbl_keys(servers or {}),
