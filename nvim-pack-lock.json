@@ -249,7 +249,7 @@
       "src": "https://github.com/gruvw/strudel.nvim"
     },
     "testreport.nvim": {
-      "rev": "bd742e2652ad65ab749b18f2f56fa9879e8ff850",
+      "rev": "7aed19e4c1c88116612e3a42a6f79ac26e9631e3",
       "src": "git@github.com:PhilippOesch/testreport.nvim.git"
     },
     "todo-comments.nvim": {
