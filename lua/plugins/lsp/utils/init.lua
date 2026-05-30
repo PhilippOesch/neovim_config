@@ -60,64 +60,6 @@ local function join(...)
 	return table.concat({ ... }, "/")
 end
 
----Utility for keymap creation.
----@param lhs string
----@param rhs string|function
----@param opts string|table
----@param mode? string|string[]
-local function keymap(lhs, rhs, opts, mode)
-	opts = type(opts) == "string" and { desc = opts }
-		or vim.tbl_extend("error", opts --[[@as table]], { buffer = bufnr })
-	mode = mode or "n"
-	vim.keymap.set(mode, lhs, rhs, opts)
-end
-
----Is the completion menu open?
-local function pumvisible()
-	return tonumber(vim.fn.pumvisible()) ~= 0
-end
-
----For replacing certain <C-x>... keymaps.
----@param keys string
-local function feedkeys(keys)
-	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(keys, true, false, true), "n", true)
-end
-
-local function setup_autocompletion(client, bufnr)
-	vim.lsp.completion.enable(true, client.id, bufnr, {
-		autotrigger = true,
-		convert = function(item)
-			return { abbr = item.label:gsub("%b()", "") }
-		end,
-	})
-	vim.keymap.set({ "i" }, "<C-Space>", function()
-		vim.lsp.completion.get()
-	end, { desc = "trigger autocompletion" })
-
-	-- default keymaps
-	-- - <C-y>: accept completion.
-	-- - <C-e>: cancel completion.
-
-	keymap("<Tab>", function()
-		if pumvisible() then
-			feedkeys("<C-n>")
-		elseif vim.snippet.active({ direction = 1 }) then
-			vim.snippet.jump(1)
-		else
-			feedkeys("<Tab>")
-		end
-	end, {}, { "i", "s" })
-	keymap("<S-Tab>", function()
-		if pumvisible() then
-			feedkeys("<C-p>")
-		elseif vim.snippet.active({ direction = -1 }) then
-			vim.snippet.jump(-1)
-		else
-			feedkeys("<S-Tab>")
-		end
-	end, {}, { "i", "s" })
-end
-
 ---get the path for a plugin
 ---@param name string of the plugin
 ---@return string
@@ -153,8 +95,6 @@ M.on_attach = function(event)
 	elseif client and M.is_client_active("obsidian-ls") and client.name == "marksman" then
 		client:stop()
 	end
-
-	setup_autocompletion(client, event.buf)
 
 	if client and customHandlers[client.name] then
 		client.handlers = vim.tbl_deep_extend("force", client.handlers or {}, customHandlers[client.name])
