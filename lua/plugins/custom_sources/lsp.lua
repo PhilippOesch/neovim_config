@@ -5,11 +5,6 @@
 
 local M = {}
 
----@class custom_source.Context
----@field bufnr number
----@field line string
----@field line_to_cursor string
-
 ---@param active_sources custom_sources.Source[]
 ---@param trigger_chars string[]
 ---@return custom_sources.lsp_server.definition
