@@ -94,7 +94,7 @@
       "src": "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim"
     },
     "mason.nvim": {
-      "rev": "b03fb0f20bc1d43daf558cda981a2be22e73ac42",
+      "rev": "16ba83bfc8a25f52bb545134f5bee082b195c460",
       "src": "https://github.com/williamboman/mason.nvim"
     },
     "mini.surround": {
