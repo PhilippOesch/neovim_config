@@ -23,6 +23,7 @@ formattingConfig.xml = { "xmlformatter" }
 formattingConfig.python = { "black", stop_after_first = true }
 formattingConfig.proj = { "xmlformatter" }
 formattingConfig.cs = { "csharpier" }
+formattingConfig.c = { "clang-format" }
 formattingConfig.lua = { "stylua" }
 formattingConfig.yaml = { "yamlfmt" }
 formattingConfig["markdown"] = { "prettier", "markdownlint-cli2", "markdown-toc" }

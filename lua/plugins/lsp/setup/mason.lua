@@ -60,6 +60,7 @@ local servers = {
 			"sass",
 		},
 	},
+	clangd = {},
 	cssls = {},
 	pyright = {},
 	marksman = {},
@@ -100,6 +101,7 @@ local formatters = {
 	"markdownlint-cli2",
 	"markdown-toc",
 	"yamlfmt",
+	"clang-format",
 }
 ensure_tools_installed = vim.list_extend(ensure_tools_installed, formatters)
 local debuggers = {
