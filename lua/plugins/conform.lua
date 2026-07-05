@@ -10,6 +10,7 @@ local prettierLanguages = {
 	"html",
 	"htmlangular",
 	"json",
+	"jsonc",
 }
 
 local formattingConfig = {}
