@@ -77,6 +77,10 @@
       "rev": "6f874f36284bb6b9c152aa6e3ec0ec34aa5784c9",
       "src": "https://github.com/PhilippOesch/lineforge.nvim"
     },
+    "live-server.nvim": {
+      "rev": "85915d0e7dd926a54b0082aaeafc10a82bfe8288",
+      "src": "https://github.com/selimacerbas/live-server.nvim"
+    },
     "markdown-preview.nvim": {
       "rev": "a923f5fc5ba36a3b17e289dc35dc17f66d0548ee",
       "src": "https://github.com/iamcco/markdown-preview.nvim"
@@ -257,8 +261,9 @@
       "src": "https://github.com/gruvw/strudel.nvim"
     },
     "testreport.nvim": {
-      "rev": "a0f0c779a79d1e516a7c8605eac5ef1cb92188a9",
-      "src": "git@github.com:PhilippOesch/testreport.nvim.git"
+      "rev": "16ef8a94d77a187fccc455b430ba3cf063ee26c4",
+      "src": "git@github.com:PhilippOesch/testreport.nvim.git",
+      "version": "'feat/allow-specifiying-adapter-on-run-tests'"
     },
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",

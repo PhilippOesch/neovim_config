@@ -7,8 +7,6 @@ local obsidian_opts = {
 	},
 	completion = {
 		-- Set to false to disable completion.
-		nvim_cmp = false,
-		blink = false,
 		-- Trigger completion at 2 chars.
 		min_chars = 1,
 	},
@@ -24,7 +22,7 @@ local obsidian_opts = {
 		-- The default folder to place images in via `:ObsidianPasteImg`.
 		-- If this is a relative path it will be interpreted as relative to the vault root.
 		-- You can always override this per image by passing a full path to the command instead of just a filename.
-		img_folder = "files/imgs", -- This is the default
+		folder = "files/imgs", -- This is the default
 		-- A function that determines the text to insert in the note when pasting an image.
 		-- It takes two arguments, the `obsidian.Client` and an `obsidian.Path` to the image file.
 		-- This is the default implementation.

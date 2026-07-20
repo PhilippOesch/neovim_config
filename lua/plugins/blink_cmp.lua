@@ -12,8 +12,8 @@ local opts = {
 	--
 	-- See :h blink-cmp-config-keymap for defining your own keymap
 	keymap = {
-		["<S-Tab>"] = { "select_prev", "fallback" },
-		["<Tab>"] = { "select_next", "fallback" },
+		-- ["<S-Tab>"] = { "select_prev", "fallback" },
+		-- ["<Tab>"] = { "select_next", "fallback" },
 		-- ["<C-y>"] = { "select_and_accept" },
 	},
 	appearance = {
