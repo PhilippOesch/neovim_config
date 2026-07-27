@@ -262,8 +262,7 @@
     },
     "testreport.nvim": {
       "rev": "16ef8a94d77a187fccc455b430ba3cf063ee26c4",
-      "src": "git@github.com:PhilippOesch/testreport.nvim.git",
-      "version": "'feat/allow-specifiying-adapter-on-run-tests'"
+      "src": "git@github.com:PhilippOesch/testreport.nvim.git"
     },
     "todo-comments.nvim": {
       "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
