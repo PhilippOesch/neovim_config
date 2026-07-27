@@ -132,6 +132,15 @@ return {
 			})
 		end, { noremap = true, desc = "Projects" })
 		map("n", "<leader>fw", snacks.picker.grep, { noremap = true, desc = "Grep" })
+		map("n", "<leader>ft", function()
+			snacks.input({
+				prompt = "Filetype: ",
+			}, function(ft)
+				if ft and ft ~= "" then
+					snacks.picker.grep({ ft = ft })
+				end
+			end)
+		end, { noremap = true, desc = "Grep by Filetype" })
 		map("n", "<leader>:", snacks.picker.command_history, { noremap = true, desc = "command history" })
 		map("n", "<leader>fr", snacks.picker.recent, { noremap = true, desc = "Recent" })
 		map("n", "<leader>sC", snacks.picker.commands, { noremap = true, desc = "Commands" })
