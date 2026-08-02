@@ -47,6 +47,7 @@ return {
 			"angular",
 			"go",
 			"sql",
+			"powershell"
 		}
 
 		if vim.fn.executable("tree-sitter") == 1 then
