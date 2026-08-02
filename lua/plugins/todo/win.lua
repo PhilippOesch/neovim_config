@@ -1,12 +1,13 @@
 local config = require("plugins.todo.config")
 
+local Log = require("utils.log")
+
 ---@class Todo.Win
 ---@field state Todo.State
 ---@field init fun(self: Todo.Win)
 ---@field open fun(self: Todo.Win)
 ---@field close fun(self: Todo.Win)
 ---@field toggle fun(self: Todo.Win)
-
 
 local function get_todo_path()
 	return _G.todo_path or config.config.todo_file
@@ -54,6 +55,7 @@ local function save_todo_file(state)
 		file:close()
 		vim.api.nvim_set_option_value("modified", false, { buf = state.buf })
 	else
+		Log.error("Failed to save todo file")
 		vim.notify("Failed to save todo file", vim.log.levels.ERROR)
 	end
 end
@@ -73,15 +75,15 @@ end
 ---comment
 ---@param file_path string
 local function ensure_file_exists(file_path)
-	vim.notify("Ensure path exists: " .. file_path, vim.log.levels.INFO)
+	Log.info("Ensure path exists: " .. file_path)
 	file_path = vim.fn.expand(file_path)
 	local parent_dir = vim.fn.fnamemodify(file_path, ":h")
-	vim.notify(parent_dir, vim.log.levels.INFO)
+	Log.info(parent_dir)
 
 	-- Create parent directory if it doesn't exist
 	if vim.fn.isdirectory(parent_dir) == 0 then
 		vim.fn.mkdir(parent_dir, "p")
-		vim.notify("create path" .. parent_dir)
+		Log.info("create path" .. parent_dir)
 	end
 
 	-- Create file with initial header if it doesn't exist
@@ -243,6 +245,5 @@ function Win:create_floating_window()
 		self:close()
 	end, { buffer = self.state.buf, noremap = true, silent = true, desc = "Close todo window" })
 end
-
 
 return Win
