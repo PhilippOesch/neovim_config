@@ -48,6 +48,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.lineforge"),
 	require("plugins.clipboard"),
 	require("plugins.testreport"),
+	require("plugins.liveserver"),
 })
 
 require("config.general")
