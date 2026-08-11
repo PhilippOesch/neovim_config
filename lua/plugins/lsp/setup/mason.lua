@@ -24,6 +24,12 @@ local vue_plugin = {
 -- Enable the following language servers
 local servers = {
 	html = {
+		init_options = {
+			embeddedLanguages = {
+				css = true,
+				javascript = false,
+			},
+		},
 		filetypes = { "html", "twig", "hbs", "tsx" },
 	},
 	gopls = {},

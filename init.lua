@@ -49,6 +49,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.clipboard"),
 	require("plugins.testreport"),
 	require("plugins.liveserver"),
+	require("plugins.otter"),
 })
 
 require("config.general")
