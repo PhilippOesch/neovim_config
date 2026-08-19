@@ -4,11 +4,11 @@ local M = {}
 
 --- rename that unducks angular lsp rename.
 local rename = function()
-	if utils.is_client_active("angularls") then
-		vim.lsp.buf.rename(nil, { name = "angularls" })
-	else
-		vim.lsp.buf.rename(nil, {})
-	end
+	vim.lsp.buf.rename(nil, {
+		filter = function(client)
+			return client.name ~= "angularls"
+		end,
+	})
 end
 
 ---@param event table attach event

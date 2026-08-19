@@ -22,14 +22,14 @@ end
 ---@type table<string,table<string, lsp.Handler>>
 local customHandlers = {
 	["angularls"] = {
-		["textDocument/rename"] = function(_, result, ctx)
-			if not result then
-				-- use typescript language server instead for renaming
-				vim.lsp.buf.rename(ctx.params.newName, { name = "vtsls" })
-				return
-			end
-			local res = vim.lsp.handlers["textDocument/rename"](_, result, ctx)
-		end,
+		-- ["textDocument/rename"] = function(_, result, ctx)
+		-- 	if not result then
+		-- 		-- use typescript language server instead for renaming
+		-- 		vim.lsp.buf.rename(ctx.params.newName, { name = "vtsls" })
+		-- 		return
+		-- 	end
+		-- 	local res = vim.lsp.handlers["textDocument/rename"](_, result, ctx)
+		-- end,
 	},
 }
 
@@ -94,10 +94,6 @@ M.on_attach = function(event)
 		marksman:stop()
 	elseif client and M.is_client_active("obsidian-ls") and client.name == "marksman" then
 		client:stop()
-	end
-
-	if client and customHandlers[client.name] then
-		client.handlers = vim.tbl_deep_extend("force", client.handlers or {}, customHandlers[client.name])
 	end
 
 	-- Diagnostic Config

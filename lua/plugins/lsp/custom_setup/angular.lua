@@ -69,6 +69,7 @@ local M = {}
 local lspHelpers = require("plugins.lsp.utils")
 
 function M.init()
+	---@type vim.lsp.Config
 	local config = {
 		cmd = function(dispatchers, config)
 			local root_dir = (config and config.root_dir) or fn.getcwd()
