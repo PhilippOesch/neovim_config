@@ -34,11 +34,12 @@ return {
 			tools = {
 				opencode = {},
 				gemini = {},
+				pi = {},
 			},
 		})
 
 		vim.keymap.set("n", "<leader>it", function()
-			require("sidekick.cli").toggle({ name = "opencode", focus = true })
+			require("sidekick.cli").toggle({ name = "pi", focus = true })
 		end, { desc = "Sidekick Toggle CLI" })
 		vim.keymap.set("n", "<leader>ib", function()
 			require("sidekick.cli").send({ msg = "{file}" })

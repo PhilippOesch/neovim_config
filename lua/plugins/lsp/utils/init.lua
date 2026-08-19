@@ -25,7 +25,7 @@ local customHandlers = {
 		["textDocument/rename"] = function(_, result, ctx)
 			if not result then
 				-- use typescript language server instead for renaming
-				vim.lsp.buf.rename(ctx.params.newName, { name = "typescript-tools" })
+				vim.lsp.buf.rename(ctx.params.newName, { name = "vtsls" })
 				return
 			end
 			local res = vim.lsp.handlers["textDocument/rename"](_, result, ctx)
