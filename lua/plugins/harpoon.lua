@@ -13,7 +13,7 @@ return {
 		local wk = require("which-key")
 		--
 		-- keymaps
-		vim.keymap.set("n", "<ctrl>h", function()
+		vim.keymap.set("n", "<leader>o", function()
 			require("harpoon.ui").toggle_quick_menu()
 		end, {
 			noremap = true,

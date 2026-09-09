@@ -46,10 +46,6 @@ body {
   padding-right: 45px;
 }
 
-#page-ctn {
-  max-width: 800px;
-}
-
 .markdown-body ol ol,
 .markdown-body ul ol,
 .markdown-body ol ul,
@@ -72,6 +68,9 @@ body {
   padding: 45px;
   -webkit-border-radius: 0 0 3px 3px;
   border-radius: 0 0 3px 3px;
+  max-width: 880px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .markdown-body > *:first-child {
   margin-top: 0 !important;
