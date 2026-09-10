@@ -41,6 +41,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.smear_nvim"),
 	require("plugins.obsidian_nvim"),
 	require("plugins.markdown_render"),
+	require("plugins.markdown_web_preview"),
 	require("plugins.dap.init"),
 	require("plugins.persisted_nvim"),
 	require("plugins.nvimcolorizer"),
