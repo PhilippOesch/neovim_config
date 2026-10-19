@@ -33,7 +33,7 @@ local plugins = require("utils.plugin_manager").new({
 	require("plugins.harpoon"),
 	require("plugins.blink_cmp"),
 	require("plugins.oil"),
-	require("plugins.kulala"),
+	require("plugins.rest"),
 	require("plugins.snacks"),
 	require("plugins.todo_comment"),
 	require("plugins.surround"),

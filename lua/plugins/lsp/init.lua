@@ -18,6 +18,13 @@ return {
 			group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
 
 			callback = function(event)
+				-- schematic templates contain `<% %>` tags, so they are not valid TS/HTML
+				if vim.api.nvim_buf_get_name(event.buf):match("%.template$") then
+					vim.schedule(function()
+						vim.lsp.buf_detach_client(event.buf, event.data.client_id)
+					end)
+					return
+				end
 				lspHelpers.on_attach(event)
 			end,
 		})

@@ -54,8 +54,7 @@ map("n", "gx", [[:execute '!open ' . shellescape(expand('<cfile>'), 1)<CR>]], op
 map("x", "p", "P", { silent = true })
 map("x", "P", "p", { silent = true })
 
-local ok, oil = pcall(require, 'oil')
-
+local ok, oil = pcall(require, "oil")
 
 local function getBufFileType()
 	local bufnr = vim.api.nvim_get_current_buf()
@@ -104,5 +103,10 @@ map("n", "<leader>cf", insertFullPath, { noremap = true, desc = "Copy full file 
 map("n", "<leader>cs", insertFileName, { noremap = true, desc = "Copy file name" })
 map("n", "<leader>cd", insertPwd, { noremap = true, desc = "Copy current working directory to clipboard." })
 map("n", "<leader>cp", insertCwdPath, { noremap = true, desc = "Copy filepath relative to current working directory" })
-map("n", "<leader>u", require("undotree").open, {noremap = true, desc = 'undootree'})
+map("n", "<leader>u", require("undotree").open, { noremap = true, desc = "undootree" })
 
+map("n", "<leader>%o", function()
+	local path = getBufFileType() == "oil" and oil.get_current_dir() or vim.fn.expand("%:p")
+	local winpath = vim.trim(vim.fn.system({ "wslpath", "-w", path }))
+	vim.system({ "/mnt/c/Windows/explorer.exe", winpath })
+end, { noremap = true, desc = "open (wsl compatible)" })

@@ -65,10 +65,6 @@
       "rev": "fae936abb5e0345b85c3a03ecf38525b0828b992",
       "src": "https://github.com/rebelot/heirline.nvim"
     },
-    "kulala.nvim": {
-      "rev": "6656c9d332735ca6a27725e0fb45a1715c4372d9",
-      "src": "https://github.com/mistweaverco/kulala.nvim"
-    },
     "lazydev.nvim": {
       "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
       "src": "https://github.com/folke/lazydev.nvim"
@@ -80,6 +76,11 @@
     "live-server.nvim": {
       "rev": "85915d0e7dd926a54b0082aaeafc10a82bfe8288",
       "src": "https://github.com/selimacerbas/live-server.nvim"
+    },
+    "lua-mimetypes": {
+      "rev": "7c899be0c402067d11e50d802f0135ba64eccb51",
+      "src": "https://github.com/lunarmodules/lua-mimetypes",
+      "version": "'7c899be0c402067d11e50d802f0135ba64eccb51'"
     },
     "markdown-preview.nvim": {
       "rev": "a923f5fc5ba36a3b17e289dc35dc17f66d0548ee",
@@ -244,6 +245,11 @@
       "rev": "0fd43fb4b1f073931c4b481f5f3b7cea3749e190",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
+    "rest.nvim": {
+      "rev": "de9726ab956e30202aafbcdea83c1d6bffe54227",
+      "src": "https://github.com/rest-nvim/rest.nvim",
+      "version": "'de9726ab956e30202aafbcdea83c1d6bffe54227'"
+    },
     "roslyn.nvim": {
       "rev": "f2ec6ee6384c3b611ddc817b9e78b20cd0334bbb",
       "src": "https://github.com/seblj/roslyn.nvim"
@@ -275,6 +281,11 @@
     "tokyonight.nvim": {
       "rev": "cdc07ac78467a233fd62c493de29a17e0cf2b2b6",
       "src": "https://github.com/folke/tokyonight.nvim"
+    },
+    "tree-sitter-http": {
+      "rev": "db8b4398de90b6d0b6c780aba96aaa2cd8e9202c",
+      "src": "https://github.com/rest-nvim/tree-sitter-http",
+      "version": "'db8b4398de90b6d0b6c780aba96aaa2cd8e9202c'"
     },
     "typescript-tools.nvim": {
       "rev": "c2f5910074103705661e9651aa841e0d7eea9932",
@@ -316,6 +327,11 @@
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
       "src": "https://github.com/folke/which-key.nvim"
+    },
+    "xml2lua": {
+      "rev": "b0d2b0b156b4e66078da2dc4b31d978daa69b3ef",
+      "src": "https://github.com/manoelcampos/xml2lua",
+      "version": "'b0d2b0b156b4e66078da2dc4b31d978daa69b3ef'"
     }
   }
 }

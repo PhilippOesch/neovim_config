@@ -36,6 +36,7 @@ return {
 			"jsx",
 			"javascript",
 			"typescript",
+			"embedded_template",
 			"jsdoc",
 			"vimdoc",
 			"vim",
@@ -58,6 +59,15 @@ return {
 			local msg = "`tree-sitter-cli` not found. Skipping auto-install of parsers."
 			vim.notify(msg, vim.log.levels.WARN, { title = "Treesitter" })
 		end
+
+		-- Angular schematics: `foo.ts.template` -> filetype of `foo.ts`
+		vim.filetype.add({
+			pattern = {
+				[".*%.template"] = function(path)
+					return (vim.filetype.match({ filename = (path:gsub("%.template$", "")) }))
+				end,
+			},
+		})
 
 		-- auto-start highlights & indentation
 		vim.api.nvim_create_autocmd("FileType", {
