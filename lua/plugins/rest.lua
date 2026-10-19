@@ -15,9 +15,15 @@ return {
 			local output = root .. "/parser/http.so"
 			vim.fn.mkdir(root .. "/parser", "p")
 			local linker = vim.uv.os_uname().sysname == "Darwin" and "-dynamiclib" or "-shared"
-			local result = vim.system({ "cc", "-O2", "-fPIC", linker, "-I" .. src, src .. "/parser.c", "-o", output }, { text = true }):wait()
+			local result = vim.system(
+				{ "cc", "-O2", "-fPIC", linker, "-I" .. src, src .. "/parser.c", "-o", output },
+				{ text = true }
+			):wait()
 			if result.code ~= 0 then
-				error("HTTP parser compilation failed; install a C compiler and retry :PackUpdate tree-sitter-http: " .. (result.stderr or ""))
+				error(
+					"HTTP parser compilation failed; install a C compiler and retry :PackUpdate tree-sitter-http: "
+						.. (result.stderr or "")
+				)
 			end
 		end,
 	},
