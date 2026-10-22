@@ -16,7 +16,7 @@ local plugins = require("utils.plugin_manager").new({
 	"https://github.com/tpope/vim-sleuth",
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/j-hui/fidget.nvim",
-	"https://github.com/esmuellert/vscode-diff.nvim",
+	"https://github.com/esmuellert/codediff.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
 	"https://github.com/nvim-mini/mini.test",
 	require("plugins.whichkey"),
