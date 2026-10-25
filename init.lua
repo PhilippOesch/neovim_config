@@ -56,3 +56,7 @@ require("config.general")
 require("config.keymaps")
 
 plugins:init()
+
+vim.api.nvim_create_user_command("PackUpdateSingle", function()
+	plugins:select_update()
+end, { desc = "Select and update a single installed plugin" })

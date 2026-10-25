@@ -125,4 +125,35 @@ function Manager:init()
 	end
 end
 
+--- Open vim.ui.select to choose an installed plugin and update it via vim.pack.update
+function Manager:select_update()
+	local ok, plugins = pcall(vim.pack.get)
+	if not ok then
+		vim.notify("Failed to list installed plugins: " .. tostring(plugins), vim.log.levels.ERROR)
+		return
+	end
+
+	table.sort(plugins, function(a, b)
+		return a.spec.name < b.spec.name
+	end)
+
+	if #plugins == 0 then
+		vim.notify("No installed plugins found", vim.log.levels.WARN)
+		return
+	end
+
+	local display = vim.iter(plugins)
+		:map(function(p)
+			return p.spec.name
+		end)
+		:totable()
+
+	vim.ui.select(display, { prompt = "Select plugin to update:" }, function(choice)
+		if not choice then
+			return
+		end
+		vim.pack.update({ choice })
+	end)
+end
+
 return M
