@@ -43,3 +43,25 @@ make test_file FILE=tests/plugins/statusline/test_highlight.lua
 
 The first run will automatically clone `mini.nvim` into `deps/`. Test files live under `tests/` and mirror the source structure in `lua/`.
 
+## Development Notes
+
+### Syntax checking
+
+Before committing, run:
+
+```bash
+make check
+```
+
+This parses every Lua file in the config with `nvim --headless` without executing it.
+
+### Locating Neovim runtime source
+
+When you need to verify the behavior of built-in APIs such as `vim.pack`, locate the runtime source instead of guessing:
+
+```bash
+nvim --headless -u NONE -c 'lua print(vim.fn.globpath(&rtp, "lua/vim/pack.lua"))' -c q
+```
+
+On macOS with Homebrew this is typically `/opt/homebrew/Cellar/neovim/<version>/share/nvim/runtime/lua/vim/pack.lua`.
+

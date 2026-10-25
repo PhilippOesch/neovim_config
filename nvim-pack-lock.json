@@ -29,6 +29,10 @@
       "rev": "680c445eb357c72129d175ea5d481aa9e92ae6a5",
       "src": "https://github.com/olimorris/codecompanion.nvim"
     },
+    "codediff.nvim": {
+      "rev": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e",
+      "src": "https://github.com/esmuellert/codediff.nvim"
+    },
     "conform.nvim": {
       "rev": "086a40dc7ed8242c03be9f47fbcee68699cc2395",
       "src": "https://github.com/stevearc/conform.nvim"
@@ -210,7 +214,7 @@
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "obsidian.nvim": {
-      "rev": "3d8a102e8fe970815e1108ab7e22d53654710001",
+      "rev": "03e7925d2ecd462dba7708b7ec4cf46b6eb4d8f2",
       "src": "https://github.com/obsidian-nvim/obsidian.nvim"
     },
     "oil-git-status.nvim": {
