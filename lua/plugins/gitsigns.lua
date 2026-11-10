@@ -16,8 +16,18 @@ local opts = {
 			vim.keymap.set(mode, l, r, opts)
 		end
 
+		local function in_codediff()
+			return require("codediff.ui.lifecycle").get_session(vim.api.nvim_get_current_tabpage()) ~= nil
+		end
+
 		-- Navigation
 		map({ "n", "v" }, "]c", function()
+			if in_codediff() then
+				vim.schedule(function()
+					require("codediff").next_hunk()
+				end)
+				return "<Ignore>"
+			end
 			if vim.wo.diff then
 				return "]c"
 			end
@@ -28,6 +38,12 @@ local opts = {
 		end, { expr = true, desc = "Jump to next hunk" })
 
 		map({ "n", "v" }, "[c", function()
+			if in_codediff() then
+				vim.schedule(function()
+					require("codediff").prev_hunk()
+				end)
+				return "<Ignore>"
+			end
 			if vim.wo.diff then
 				return "[c"
 			end
