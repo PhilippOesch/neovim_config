@@ -17,6 +17,8 @@ local obsidian_opts = {
 	footer = {
 		enabled = false,
 	},
+	legacy_commands = false,
+	-- see below for full list of options 👇
 	attachments = {
 		-- The default folder to place images in via `:ObsidianPasteImg`.
 		-- If this is a relative path it will be interpreted as relative to the vault root.
