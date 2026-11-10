@@ -1,26 +1,24 @@
 return {
 	deps = {
-		"https://github.com/ThePrimeagen/harpoon",
+		{ src = "https://github.com/ThePrimeagen/harpoon", version = "harpoon2" },
+		"https://github.com/nvim-lua/plenary.nvim",
 	},
 	init = function()
-		require("harpoon").setup({
-			menu = {
-				width = vim.api.nvim_win_get_width(0) - 4,
-			},
-		})
-		--
+		local harpoon = require("harpoon")
+		harpoon:setup()
+
 		local fmt = string.format
 		local wk = require("which-key")
 		--
 		-- keymaps
 		vim.keymap.set("n", "<leader>o", function()
-			require("harpoon.ui").toggle_quick_menu()
+			harpoon.ui:toggle_quick_menu(harpoon:list())
 		end, {
 			noremap = true,
 			desc = "Open Harpoon Marks View",
 		})
 		vim.keymap.set("n", "<leader>'", function()
-			require("harpoon.mark").add_file()
+			harpoon:list():add()
 		end, {
 			noremap = true,
 			desc = "Create Mark",
@@ -33,7 +31,7 @@ return {
 		local markDescBase = "Go to mark %d"
 		for i = 1, 9, 1 do
 			vim.keymap.set("n", fmt("<leader>%d", i), function()
-				require("harpoon.ui").nav_file(i)
+				harpoon:list():select(i)
 			end, {
 				noremap = true,
 				desc = fmt(markDescBase, i),
