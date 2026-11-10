@@ -1,4 +1,7 @@
 local obsidian_opts = {
+	picker = {
+		name = "snacks.picker", -- use snacks picker
+	},
 	workspaces = {
 		{
 			name = "personal",
@@ -6,8 +9,6 @@ local obsidian_opts = {
 		},
 	},
 	completion = {
-		-- Set to false to disable completion.
-		-- Trigger completion at 2 chars.
 		min_chars = 1,
 	},
 	ui = {
@@ -16,8 +17,6 @@ local obsidian_opts = {
 	footer = {
 		enabled = false,
 	},
-	legacy_commands = false,
-	-- see below for full list of options 👇
 	attachments = {
 		-- The default folder to place images in via `:ObsidianPasteImg`.
 		-- If this is a relative path it will be interpreted as relative to the vault root.

@@ -5,6 +5,7 @@ return {
 		{ src = "https://github.com/lunarmodules/lua-mimetypes", version = "7c899be0c402067d11e50d802f0135ba64eccb51" },
 		{ src = "https://github.com/manoelcampos/xml2lua", version = "b0d2b0b156b4e66078da2dc4b31d978daa69b3ef" },
 		{ src = "https://github.com/rest-nvim/tree-sitter-http", version = "db8b4398de90b6d0b6c780aba96aaa2cd8e9202c" },
+		{ src = "https://github.com/rest-nvim/rest.nvim", version = "de9726ab956e30202aafbcdea83c1d6bffe54227" },
 	},
 	build = {
 		plugin_name = "tree-sitter-http",
@@ -59,10 +60,6 @@ return {
 			pattern = "RestResponsePre",
 			callback = cookie_policy.on_response,
 		})
-		-- Rest checks dependencies while loading, before the wrapper's add completes.
-		vim.pack.add({
-			{ src = "https://github.com/rest-nvim/rest.nvim", version = "de9726ab956e30202aafbcdea83c1d6bffe54227" },
-		}, { confirm = false })
 		-- :Rest last skips pre-request validation; an autocmd error cannot stop curl.
 		require("rest-nvim.commands").register_subcommand("last", {
 			impl = function()
